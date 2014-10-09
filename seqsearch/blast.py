@@ -33,17 +33,20 @@ class BLASTquery(object):
        You can also call search.non_block_run() to run maybe searches in parallel.
        """
 
+    def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.query)
+
     def __init__(self, query_path, db_path,
+                 seq_type   = 'prot' or 'nucl',
                  params     = None,
-                 algorithm  = "blastn",
+                 algorithm  = "blastn" or "blastp",
                  version    = "plus" or "legacy",
                  out_path   = None,
                  executable = None,
                  cpus       = None):
         # Save attributes #
-        self.path = query_path
         self.query = FASTA(query_path)
-        self.db = FilePath(db_path)
+        self.db = BLASTdb(db_path, seq_type)
+        self.seq_type = seq_type
         self.version = version
         self.algorithm = algorithm
         self.params = params if params else {}

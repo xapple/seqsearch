@@ -26,24 +26,34 @@ class SeqSearch(object):
            - Number of threads to use
            - The desired output path
            - The filtering options:
-             * BLAST supported:   - Minimum identity
-                                  - E value
+              * BLAST supported:  - e-value
                                   - Maximum targets
+                                  - Minimum identity (via manual output format)
                                   - Minimum query coverage (via manual output format)
-             * USEARCH supported: - ?
-    Output: - Sorted list of identifiers in the database (object with significance value and identity attached)
+              * VSEARCH supported: - ?
+
+    Output: - Sorted list of identifiers in the database
+              (object with significance value and identity attached)
+
+    Other possible alogrithms:
+        * http://www.ncbi.nlm.nih.gov/pubmed/11932250
+        * http://ab.inf.uni-tuebingen.de/software/pauda/
+        * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
     """
 
-    def __init__(self, input_fasta, seq_type, database,
-                 algorithm   = 'blast',
+    def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.input_fasta)
+
+    def __init__(self, input_fasta, database,
+                 seq_type    = 'prot' or 'nucl',
+                 algorithm   = 'blast' or 'vsearch',
                  num_threads = None,
                  filtering   = None,
                  out_path    = None,
                  params      = None):
         # Base parameters #
         self.input_fasta = input_fasta
-        self.seq_type = seq_type
         self.database = database
+        self.seq_type = seq_type
         # Optional #
         self.algorithm = algorithm
         # The filtering options #
@@ -63,46 +73,8 @@ class SeqSearch(object):
     def query(self):
         """The similarity search object with all the relevant parameters."""
         if self.algorithm == 'blast':   return self.blast_query
-        if self.algorithm == 'usearch': return self.vsearch_query
+        if self.algorithm == 'vsearch': return self.vsearch_query
         raise NotImplemented(self.algorithm)
-
-    @property_cached
-    def blast_params(self):
-        """A dictionary of options to pass to the blast executable.
-        The params should depend on the filtering options."""
-        # Initialize #
-        params = self.params.copy()
-        # Defaults #
-        params['-num_threads'] = self.num_threads
-        # Conditionals #
-        if 'e_value'      in self.filtering: params['-evalue']          = self.filtering['e_value']
-        if 'max_targets'  in self.filtering: params['-max_target_seqs'] = self.filtering['max_targets']
-        # Depends on sequence type #
-        if self.seq_type == 'nucl':
-            if 'min_identity' in self.filtering: params['-perc_identity'] = self.filtering['min_identity'] * 100
-        # Return #
-        return params
-
-    @property_cached
-    def blast_query(self):
-        """Make a BLAST search object."""
-        # Sequence type #
-        if self.seq_type == 'nucl': blast_algo = 'blastn'
-        if self.seq_type == 'prot': blast_algo = 'blastp'
-        # The query object #
-        return BLASTquery(query_path = self.input_fasta,
-                          db_path    = self.database,
-                          params     = self.blast_params,
-                          algorithm  = blast_algo,
-                          version    = "plus",
-                          out_path   = self.out_path)
-
-    @property_cached
-    def vsearch_query(self):
-        """Make a VSEARCH search object."""
-        params = {}
-        query = VSEARCHquery(self.input_fasta, self.database, params)
-        return query
 
     def run(self):
         """Run the search"""
@@ -116,3 +88,37 @@ class SeqSearch(object):
     def results(self):
         """Parse the results."""
         return self.query.results
+
+    #-------------------------- BLAST IMPLEMTATION -------------------------#
+    @property_cached
+    def blast_params(self):
+        """A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options."""
+        params = self.params.copy()
+        if 'e_value'      in self.filtering: params['-evalue']          = self.filtering['e_value']
+        if 'max_targets'  in self.filtering: params['-max_target_seqs'] = self.filtering['max_targets']
+        return params
+
+    @property_cached
+    def blast_query(self):
+        """Make a BLAST search object."""
+        # Sequence type #
+        if self.seq_type == 'nucl': blast_algo = 'blastn'
+        if self.seq_type == 'prot': blast_algo = 'blastp'
+        # The query object #
+        return BLASTquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.blast_params,
+                          algorithm  = blast_algo,
+                          version    = "plus",
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path)
+
+    #-------------------------- VSEARCH IMPLEMTATION -------------------------#
+    @property_cached
+    def vsearch_query(self):
+        """Make a VSEARCH search object."""
+        params = {}
+        query = VSEARCHquery(self.input_fasta, self.database, params)
+        return query

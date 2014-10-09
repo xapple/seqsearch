@@ -28,7 +28,7 @@ class ParallelSeqSearch(SeqSearch):
     def queries(self):
         """A list of all the queries to run."""
         if self.algorithm == 'blast':   return self.blast_queries
-        if self.algorithm == 'usearch': return self.vsearch_queries
+        if self.algorithm == 'vsearch': return self.vsearch_queries
         raise NotImplemented(self.algorithm)
 
     @property_cached
@@ -40,6 +40,7 @@ class ParallelSeqSearch(SeqSearch):
         # Make many queries #
         return [BLASTquery(query_path = p,
                            db_path    = self.database,
+                           seq_type   = self.seq_type,
                            params     = self.blast_params,
                            algorithm  = blast_algo,
                            version    = "plus",
@@ -48,10 +49,7 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def vsearch_queries(self):
         """Make all VSEARCH search objects."""
-        # The params should depend on the filtering options #
-        params = {}
-        # Make many queries #
-        return [VSEARCHquery(p, self.database, params) for p in self.splitable.parts]
+        return [VSEARCHquery(p, self.database, self.vsearch_params) for p in self.splitable.parts]
 
     def run(self):
         """Run the search"""
