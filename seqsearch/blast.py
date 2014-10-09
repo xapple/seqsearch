@@ -2,7 +2,7 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing, threading, shutil
+import sys, os, multiprocessing, threading, shutil
 
 # Internal modules #
 from fasta import FASTA
@@ -42,13 +42,15 @@ class BLASTquery(object):
                  version    = "plus" or "legacy",
                  out_path   = None,
                  executable = None,
-                 cpus       = None):
+                 cpus       = None,
+                 num        = None):
         # Save attributes #
         self.query = FASTA(query_path)
         self.db = BLASTdb(db_path, seq_type)
         self.seq_type = seq_type
         self.version = version
         self.algorithm = algorithm
+        self.num = num
         self.params = params if params else {}
         self.executable = FilePath(executable)
         # Output #
@@ -81,12 +83,14 @@ class BLASTquery(object):
     def non_block_run(self):
         """Special method to run the query in a thread without blocking."""
         self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
         self.thread.start()
 
     def wait(self):
         """If you have run the query in a non-blocking way, call this method to pause
         until the query is finished."""
-        self.thread.join()
+        try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+        except KeyboardInterrupt: print "Stopped waiting on BLAST thread number %i" % self.num
 
     def filter(self, filtering):
         """We can do some special filtering on the results.
@@ -103,8 +107,8 @@ class BLASTquery(object):
             cov_position = self.params['-outfmt'].strip('"').split().index('qcovs') - 1
             idy_position = self.params['-outfmt'].strip('"').split().index('pident') - 1
             for line in blastout:
-                coverage = line.split()[cov_position]
-                identity = line.split()[idy_position]
+                coverage = float(line.split()[cov_position])
+                identity = float(line.split()[idy_position])
                 if coverage < cov_threshold: continue
                 if identity < idy_threshold: continue
                 else: yield line

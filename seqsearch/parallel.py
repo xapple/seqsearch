@@ -44,7 +44,8 @@ class ParallelSeqSearch(SeqSearch):
                            params     = self.blast_params,
                            algorithm  = blast_algo,
                            version    = "plus",
-                           cpus       = 1) for p in self.splitable.parts]
+                           cpus       = 1,
+                           num        = p.num) for p in self.splitable.parts]
 
     @property_cached
     def vsearch_queries(self):
