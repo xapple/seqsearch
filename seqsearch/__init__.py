@@ -7,7 +7,7 @@ __version__ = '0.0.1'
 import multiprocessing
 
 # Internal modules #
-from seqsearch.blast import BLASTquery
+from seqsearch.blast import BLASTquery, BLASTdb
 from seqsearch.vsearch import VSEARCHquery
 from plumbing.cache import property_cached
 from plumbing.autopaths import FilePath
@@ -103,9 +103,13 @@ class SeqSearch(object):
     @property_cached
     def blast_query(self):
         """Make a BLAST search object."""
-        # Sequence type #
-        if self.seq_type == 'nucl': blast_algo = 'blastn'
-        if self.seq_type == 'prot': blast_algo = 'blastp'
+        # Database sequence type #
+        self.database = BLASTdb(self.database)
+        # Query sequence type #
+        if self.seq_type == 'nucl' and self.database.seq_type == 'nucl': blast_algo = 'blastn'
+        if self.seq_type == 'prot' and self.database.seq_type == 'prot': blast_algo = 'blastp'
+        if self.seq_type == 'nucl' and self.database.seq_type == 'prot': blast_algo = 'blastx'
+        if self.seq_type == 'prot' and self.database.seq_type == 'nucl': blast_algo = 'tblastn'
         # The query object #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,
