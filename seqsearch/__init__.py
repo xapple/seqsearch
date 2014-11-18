@@ -100,16 +100,19 @@ class SeqSearch(object):
         if 'max_targets'  in self.filtering: params['-max_target_seqs'] = self.filtering['max_targets']
         return params
 
+    def select_blast_algo(self):
+      """Depends on the query type and the database type"""
+      self.database = BLASTdb(self.database)
+      if self.seq_type == 'nucl' and self.database.seq_type == 'nucl': return 'blastn'
+      if self.seq_type == 'prot' and self.database.seq_type == 'prot': return 'blastp'
+      if self.seq_type == 'nucl' and self.database.seq_type == 'prot': return 'blastx'
+      if self.seq_type == 'prot' and self.database.seq_type == 'nucl': return 'tblastn'
+
     @property_cached
     def blast_query(self):
         """Make a BLAST search object."""
-        # Database sequence type #
-        self.database = BLASTdb(self.database)
-        # Query sequence type #
-        if self.seq_type == 'nucl' and self.database.seq_type == 'nucl': blast_algo = 'blastn'
-        if self.seq_type == 'prot' and self.database.seq_type == 'prot': blast_algo = 'blastp'
-        if self.seq_type == 'nucl' and self.database.seq_type == 'prot': blast_algo = 'blastx'
-        if self.seq_type == 'prot' and self.database.seq_type == 'nucl': blast_algo = 'tblastn'
+        # Chose algorithm #
+        blast_algo = self.select_blast_algo()
         # The query object #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,

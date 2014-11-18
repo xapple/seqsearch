@@ -54,7 +54,7 @@ class ParallelSeqSearch(SeqSearch):
                            db_path    = self.database,
                            seq_type   = self.seq_type,
                            params     = self.blast_params,
-                           algorithm  = blast_algo,
+                           algorithm  = self.select_blast_algo(),
                            version    = "plus",
                            cpus       = 1,
                            num        = p.num) for p in self.splitable.parts]
