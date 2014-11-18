@@ -130,9 +130,10 @@ class BLASTdb(FASTA):
 
     def __repr__(self): return '<%s on "%s">' % (self.__class__.__name__, self.path)
 
-    def __init__(self, fasta_path, dbtype='nucl' or 'prot'):
+    def __init__(self, fasta_path, seq_type='nucl' or 'prot'):
+        if hasattr(self.fasta_path, 'seq_type'): self.seq_type = self.fasta_path.seq_type
+        else:                                    self.seq_type = seq_type
         FASTA.__init__(self, fasta_path)
-        self.dbtype = dbtype
 
     def makeblastdb(self):
-        sh.makeblastdb('-in', self.path, '-dbtype', self.dbtype)
+        sh.makeblastdb('-in', self.path, '-dbtype', self.seq_type)
