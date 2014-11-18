@@ -131,7 +131,7 @@ class BLASTdb(FASTA):
     def __repr__(self): return '<%s on "%s">' % (self.__class__.__name__, self.path)
 
     def __init__(self, fasta_path, seq_type='nucl' or 'prot'):
-        if hasattr(fasta_path, 'seq_type'): self.seq_type = self.fasta_path.seq_type
+        if hasattr(fasta_path, 'seq_type'): self.seq_type = fasta_path.seq_type
         else:                               self.seq_type = seq_type
         FASTA.__init__(self, fasta_path)
 
