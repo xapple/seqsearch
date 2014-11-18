@@ -111,14 +111,12 @@ class SeqSearch(object):
     @property_cached
     def blast_query(self):
         """Make a BLAST search object."""
-        # Chose algorithm #
-        blast_algo = self.select_blast_algo()
         # The query object #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,
                           seq_type   = self.seq_type,
                           params     = self.blast_params,
-                          algorithm  = blast_algo,
+                          algorithm  = self.select_blast_algo(),
                           version    = "plus",
                           cpus       = self.num_threads,
                           out_path   = self.out_path)
