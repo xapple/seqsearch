@@ -45,29 +45,30 @@ class BLASTquery(object):
                  cpus       = None,
                  num        = None):
         # Save attributes #
-        self.query = FASTA(query_path)
-        self.db = BLASTdb(db_path, seq_type)
-        self.seq_type = seq_type
-        self.version = version
+        self.query     = FASTA(query_path)
+        self.db        = BLASTdb(db_path, seq_type)
+        self.seq_type  = seq_type
+        self.version   = version
         self.algorithm = algorithm
-        self.num = num
-        self.params = params if params else {}
-        self.executable = FilePath(executable)
+        self.num       = num
+        self.params    = params if params else {}
         # Output #
-        if out_path is None: self.out_path = self.query.prefix_path + '.blastout'
+        if out_path is None:         self.out_path = self.query.prefix_path + '.blastout'
         elif out_path.endswith('/'): self.out_path = out_path + self.query.prefix + '.blastout'
-        else: self.out_path = out_path
+        else:                        self.out_path = out_path
         self.out_path = FilePath(self.out_path)
+        # Executable #
+        self.executable = FilePath(executable)
         # Cores to use #
         if cpus is None: self.cpus = multiprocessing.cpu_count()
-        else: self.cpus = cpus
+        else:            self.cpus = cpus
 
     @property
     def command(self):
         # Executable #
-        if self.executable: cmd = [self.executable.path]
+        if self.executable:            cmd = [self.executable.path]
         elif self.version == 'legacy': cmd = ["blastall", '-p', self.algorithm]
-        else: cmd = [self.algorithm]
+        else:                          cmd = [self.algorithm]
         # Essentials #
         if self.version == 'legacy': cmd += ['-d',  self.db, '-i',     self.query, '-o',   self.out_path, '-a',           self.cpus]
         if self.version == 'plus':   cmd += ['-db', self.db, '-query', self.query, '-out', self.out_path, '-num_threads', self.cpus]

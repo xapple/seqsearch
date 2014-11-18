@@ -16,12 +16,12 @@ class ParallelSeqSearch(SeqSearch):
     smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
 
     In addition, the pieces can be run separately on the local machine, or distributed to different
-    compute nodes using the SLURM system.
+    compute nodes using the SLURM system. #TODO
     """
 
     @property_cached
     def splitable(self):
-        """The input fasta file, but with the ability to split it."""
+        """The input fasta file as it is, but with the ability to split it."""
         return SplitableFASTA(self.input_fasta, self.num_threads)
 
     @property
@@ -31,6 +31,18 @@ class ParallelSeqSearch(SeqSearch):
         if self.algorithm == 'vsearch': return self.vsearch_queries
         raise NotImplemented(self.algorithm)
 
+    def run(self):
+        """Run the search"""
+        self.splitable.split()
+        for query in self.queries: query.non_block_run()
+        for query in self.queries: query.wait()
+        self.join_outputs()
+
+    def join_outputs(self):
+        """Join the outputs"""
+        shell_output('cat %s > %s' % (' '.join(q.out_path for q in self.queries), self.out_path))
+
+    #-------------------------- BLAST IMPLEMTATION -------------------------#
     @property_cached
     def blast_queries(self):
         """Make all BLAST search objects."""
@@ -47,18 +59,8 @@ class ParallelSeqSearch(SeqSearch):
                            cpus       = 1,
                            num        = p.num) for p in self.splitable.parts]
 
+    #-------------------------- VSEARCH IMPLEMTATION -------------------------#
     @property_cached
     def vsearch_queries(self):
         """Make all VSEARCH search objects."""
         return [VSEARCHquery(p, self.database, self.vsearch_params) for p in self.splitable.parts]
-
-    def run(self):
-        """Run the search"""
-        self.splitable.split()
-        for query in self.queries: query.non_block_run()
-        for query in self.queries: query.wait()
-        self.join_outputs()
-
-    def join_outputs(self):
-        """Join the outputs"""
-        shell_output('cat %s > %s' % (' '.join(q.out_path for q in self.queries), self.out_path))

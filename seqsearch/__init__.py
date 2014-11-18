@@ -19,20 +19,21 @@ class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
     as BLAST, USEARCH, BLAT etc.
 
-    Input: - List of sequences in a FASTA file
-           - The type of the sequences
-           - A database to search against
-           - The type of algorithm to use
-           - Number of threads to use
-           - The desired output path
+    Input: - Serie of sequences in a FASTA file.
+           - The type of the sequences.
+           - A database to search against.
+           - The type of algorithm to use. Currently BLAST or VSEARCH.
+           - Number of threads to use.
+           - The desired output path.
+           - An extra set of parameters to be given to the search command.
            - The filtering options:
-              * BLAST supported:  - e-value
-                                  - Maximum targets
-                                  - Minimum identity (via manual output format)
-                                  - Minimum query coverage (via manual output format)
+              * BLAST supported:   - e-value
+                                   - Maximum targets
+                                   - Minimum identity (via manual output format)
+                                   - Minimum query coverage (via manual output format)
               * VSEARCH supported: - ?
 
-    Output: - Sorted list of identifiers in the database
+    Output: - List of identifiers in the database
               (object with significance value and identity attached)
 
     Other possible alogrithms:
@@ -59,34 +60,34 @@ class SeqSearch(object):
         # The filtering options #
         if filtering is None: self.filtering = {}
         else: self.filtering = filtering
-        # Number of cores to use #
-        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
-        else: self.num_threads = num_threads
         # Output path #
         if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + '.' + algorithm + 'out')
         else: self.out_path = FilePath(out_path)
-        # Extra params to be past to the search algorithm #
-        if num_threads is None: self.params = {}
-        else: self.params = params
+        # Number of cores to use #
+        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
+        else:                   self.num_threads = num_threads
+        # Extra params to be given to the search algorithm #
+        if params is None: self.params = {}
+        else:              self.params = params
 
     @property
     def query(self):
-        """The similarity search object with all the relevant parameters."""
+        """The actual search object with all the relevant parameters."""
         if self.algorithm == 'blast':   return self.blast_query
         if self.algorithm == 'vsearch': return self.vsearch_query
-        raise NotImplemented(self.algorithm)
+        raise NotImplemented("The algorithm '%s' is not supported" % self.algorithm)
 
     def run(self):
-        """Run the search"""
+        """Run the search."""
         return self.query.run()
 
     def filter(self):
-        """Filter the results accordingly"""
+        """Filter the results accordingly."""
         return self.query.filter(self.filtering)
 
     @property
     def results(self):
-        """Parse the results."""
+        """Parse the results in a meaningful manner."""
         return self.query.results
 
     #-------------------------- BLAST IMPLEMTATION -------------------------#
