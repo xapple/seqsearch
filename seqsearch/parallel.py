@@ -46,10 +46,6 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def blast_queries(self):
         """Make all BLAST search objects."""
-        # Sequence type #
-        if self.seq_type == 'nucl': blast_algo = 'blastn'
-        if self.seq_type == 'prot': blast_algo = 'blastp'
-        # Make many queries #
         return [BLASTquery(query_path = p,
                            db_path    = self.database,
                            seq_type   = self.seq_type,
