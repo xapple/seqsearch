@@ -1,6 +1,6 @@
 # Built-in modules #
 import time
-from urllib.error import HTTPError
+from urllib2.error import HTTPError
 
 # Internal modules #
 
