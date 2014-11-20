@@ -35,7 +35,7 @@ class UtilsNCBI(object):
             return records[0]['Lineage']
 
     #-------------------------------------------------------------------------#
-    def gis_to_records(self, gis, progress=False):
+    def gis_to_records(self, gis, progress=True):
         """Download information from NCBI in batch mode.
         Return a dictionary with gi numbers as keys and records
         as values."""
@@ -64,6 +64,7 @@ class UtilsNCBI(object):
             records  = list(Entrez.parse(response, validate=validate))
             return records
         except (HTTPError, CorruptedXMLError):
+            print "Failed downloading %i records, trying again\n" % len(chunk)
             return self.chunk_to_records(chunk)
 
     def record_to_taxonomy(self, record): return record['GBSeq_taxonomy']
