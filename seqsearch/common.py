@@ -64,7 +64,7 @@ class UtilsNCBI(object):
             records  = list(Entrez.parse(response, validate=validate))
             return records
         except (HTTPError, CorruptedXMLError):
-            print "Failed downloading %i records, trying again\n" % len(chunk)
+            print "\nFailed downloading %i records, trying again\n" % len(chunk)
             return self.chunk_to_records(chunk)
 
     def record_to_taxonomy(self, record): return record['GBSeq_taxonomy']
