@@ -135,5 +135,7 @@ class BLASTdb(FASTA):
         else:                               self.seq_type = seq_type
         FASTA.__init__(self, fasta_path)
 
-    def makeblastdb(self):
-        sh.makeblastdb('-in', self.path, '-dbtype', self.seq_type)
+    def makeblastdb(self, logfile=None):
+        options = ['-in', self.path, '-dbtype', self.seq_type]
+        if logfile: options += ['-logfile', logfile]
+        sh.makeblastdb(*options)
