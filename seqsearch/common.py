@@ -67,6 +67,7 @@ class UtilsNCBI(object):
             print "\nFailed downloading %i records, trying again\n" % len(chunk)
             return self.chunk_to_records(chunk)
 
+    #-------------------------------------------------------------------------#
     def record_to_taxonomy(self, record): return record['GBSeq_taxonomy']
 
     def record_to_source(self, record):
