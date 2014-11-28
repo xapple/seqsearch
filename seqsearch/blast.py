@@ -9,10 +9,14 @@ from fasta import FASTA
 from plumbing.tmpstuff import new_temp_path
 from plumbing.autopaths import FilePath
 from plumbing.cache import property_cached
-from plumbing.slurm import SLURMjob
+from plumbing.slurm.job import JobSLURM
 
 # Third party modules #
 import sh
+from ftputil import FTPHost
+
+# Constants #
+home = os.environ['HOME'] + '/'
 
 ###############################################################################
 class BLASTquery(object):
@@ -40,7 +44,7 @@ class BLASTquery(object):
     def __init__(self, query_path, db_path,
                  seq_type     = 'prot' or 'nucl',     # The seq type of the query_path file
                  params       = None,                 # Add extra params for the command line
-                 algorithm    = "blastn" or "blastp", # Will be autodetermined with seq_type
+                 algorithm    = "blastn" or "blastp", # Will be autodetermined with seq_type
                  version      = "plus" or "legacy",   # Either blast+ or the old `blastall`
                  out_path     = None,                 # Where the results will be dropped
                  executable   = None,                 # If you want a specific binary give the path
@@ -103,11 +107,11 @@ class BLASTquery(object):
         except KeyboardInterrupt: print "Stopped waiting on BLAST thread number %i" % self.num
 
     @property_cached
-    def run_slurm(self):
+    def slurm_job(self):
         """If you have access to a cluster with a SLURM queuing system, this property
         will return a SLURMjob object from which you can submit and check the status
         of the job."""
-        return SLURMjob(self.command, **self.slurm_params)
+        return JobSLURM(' '.join(self.command), 'bash', self.out_path.directory, **self.slurm_params)
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):
@@ -152,7 +156,22 @@ class BLASTdb(FASTA):
         else:                               self.seq_type = seq_type
         FASTA.__init__(self, fasta_path)
 
-    def makeblastdb(self, logfile=None):
+    def makeblastdb(self, logfile=None, out=None):
+        # Message #
+        print "Calling `makeblastdb` on '%s'..." % self
+        # Options #
         options = ['-in', self.path, '-dbtype', self.seq_type]
         if logfile: options += ['-logfile', logfile]
-        sh.makeblastdb(*options)
+        # Call the program #
+        if out: sh.makeblastdb(*options, _out=out)
+        else:   sh.makeblastdb(*options)
+
+###############################################################################
+def install_blast(base_dir=home + 'programs/blast/'):
+    ftp_url = "ftp.ncbi.nlm.nih.gov"
+    ftp_dir = "/blast/executables/blast+/LATEST/"
+    pattern = 'ncbi-blast-*+-src.zip'
+    ftp = FTPHost(ftp_url, "anonymous")
+    ftp.chdir(ftp_dir)
+    files = ftp.listdir(self.ftp.curdir)
+    ftp.download(source, dest)

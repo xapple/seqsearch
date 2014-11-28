@@ -14,7 +14,6 @@ import sh
 class VSEARCHquery(object):
     """A vsearch job."""
 
-
     def __init__(self, query_path, db_path,
                  params = None,
                  out_path = None,

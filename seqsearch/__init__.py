@@ -45,12 +45,12 @@ class SeqSearch(object):
     def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.input_fasta)
 
     def __init__(self, input_fasta, database,
-                 seq_type    = 'prot' or 'nucl',
-                 algorithm   = 'blast' or 'vsearch',
-                 num_threads = None,
-                 filtering   = None,
-                 out_path    = None,
-                 params      = None):
+                 seq_type    = 'prot' or 'nucl',      # What sequence type is the input fasta
+                 algorithm   = 'blast' or 'vsearch',  # Which implementation do you want
+                 num_threads = None,                  # How many processes to use
+                 filtering   = None,                  # The result filtering options
+                 out_path    = None,                  # Where the .blastout file will be
+                 params      = None):                 # Add extra params for the command line
         # Base parameters #
         self.input_fasta = input_fasta
         self.database = database
@@ -59,7 +59,7 @@ class SeqSearch(object):
         self.algorithm = algorithm
         # The filtering options #
         if filtering is None: self.filtering = {}
-        else: self.filtering = filtering
+        else:                 self.filtering = filtering
         # Output path #
         if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + '.' + algorithm + 'out')
         else: self.out_path = FilePath(out_path)
