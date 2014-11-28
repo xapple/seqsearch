@@ -47,7 +47,7 @@ class SeqSearch(object):
     def __init__(self, input_fasta, database,
                  seq_type    = 'prot' or 'nucl',      # What sequence type is the input fasta
                  algorithm   = 'blast' or 'vsearch',  # Which implementation do you want
-                 num_threads = None,                  # How many processes to use
+                 num_threads = None,                  # How many processes to use
                  filtering   = None,                  # The result filtering options
                  out_path    = None,                  # Where the .blastout file will be
                  params      = None):                 # Add extra params for the command line

@@ -30,7 +30,7 @@ class ParallelSeqSearch(SeqSearch):
                  num_parts     = None,   # How many fasta pieces should we make
                  part_size     = None,   # What size in MB should a fasta piece be
                  seqs_per_part = None,   # How many sequences in one fasta piece
-                 slurm_params  = None,   # Additional parameters for possible SLURM jobs
+                 slurm_params  = None,   # Additional parameters for possible SLURM jobs
                  parts_dir     = None,   # If you want a special direcotry for the fasta pieces
                  **kwargs):
         # Determine number of parts #

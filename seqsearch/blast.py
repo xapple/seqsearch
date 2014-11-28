@@ -163,8 +163,8 @@ class BLASTdb(FASTA):
         options = ['-in', self.path, '-dbtype', self.seq_type]
         if logfile: options += ['-logfile', logfile]
         # Call the program #
-        if out: sh.makeblastdb(*options, _out=out)
-        else:   sh.makeblastdb(*options)
+        if out is not None: sh.makeblastdb(*options, _out=out)
+        else:               sh.makeblastdb(*options)
 
 ###############################################################################
 def install_blast(base_dir=home + 'programs/blast/'):
