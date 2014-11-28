@@ -64,6 +64,12 @@ class Database(object):
         """The files we have downloaded."""
         return map(FASTA, self.p.raw_dir.contents)
 
+    @property
+    def sequences(self):
+        """All the sequences from all the files."""
+        for fasta in self.raw_files:
+            for seq in fasta: yield seq
+
 ###############################################################################
 class RefSeqBacteriaProtNR(Database):
     """the RefSeq sequences for only bacteria, only protein, and only the
