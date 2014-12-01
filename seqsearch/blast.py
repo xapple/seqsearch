@@ -161,9 +161,10 @@ class BLASTdb(FASTA):
         print "Calling `makeblastdb` on '%s'..." % self
         # Options #
         options = ['-in', self.path, '-dbtype', self.seq_type]
-        if logfile: options += ['-logfile', logfile]
+        # Add a log file #
+        if logfile is not None: options += ['-logfile', logfile]
         # Call the program #
-        if out is not None: sh.makeblastdb(*options, _out=out)
+        if out is not None: sh.makeblastdb(*options, _out=str(out))
         else:               sh.makeblastdb(*options)
 
 ###############################################################################
