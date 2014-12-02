@@ -79,7 +79,7 @@ class String(object):
     @property
     def mappings(self):
         """The cog mappings."""
-        return TSVTable(self.p.unzipped_proteins)
+        return TSVTable(self.p.unzipped_mappings)
 
     @property
     def blast_db(self):
