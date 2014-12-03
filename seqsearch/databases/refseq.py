@@ -8,6 +8,7 @@ from fasta import FASTA
 # First party modules #
 from plumbing.autopaths import AutoPaths, FilePath
 from plumbing.cache import property_cached
+from plumbing.common import natural_sort
 
 # Third party modules #
 from ftputil import FTPHost
@@ -43,6 +44,7 @@ class Database(object):
     def files_to_retrive(self):
         """The files we want to download with their destinations."""
         files = self.ftp.listdir(self.ftp.curdir)
+        files.sort(key=natural_sort)
         return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in files
                             if fnmatch.fnmatch(f, self.pattern))
 
