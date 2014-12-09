@@ -43,7 +43,7 @@ class UtilsNCBI(object):
         progress = tqdm if progress else lambda x:x
         # Do it by chunks #
         gis = list(gis)
-        at_a_time = 100
+        at_a_time = 400
         result = {}
         # Main loop #
         for i in progress(range(0, len(gis), at_a_time)):
