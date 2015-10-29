@@ -1,8 +1,9 @@
 # Built-in modules #
-import os
+import os, sh
 
 # Internal modules #
 from seqsearch.databases import Database
+from plumbing.autopaths import DirectoryPath, FilePath, AutoPaths
 
 # Constants #
 home = os.environ['HOME'] + '/'
@@ -24,9 +25,15 @@ class Pfam(Database):
         pfam.unzip()
     """
 
+    all_paths = """
+    /raw/
+    /unzipped/
+    /specific/
+    """
+
     short_name = "pfam"
     ftp_url    = "ftp.ebi.ac.uk"
-    ftp_dir    = "/pub/databases/Pfam/releases/Pfam28.0/"
+    ftp_dir    = "/pub/databases/Pfam/current_release/"
     pattern    = 'Pfam-A.hmm.gz'
 
     @property
@@ -35,3 +42,26 @@ class Pfam(Database):
 
 ###############################################################################
 pfam = Pfam("hmm")
+
+###############################################################################
+class SpecificFamily(Database):
+    """When you are interested in having an HMM 'database' with only
+    one specific Pfam in it.
+    """
+
+    all_paths = """
+    /model.hmm
+    """
+
+    def __init__(self, fam_name):
+        self.fam_name = fam_name
+        self.base_dir = DirectoryPath(pfam.p.specific_dir + self.fam_name)
+        self.p        = AutoPaths(self.base_dir, self.all_paths)
+
+    @property
+    def hmm_db(self):
+        hmm_db = self.p.model
+        if not hmm_db.exists:
+            print sh.hmmfetch('-o', hmm_db, pfam.hmm_db, self.fam_name)
+            assert hmm_db
+        return hmm_db

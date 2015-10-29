@@ -29,7 +29,7 @@ class Database(object):
     def __init__(self, seq_type):
         # Attributes #
         self.seq_type = seq_type
-        self.base_dir = base_directory + self.short_name
+        self.base_dir = base_directory + self.short_name + '/'
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached
