@@ -31,7 +31,7 @@ class Pfam(Database):
 
     @property
     def hmm_db(self):
-        return self.p.unzipped_dir.contents[0]
+        return self.p.unzipped_dir.contents.next()
 
 ###############################################################################
 pfam = Pfam("hmm")
