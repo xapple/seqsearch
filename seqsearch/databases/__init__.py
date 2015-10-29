@@ -60,6 +60,10 @@ class Database(object):
             self.ftp.download(source, dest)
             dest.permissions.only_readable()
 
+    def unzip(self):
+        """Unzip them"""
+        for f in self.raw_files: f.ungzip_to(self.p.unzipped_dir + f.prefix)
+
     @property
     def raw_files(self):
         """The files we have downloaded."""
@@ -67,6 +71,6 @@ class Database(object):
 
     @property
     def sequences(self):
-        """All the sequences from all the files."""
+        """All the sequences from all the raw files."""
         for fasta in self.raw_files:
             for seq in fasta: yield seq
