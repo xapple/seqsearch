@@ -2,9 +2,6 @@
 import os, fnmatch
 from collections import OrderedDict
 
-# Internal modules #
-from seqsearch.databases import Database
-
 # First party modules #
 from plumbing.autopaths import AutoPaths, FilePath
 from plumbing.cache import property_cached
