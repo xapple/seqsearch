@@ -22,6 +22,7 @@ class Database(object):
 
     all_paths = """
     /raw/
+    /unzipped/
     /blast_db/
     """
 

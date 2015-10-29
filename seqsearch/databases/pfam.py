@@ -21,15 +21,14 @@ class Pfam(Database):
     ftp_dir    = "/pub/databases/Pfam/releases/Pfam28.0/"
     pattern    = 'Pfam-A.hmm.gz'
 
-    @property
-    def raw_files(self):
-        """The files we have downloaded."""
-        pass
 
     @property
-    def sequences(self):
-        """All the sequences from all the files."""
+    def hmm_db(self):
         pass
+
+    def unzip(self):
+        """Unzip them"""
+        for f in self.raw_files: f.ungzip_to(self.p.unzipped_dir + f.prefix)
 
 ###############################################################################
 pfam = Pfam("hmm")
