@@ -1,20 +1,15 @@
 # Built-in modules #
-import os, urllib
+import urllib
 from collections import OrderedDict
 
 # Internal modules #
 from seqsearch.blast import BLASTdb
+from seqsearch.databases import base_directory
 
 # First party modules #
 from fasta import FASTA
 from plumbing.autopaths import AutoPaths, FilePath
 from plumbing.csv_tables import TSVTable
-
-# Third party modules #
-
-# Constants #
-home = os.environ['HOME'] + '/'
-directory = home + "/databases/"
 
 ###############################################################################
 class String(object):
@@ -37,7 +32,7 @@ class String(object):
 
     def __init__(self, seq_type='prot'):
         self.seq_type = seq_type
-        self.base_dir = directory + self.short_name
+        self.base_dir = base_directory + self.short_name
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
     @property
