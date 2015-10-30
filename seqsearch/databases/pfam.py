@@ -83,7 +83,7 @@ class SpecificFamily(object):
         if not fasta.exists:
             fasta.create()
             for seq in pfam.fasta:
-                if self.fam_name in seq.id: fasta.add_seq(seq)
+                if self.fam_name in seq.description: fasta.add_seq(seq)
             fasta.close()
             assert fasta
         return fasta
