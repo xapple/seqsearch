@@ -31,13 +31,14 @@ class Pfam(Database):
     /raw/
     /unzipped/Pfam-A.hmm
     /unzipped/Pfam-A.fasta
+    /unzipped/Pfam-A.seed
     /specific/
     """
 
     short_name = "pfam"
     ftp_url    = "ftp.ebi.ac.uk"
     ftp_dir    = "/pub/databases/Pfam/current_release/"
-    files      = ("Pfam-A.hmm.gz", "Pfam-A.fasta.gz")
+    files      = ("Pfam-A.hmm.gz", "Pfam-A.fasta.gz", "Pfam-A.seed.gz")
 
     @property_cached
     def hmm_db(self):
@@ -50,17 +51,24 @@ class Pfam(Database):
         fasta = FASTA(self.p.fasta)
         return fasta
 
+    @property_cached
+    def seeds(self):
+        seeds = FASTA(self.p.seed)
+        return seeds
+
 ###############################################################################
 pfam = Pfam("hmm")
 
 ###############################################################################
 class SpecificFamily(object):
     """When you are interested in having an HMM 'database' with only
-    one specific Pfam in it."""
+    one specific Pfam in it. As well as the associated proteins that
+    are part of it."""
 
     all_paths = """
     /model.hmm
     /proteins.fasta
+    /subsampled.fasta
     """
 
     def __init__(self, fam_name):
@@ -87,3 +95,10 @@ class SpecificFamily(object):
             fasta.close()
             assert fasta
         return fasta
+
+    @property_cached
+    def subsampled(self):
+        subsampled = FASTA(self.p.subsampled)
+        if not subsampled.exists:
+            self.fasta.subsample(self, down_to=30, new_path=subsampled)
+        return subsampled
