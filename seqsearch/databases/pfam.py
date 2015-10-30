@@ -110,12 +110,17 @@ class SpecificFamily(object):
 
     def add_taxonomy(self, fasta):
         """Add taxonomic information to the fastas file"""
-        from Bio import Entrez
-        Entrez.email = "test@example.com"
-        ids          = [seq.description for seq in fasta]
-        accesions    = [seq.description.split()[1] for seq in fasta]
-        response     = Entrez.efetch(db="nucleotide", id=accesions, retmode="xml")
-        records      = list(Entrez.parse(response, validate=True))
-        result       = [' (' + rec['GBSeq_taxonomy'] + ')' for rec in records]
-        naming_dict  = {ids[i]: ids[i] + result[i] for i in range(len(ids))}
+        ids        = [seq.description for seq in fasta]
+        accesions  = [seq.description.split()[1] for seq in fasta]
+        taxonomies = map(self.uniprot_acc_to_taxonmy, accesions)
+        naming_dict  = {ids[i]: ids[i] + taxonomies[i] for i in range(len(ids))}
         fasta.rename_sequences(naming_dict, in_place=True)
+
+    def uniprot_acc_to_taxonmy(self, accesion):
+        """From one uniprot ID to taxonomy"""
+        from bioservices import UniProt
+        u = UniProt()
+        data = u.search(accesion, frmt="xml")
+        from bs4 import BeautifulSoup
+        soup = BeautifulSoup(data)
+        return ' ( ' + ', '.join([t.text for t in soup.find_all('taxon')]) + ')'
