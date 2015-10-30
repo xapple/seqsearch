@@ -42,10 +42,14 @@ class Database(object):
     @property_cached
     def files_to_retrive(self):
         """The files we want to download with their destinations."""
-        files = self.ftp.listdir(self.ftp.curdir)
-        files.sort(key=natural_sort)
-        return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in files
-                            if fnmatch.fnmatch(f, self.pattern))
+        if hasattr(self, "pattern"):
+            files = self.ftp.listdir(self.ftp.curdir)
+            files.sort(key=natural_sort)
+            return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in files
+                                if fnmatch.fnmatch(f, self.pattern))
+        if hasattr(self, "files"):
+            return OrderedDict((f, FilePath(self.p.raw_dir + f)) for f in self.files)
+
 
     @property
     def files_remaining(self):

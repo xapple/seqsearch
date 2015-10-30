@@ -35,12 +35,7 @@ class Pfam(Database):
     short_name = "pfam"
     ftp_url    = "ftp.ebi.ac.uk"
     ftp_dir    = "/pub/databases/Pfam/current_release/"
-
-    @property
-    def files_to_retrive(self):
-        """The files we want to download with their destinations."""
-        return OrderedDict([("Pfam-A.hmm",   self.p.raw_dir + "Pfam-A.hmm"),
-                            ("Pfam-A.fasta", self.p.raw_dir + "Pfam-A.fasta")])
+    files      = ("Pfam-A.hmm", "Pfam-A.fasta")
 
     @property
     def hmm_db(self):
