@@ -78,6 +78,7 @@ class SpecificFamily(object):
 
     @property_cached
     def hmm_db(self):
+        """Create an HMM 'database' with only one profile in it."""
         hmm_db = self.p.model
         hmm_db.seqtype = 'hmm_prot'
         if not hmm_db.exists:
@@ -87,6 +88,8 @@ class SpecificFamily(object):
 
     @property_cached
     def fasta(self):
+        """Make a fasta file with all uniprot proteins that are related to
+        this family."""
         fasta = FASTA(self.p.proteins)
         if not fasta.exists:
             fasta.create()
@@ -94,7 +97,22 @@ class SpecificFamily(object):
                 if self.fam_name in seq.description: fasta.add_seq(seq)
             fasta.close()
             assert fasta
+        # Add taxonomy #
+        self.add_taxonomy(fasta)
+        # Return #
         return fasta
+
+    def add_taxonomy(self, fasta):
+        """Add taxonomic information to the fastas file"""
+        from Bio import Entrez
+        Entrez.email = "test@example.com"
+        ids          = [seq.description for seq in fasta]
+        accesions    = [seq.description.split()[1] for seq in fasta]
+        response     = Entrez.efetch(db="nucleotide", id=accesions, retmode="xml")
+        records      = list(Entrez.parse(response, validate=True))
+        result       = [' (' + rec['GBSeq_taxonomy'] + ')' for rec in records]
+        naming_dict  = {ids[i]: ids[i] + result[i] for i in range(len(ids))}
+        fasta.renbame
 
     @property_cached
     def subsampled(self):
