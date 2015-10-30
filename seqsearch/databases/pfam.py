@@ -79,7 +79,7 @@ class SpecificFamily(object):
 
     @property_cached
     def fasta(self):
-        fasta = self.p.proteins
+        fasta = FASTA(self.p.proteins)
         if not fasta.exists:
             fasta.create()
             for seq in pfam.fasta:
