@@ -49,7 +49,7 @@ class BLASTquery(object):
                  out_path     = None,                 # Where the results will be dropped
                  executable   = None,                 # If you want a specific binary give the path
                  cpus         = None,                 # The number of threads to use
-                 num          = None,                 # The number
+                 num          = None,                 # When parallelizing, the number of this thread
                  slurm_params = None):                # If you have special slurm parameters
         # Save attributes #
         self.query        = FASTA(query_path)

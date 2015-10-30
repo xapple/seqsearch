@@ -1,9 +1,10 @@
 # Built-in modules #
 import os, sh
+from collections import OrderedDict
 
 # Internal modules #
 from seqsearch.databases import Database
-from plumbing.autopaths import DirectoryPath, FilePath, AutoPaths
+from plumbing.autopaths import DirectoryPath, AutoPaths
 
 # Constants #
 home = os.environ['HOME'] + '/'
@@ -34,20 +35,26 @@ class Pfam(Database):
     short_name = "pfam"
     ftp_url    = "ftp.ebi.ac.uk"
     ftp_dir    = "/pub/databases/Pfam/current_release/"
-    pattern    = 'Pfam-A.hmm.gz'
+
+    @property
+    def files_to_retrive(self):
+        """The files we want to download with their destinations."""
+        return OrderedDict([("Pfam-A.hmm",   self.p.raw_dir + "Pfam-A.hmm"),
+                            ("Pfam-A.fasta", self.p.raw_dir + "Pfam-A.fasta")])
 
     @property
     def hmm_db(self):
-        return self.p.unzipped_dir.contents.next()
+        hmm_db = self.p.unzipped_dir.contents.next()
+        hmm_db.seqtype = 'hmm_prot'
+        return hmm_db
 
 ###############################################################################
 pfam = Pfam("hmm")
 
 ###############################################################################
-class SpecificFamily(Database):
+class SpecificFamily(object):
     """When you are interested in having an HMM 'database' with only
-    one specific Pfam in it.
-    """
+    one specific Pfam in it."""
 
     all_paths = """
     /model.hmm
@@ -61,6 +68,7 @@ class SpecificFamily(Database):
     @property
     def hmm_db(self):
         hmm_db = self.p.model
+        hmm_db.seqtype = 'hmm_prot'
         if not hmm_db.exists:
             print sh.hmmfetch('-o', hmm_db, pfam.hmm_db, self.fam_name)
             assert hmm_db

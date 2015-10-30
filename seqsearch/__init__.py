@@ -7,8 +7,9 @@ __version__ = '0.0.1'
 import multiprocessing
 
 # Internal modules #
-from seqsearch.blast import BLASTquery, BLASTdb
+from seqsearch.blast   import BLASTquery, BLASTdb
 from seqsearch.vsearch import VSEARCHquery
+from seqsearch.hmmer   import HMMERquery
 from plumbing.cache import property_cached
 from plumbing.autopaths import FilePath
 
@@ -17,9 +18,9 @@ from plumbing.autopaths import FilePath
 ################################################################################
 class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
-    as BLAST, USEARCH, BLAT etc.
+    as BLAST, USEARCH, HMMER, BLAT etc.
 
-    Input: - Serie of sequences in a FASTA file.
+    Input: - Series of sequences in a FASTA file.
            - The type of the sequences.
            - A database to search against.
            - The type of algorithm to use. Currently BLAST or VSEARCH.
@@ -32,6 +33,7 @@ class SeqSearch(object):
                                    - Minimum identity (via manual output format)
                                    - Minimum query coverage (via manual output format)
               * VSEARCH supported: - ?
+              * HMMER supported:   - e-value
 
     Output: - List of identifiers in the database
               (object with significance value and identity attached)
@@ -40,6 +42,7 @@ class SeqSearch(object):
         * http://www.ncbi.nlm.nih.gov/pubmed/11932250
         * http://ab.inf.uni-tuebingen.de/software/pauda/
         * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
+        * Diamond
     """
 
     def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.input_fasta)
@@ -53,8 +56,8 @@ class SeqSearch(object):
                  params      = None):                 # Add extra params for the command line
         # Base parameters #
         self.input_fasta = input_fasta
-        self.database = database
-        self.seq_type = seq_type
+        self.database    = database
+        self.seq_type    = seq_type
         # Optional #
         self.algorithm = algorithm
         # The filtering options #
@@ -75,6 +78,7 @@ class SeqSearch(object):
         """The actual search object with all the relevant parameters."""
         if self.algorithm == 'blast':   return self.blast_query
         if self.algorithm == 'vsearch': return self.vsearch_query
+        if self.algorithm == 'hmmer':   return self.hmmer_query
         raise NotImplemented("The algorithm '%s' is not supported" % self.algorithm)
 
     def run(self):
@@ -90,7 +94,7 @@ class SeqSearch(object):
         """Parse the results in a meaningful manner."""
         return self.query.results
 
-    #-------------------------- BLAST IMPLEMTATION -------------------------#
+    #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_params(self):
         """A dictionary of options to pass to the blast executable.
@@ -120,10 +124,27 @@ class SeqSearch(object):
                           cpus       = self.num_threads,
                           out_path   = self.out_path)
 
-    #-------------------------- VSEARCH IMPLEMTATION -------------------------#
+    #------------------------- VSEARCH IMPLEMENTATION ------------------------#
     @property_cached
     def vsearch_query(self):
         """Make a VSEARCH search object."""
         params = {}
         query = VSEARCHquery(self.input_fasta, self.database, params)
         return query
+
+    #-------------------------- HMMER IMPLEMENTATION -------------------------#
+    @property_cached
+    def hmmer_params(self):
+        params = self.params.copy()
+        if 'e_value' in self.filtering: params['-E'] = self.filtering['e_value']
+        return params
+
+    @property_cached
+    def hmmer_query(self):
+        """Make a HMMER search object."""
+        return HMMERquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.hmmer_params,
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path)
