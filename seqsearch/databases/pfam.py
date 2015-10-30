@@ -100,5 +100,5 @@ class SpecificFamily(object):
     def subsampled(self):
         subsampled = FASTA(self.p.subsampled)
         if not subsampled.exists:
-            self.fasta.subsample(self, down_to=30, new_path=subsampled)
+            self.fasta.subsample(down_to=30, new_path=subsampled)
         return subsampled
