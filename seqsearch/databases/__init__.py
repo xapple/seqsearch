@@ -48,8 +48,7 @@ class Database(object):
             return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in files
                                 if fnmatch.fnmatch(f, self.pattern))
         if hasattr(self, "files"):
-            return OrderedDict((f, FilePath(self.p.raw_dir + f)) for f in self.files)
-
+            return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in self.files)
 
     @property
     def files_remaining(self):

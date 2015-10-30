@@ -35,7 +35,7 @@ class Pfam(Database):
     short_name = "pfam"
     ftp_url    = "ftp.ebi.ac.uk"
     ftp_dir    = "/pub/databases/Pfam/current_release/"
-    files      = ("Pfam-A.hmm", "Pfam-A.fasta")
+    files      = ("Pfam-A.hmm.gz", "Pfam-A.fasta.gz")
 
     @property
     def hmm_db(self):
