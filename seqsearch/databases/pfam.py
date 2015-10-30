@@ -122,5 +122,5 @@ class SpecificFamily(object):
         u = UniProt()
         data = u.search(accesion, frmt="xml")
         from bs4 import BeautifulSoup
-        soup = BeautifulSoup(data)
+        soup = BeautifulSoup(data, "html.parser")
         return ' ( ' + ', '.join([t.text for t in soup.find_all('taxon')]) + ')'
