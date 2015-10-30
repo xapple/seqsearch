@@ -1,10 +1,11 @@
 # Built-in modules #
 import os, sh
-from collections import OrderedDict
 
-# Internal modules #
+# First party modules #
 from seqsearch.databases import Database
 from plumbing.autopaths import DirectoryPath, AutoPaths
+from plumbing.cache import property_cached
+from fasta import FASTA
 
 # Constants #
 home = os.environ['HOME'] + '/'
@@ -28,7 +29,8 @@ class Pfam(Database):
 
     all_paths = """
     /raw/
-    /unzipped/
+    /unzipped/Pfam-A.hmm
+    /unzipped/Pfam-A.fasta
     /specific/
     """
 
@@ -37,11 +39,16 @@ class Pfam(Database):
     ftp_dir    = "/pub/databases/Pfam/current_release/"
     files      = ("Pfam-A.hmm.gz", "Pfam-A.fasta.gz")
 
-    @property
+    @property_cached
     def hmm_db(self):
-        hmm_db = self.p.unzipped_dir.contents.next()
+        hmm_db = self.p.hmm
         hmm_db.seqtype = 'hmm_prot'
         return hmm_db
+
+    @property_cached
+    def fasta(self):
+        fasta = FASTA(self.p.fasta)
+        return fasta
 
 ###############################################################################
 pfam = Pfam("hmm")
