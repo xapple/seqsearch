@@ -60,6 +60,7 @@ class SpecificFamily(object):
 
     all_paths = """
     /model.hmm
+    /proteins.fasta
     """
 
     def __init__(self, fam_name):
@@ -67,7 +68,7 @@ class SpecificFamily(object):
         self.base_dir = DirectoryPath(pfam.p.specific_dir + self.fam_name)
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
-    @property
+    @property_cached
     def hmm_db(self):
         hmm_db = self.p.model
         hmm_db.seqtype = 'hmm_prot'
@@ -75,3 +76,14 @@ class SpecificFamily(object):
             print sh.hmmfetch('-o', hmm_db, pfam.hmm_db, self.fam_name)
             assert hmm_db
         return hmm_db
+
+    @property_cached
+    def fasta(self):
+        fasta = self.p.proteins
+        if not fasta.exists:
+            fasta.create()
+            for seq in pfam.fasta:
+                if self.fam_name in seq.id: fasta.add_seq(seq)
+            fasta.close()
+            assert fasta
+        return fasta
