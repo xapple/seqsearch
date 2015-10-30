@@ -97,10 +97,16 @@ class SpecificFamily(object):
                 if self.fam_name in seq.description: fasta.add_seq(seq)
             fasta.close()
             assert fasta
-        # Add taxonomy #
-        self.add_taxonomy(fasta)
         # Return #
         return fasta
+
+    @property_cached
+    def subsampled(self):
+        subsampled = FASTA(self.p.subsampled)
+        if not subsampled.exists:
+            self.fasta.subsample(down_to=30, new_path=subsampled)
+            self.add_taxonomy(subsampled)
+        return subsampled
 
     def add_taxonomy(self, fasta):
         """Add taxonomic information to the fastas file"""
@@ -112,11 +118,4 @@ class SpecificFamily(object):
         records      = list(Entrez.parse(response, validate=True))
         result       = [' (' + rec['GBSeq_taxonomy'] + ')' for rec in records]
         naming_dict  = {ids[i]: ids[i] + result[i] for i in range(len(ids))}
-        fasta.renbame
-
-    @property_cached
-    def subsampled(self):
-        subsampled = FASTA(self.p.subsampled)
-        if not subsampled.exists:
-            self.fasta.subsample(down_to=30, new_path=subsampled)
-        return subsampled
+        fasta.rename_sequences(naming_dict, in_place=True)
