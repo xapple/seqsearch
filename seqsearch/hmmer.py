@@ -2,7 +2,7 @@
 from __future__ import division
 
 # Built-in modules #
-import os, multiprocessing
+import multiprocessing
 
 # Internal modules #
 from fasta import FASTA
@@ -10,9 +10,6 @@ from plumbing.autopaths import FilePath
 
 # Third party modules #
 import sh
-
-# Constants #
-home = os.environ['HOME'] + '/'
 
 ###############################################################################
 class HMMERquery(object):
