@@ -15,9 +15,6 @@ from plumbing.slurm.job import JobSLURM
 import sh
 from ftputil import FTPHost
 
-# Constants #
-home = os.environ['HOME'] + '/'
-
 ###############################################################################
 class BLASTquery(object):
     """A blast job. Possibly the standard BLAST algorithm or
@@ -168,7 +165,10 @@ class BLASTdb(FASTA):
         else:               sh.makeblastdb(*options)
 
 ###############################################################################
-def install_blast(base_dir=home + 'programs/blast/'):
+def install_blast(base_dir):
+    # Default location #
+    if base_dir is None: base_dir = os.environ.get('HOME', '/') + '/programs/blast/'
+    # Download from FTP #
     ftp_url = "ftp.ncbi.nlm.nih.gov"
     ftp_dir = "/blast/executables/blast+/LATEST/"
     pattern = 'ncbi-blast-*+-src.zip'
