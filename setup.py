@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name             = 'seqsearch',
-    version          = '1.0.3',
+    version          = '1.0.4',
     description      = 'Sequence similarity searches made easy.',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqsearch',
