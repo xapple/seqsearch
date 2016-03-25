@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
       name             = 'seqsearch',
-      version          = '1.0.0',
+      version          = '1.0.1',
       description      = 'Sequence similarity searches made easy.',
       long_description = open('README.md').read(),
       license          = 'MIT',
