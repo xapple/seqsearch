@@ -1,6 +1,6 @@
 [![changelog](http://allmychanges.com/p/python/seqsearch/badge/)](http://allmychanges.com/p/python/seqsearch/?utm_source=badge) [![PyPI version](https://badge.fury.io/py/seqsearch.svg)](https://badge.fury.io/py/seqsearch)
 
-# `seqsearch` version 1.0.2
+# `seqsearch` version 1.0.3
 
 Sequence similarity searches made easy
 
