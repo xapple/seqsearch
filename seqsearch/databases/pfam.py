@@ -1,14 +1,11 @@
 # Built-in modules #
-import os, sh
+import sh
 
 # First party modules #
 from seqsearch.databases import Database
 from plumbing.autopaths import DirectoryPath, AutoPaths
 from plumbing.cache import property_cached
 from fasta import FASTA
-
-# Constants #
-home = os.environ['HOME'] + '/'
 
 ###############################################################################
 class Pfam(Database):
