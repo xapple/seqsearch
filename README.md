@@ -1,4 +1,4 @@
-# seqsearch version 0.0.1
+# seqsearch version 1.0.0
 
 Sequence similarity searches made easy
 
