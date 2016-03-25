@@ -12,10 +12,6 @@ from fasta import FASTA
 from ftputil import FTPHost
 from tqdm import tqdm
 
-# Constants #
-home = os.environ['HOME'] + '/'
-base_directory = home + "/databases/"
-
 ###############################################################################
 class Database(object):
     """General database object to inherit from."""
@@ -26,10 +22,12 @@ class Database(object):
     /blast_db/
     """
 
-    def __init__(self, seq_type):
+    def __init__(self, seq_type, base_dir=None):
         # Attributes #
         self.seq_type = seq_type
-        self.base_dir = base_directory + self.short_name + '/'
+        # Base directory #
+        if base_dir is None: base_dir = os.environ.get('HOME', '/') + '/'
+        self.base_dir = base_dir + 'databases/' + self.short_name + '/'
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached
