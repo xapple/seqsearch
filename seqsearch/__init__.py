@@ -18,7 +18,7 @@ from plumbing.autopaths import FilePath
 ################################################################################
 class SeqSearch(object):
     """A sequence similarity search. Could use different algorithms such
-    as BLAST, USEARCH, HMMER, BLAT etc.
+    as BLAST, VSEARCH, HMMER, BLAT etc.
 
     Input: - Series of sequences in a FASTA file.
            - The type of the sequences.

@@ -22,6 +22,8 @@ class Pfam(Database):
         from seqsearch.databases.pfam import pfam
         pfam.download()
         pfam.unzip()
+
+    It will put it in ~/databases/pfam
     """
 
     all_paths = """
@@ -40,7 +42,7 @@ class Pfam(Database):
     @property_cached
     def hmm_db(self):
         hmm_db = self.p.hmm
-        hmm_db.seqtype = 'hmm_prot'
+        hmm_db.seq_type = 'hmm_prot'
         return hmm_db
 
     @property_cached
@@ -54,7 +56,7 @@ class Pfam(Database):
         return seeds
 
 ###############################################################################
-pfam = Pfam("hmm")
+pfam = Pfam("hmm_prot")
 
 ###############################################################################
 class SpecificFamily(object):

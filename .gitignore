@@ -11,6 +11,9 @@
 # IDE files #
 /.idea
 
+# Distribution #
+dist/
+
 # Automatic documentation #
 documentation/automatic
 documentation/html
