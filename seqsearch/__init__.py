@@ -9,7 +9,7 @@ import multiprocessing
 # Internal modules #
 from seqsearch.blast   import BLASTquery, BLASTdb
 from seqsearch.vsearch import VSEARCHquery
-from seqsearch.hmmer   import HMMERquery
+from seqsearch.hmmer   import HmmQuery
 from plumbing.cache import property_cached
 from plumbing.autopaths import FilePath
 
@@ -142,9 +142,9 @@ class SeqSearch(object):
     @property_cached
     def hmmer_query(self):
         """Make a HMMER search object."""
-        return HMMERquery(query_path = self.input_fasta,
-                          db_path    = self.database,
-                          seq_type   = self.seq_type,
-                          params     = self.hmmer_params,
-                          cpus       = self.num_threads,
-                          out_path   = self.out_path)
+        return HmmQuery(query_path = self.input_fasta,
+                        db_path    = self.database,
+                        seq_type   = self.seq_type,
+                        params     = self.hmmer_params,
+                        cpus       = self.num_threads,
+                        out_path   = self.out_path)
