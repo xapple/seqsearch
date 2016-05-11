@@ -46,4 +46,4 @@ class Tigrfam(Database):
         return seeds
 
 ###############################################################################
-tigrfam = tigrfam("hmm_prot")
+tigrfam = Tigrfam("hmm_prot")
