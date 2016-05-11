@@ -5,7 +5,8 @@ from __future__ import division
 import warnings, multiprocessing
 
 # Internal modules #
-from seqsearch.databases.pfam import pfam
+from seqsearch.databases.pfam    import pfam
+from seqsearch.databases.tigrfam import tigrfam
 
 # First party modules #
 from fasta import FASTA
@@ -33,7 +34,7 @@ class HmmQuery(object):
     def __nonzero__(self): return bool(self.out_path)
     def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.query)
 
-    def __init__(self, query_path,
+    def __init__(self, query_path,                    # The input sequences
                  db_path      = pfam.hmm_db,          # The database to search
                  seq_type     = 'prot' or 'nucl',     # The seq type of the query_path file
                  e_value      = 0.001,                # The search threshold
@@ -52,7 +53,8 @@ class HmmQuery(object):
         if cpus is None: self.cpus = min(multiprocessing.cpu_count(), 32)
         else:            self.cpus = cpus
         # Auto detect database short name #
-        if db_path == 'pfam': self.db = pfam.hmm_db
+        if db_path == 'pfam':    self.db = pfam.hmm_db
+        if db_path == 'tigrfam': self.db = tigrfam.hmm_db
         # Output #
         if out_path is None:         self.out_path = FilePath(self.query.prefix_path + '.hmmout')
         elif out_path.endswith('/'): self.out_path = FilePath(out_path + self.query.prefix + '.hmmout')
@@ -85,10 +87,11 @@ class HmmQuery(object):
         assert self.db.exists
         # Check if query is not empty #
         if self.query.count_bytes == 0:
-            warnings.warn("Hmm search on a file with no sequences", RuntimeWarning)
+            message = "Hmm search on a file with no sequences. File at '%s'"
+            warnings.warn(message % self.query, RuntimeWarning)
             return False
         # Do it #
-        return sh.Command(self.command[0])(['--cpu', str(cpus)] + self.command[1:])
+        sh.Command(self.command[0])(['--cpu', str(cpus)] + self.command[1:])
 
     @property
     def hits(self):
