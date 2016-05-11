@@ -36,13 +36,13 @@ class Tigrfam(Database):
 
     @property_cached
     def hmm_db(self):
-        hmm_db = self.p.hmm
+        hmm_db = self.p.HMM
         hmm_db.seq_type = 'hmm_prot'
         return hmm_db
 
     @property_cached
     def seeds(self):
-        seeds = FASTA(self.p.seed)
+        seeds = FASTA(self.p.SEED)
         return seeds
 
 ###############################################################################
