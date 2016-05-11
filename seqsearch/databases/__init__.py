@@ -70,7 +70,7 @@ class Database(object):
         """Unzip them"""
         for f in self.raw_files:
             f.ungzip_to(self.p.unzipped_dir + f.prefix)
-            FilePath(self.p.unzipped_dir + f.prefix).only_readable()
+            FilePath(self.p.unzipped_dir + f.prefix).permissions.only_readable()
 
     @property
     def sequences(self):
