@@ -14,6 +14,7 @@ from plumbing.slurm.job import JobSLURM
 # Third party modules #
 import sh
 from ftputil import FTPHost
+import Bio.Blast.NCBIXML
 
 ###############################################################################
 class BLASTquery(object):
@@ -47,7 +48,9 @@ class BLASTquery(object):
                  executable   = None,                 # If you want a specific binary give the path
                  cpus         = None,                 # The number of threads to use
                  num          = None,                 # When parallelizing, the number of this thread
-                 slurm_params = None):                # If you have special slurm parameters
+                 slurm_params = None,                 # If you have special slurm parameters
+                 _out         = None,                 # Store the stdout at this path
+                 _err         = None):                # Store the stderr at this path
         # Save attributes #
         self.query        = FASTA(query_path)
         self.db           = BLASTdb(db_path, seq_type)
@@ -57,6 +60,8 @@ class BLASTquery(object):
         self.num          = num
         self.params       = params if params else {}
         self.slurm_params = slurm_params if slurm_params else {}
+        self._out         = _out
+        self._err         = _err
         # Output #
         if out_path is None:         self.out_path = self.query.prefix_path + '.blastout'
         elif out_path.endswith('/'): self.out_path = out_path + self.query.prefix + '.blastout'
@@ -68,6 +73,10 @@ class BLASTquery(object):
         # Cores to use #
         if cpus is None: self.cpus = multiprocessing.cpu_count()
         else:            self.cpus = cpus
+        # Auto detect XML output #
+        if self.out_path.extension == '.xml':
+            if self.version == 'legacy': self.params['-xxxx']   = '5'
+            if self.version == 'plus':   self.params['-outfmt'] = '5'
 
     @property
     def command(self):
@@ -87,8 +96,10 @@ class BLASTquery(object):
 
     #-------------------------------- RUNNING --------------------------------#
     def run(self):
-        """Simply run the BLAST search locally"""
-        sh.Command(self.command[0])(self.command[1:])
+        """Simply run the BLAST search locally."""
+        out = self._out if self._out else '/dev/null'
+        err = self._err if self._err else '/dev/null'
+        sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
 
     def non_block_run(self):
@@ -140,7 +151,13 @@ class BLASTquery(object):
     @property
     def results(self):
         """Parse the results."""
-        for line in self.out_path: yield line.split()
+        # Check for XML #
+        if self.params.get('-outfmt', 0) == '5':
+            with open(self.out_path, 'rb') as handle:
+                for entry in Bio.Blast.NCBIXML.parse(handle): yield entry
+        # Default case #
+        else:
+            for line in self.out_path: yield line.split()
 
 ###############################################################################
 class BLASTdb(FASTA):

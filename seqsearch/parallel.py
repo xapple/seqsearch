@@ -45,7 +45,7 @@ class ParallelSeqSearch(SeqSearch):
             self.num_parts = int(math.ceil(input_fasta.count / seqs_per_part))
         # Default case #
         if self.num_parts is None:
-            self.num_parts = kwargs.get('num_threads', multiprocessing.cpu_count())
+            self.num_parts = kwargs.get('num_threads', min(multiprocessing.cpu_count(), 32))
         # In case the user has some special slurm params #
         self.slurm_params = slurm_params
         # In case the user wants a special parts directory #

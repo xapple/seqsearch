@@ -52,12 +52,16 @@ class SeqSearch(object):
                  algorithm   = 'blast' or 'vsearch',  # Which implementation do you want
                  num_threads = None,                  # How many processes to use
                  filtering   = None,                  # The result filtering options
-                 out_path    = None,                  # Where the .blastout file will be
-                 params      = None):                 # Add extra params for the command line
+                 out_path    = None,                  # Where the out file will be
+                 params      = None,                  # Add extra params for the command line
+                 _out        = None,                  # Store the stdout at this path
+                 _err        = None):                 # Store the stderr at this path
         # Base parameters #
         self.input_fasta = input_fasta
         self.database    = database
         self.seq_type    = seq_type
+        self._out        = _out
+        self._err        = _err
         # Optional #
         self.algorithm = algorithm
         # The filtering options #
@@ -67,7 +71,7 @@ class SeqSearch(object):
         if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + '.' + algorithm + 'out')
         else: self.out_path = FilePath(out_path)
         # Number of cores to use #
-        if num_threads is None: self.num_threads = multiprocessing.cpu_count()
+        if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
         else:                   self.num_threads = num_threads
         # Extra params to be given to the search algorithm #
         if params is None: self.params = {}
@@ -122,7 +126,9 @@ class SeqSearch(object):
                           algorithm  = self.select_blast_algo(),
                           version    = "plus",
                           cpus       = self.num_threads,
-                          out_path   = self.out_path)
+                          out_path   = self.out_path,
+                          _out       = self._out,
+                          _err       = self._err)
 
     #------------------------- VSEARCH IMPLEMENTATION ------------------------#
     @property_cached
