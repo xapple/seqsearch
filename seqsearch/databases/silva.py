@@ -64,6 +64,5 @@ class Silva(Database):
         self.aligned_dest.ungzip_to(self.aligned)
         self.aligned.permissions.only_readable()
 
-
 ###############################################################################
 silva = Silva("123", "nucl")
