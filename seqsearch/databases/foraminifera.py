@@ -25,9 +25,10 @@ class Foraminifera(Database):
     """
 
     short_name = "foraminifera"
+    long_name  = 'The custom made Foraminifera database as received by email on 7th April 2017'
 
     all_paths = """
-    /foram_db_flo.fasta
+    /foram_db_cor.fasta
     /foram_mothur.fasta
     /foram_mothur.tax
     """
@@ -40,10 +41,12 @@ class Foraminifera(Database):
         # The results #
         self.alignment = FASTA(self.p.mothur_fasta)
         self.taxonomy  = FilePath(self.p.mothur_tax)
+        # The part that mothur will use for naming files #
+        self.nickname = "foram_mothur"
 
     def process(self):
         # The file that was received by email T_T #
-        raw = FASTA(self.p.flo)
+        raw = FASTA(self.p.cor)
         # Open files #
         self.alignment.create()
         self.taxonomy.create()

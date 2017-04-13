@@ -28,6 +28,7 @@ class SilvaMothur(Database):
 
     base_url   = "https://www.mothur.org/w/images/b/b4/"
     short_name = "silva_mothur"
+    long_name  = 'The Silva version 128 database (mothur version)'
 
     all_paths = """
     /silva.tgz
