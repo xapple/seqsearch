@@ -28,6 +28,8 @@ class Foraminifera(Database):
 
     all_paths = """
     /foram_db_flo.fasta
+    /foram_mothur.fasta
+    /foram_mothur.tax
     """
 
     def __init__(self, base_dir=None):
@@ -36,18 +38,23 @@ class Foraminifera(Database):
         self.base_dir = base_dir + 'databases/' + self.short_name + '/'
         self.p        = AutoPaths(self.base_dir, self.all_paths)
         # The results #
-        self.alignment = FilePath(self.base_dir + "a")
-        self.taxonomy  = FilePath(self.base_dir + "a")
+        self.alignment = FASTA(self.p.mothur_fasta)
+        self.taxonomy  = FilePath(self.p.mothur_tax)
 
     def process(self):
+        # The file that was received by email T_T #
         raw = FASTA(self.p.flo)
         # Open files #
+        self.alignment.create()
+        self.taxonomy.create()
         # Loop #
         for seq in raw:
+            # Parse #
             name = seq.id[11:].split('|')
             num  = name.pop(0)
             # Check #
             for x in name: assert ';' not in x
+            for x in name: assert '\t' not in x
             # Make ranks #
             ranks = ['Eukaryota'                       , # Domain
                      'Foraminifera'                    , # Phylum
@@ -56,16 +63,15 @@ class Foraminifera(Database):
                      name[2] + " (" + name[3] + ")"    , # Family
                      name[4]                           , # Genus
                      name[5]]                            # Species
-            tax = ';'.join(ranks)
+            # The taxonomy string #
+            tax_line = ';'.join(ranks)
             # Add sequence to the new fasta file #
-
+            self.alignment.add_str(str(seq.seq), name=num)
             # Add the taxonomy to the tax file #
-            print num, tax #TODO
+            self.taxonomy.add_str(num + '\t' + tax_line + '\n')
         # Close files #
-
-
-    def unzip(self):
-        pass
+        self.alignment.close()
+        self.taxonomy.close()
 
 ###############################################################################
 foraminifera = Foraminifera()
