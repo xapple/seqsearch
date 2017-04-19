@@ -34,6 +34,17 @@ class SilvaMothur(Database):
     /silva.tgz
     """
 
+    @property
+    def rank_names(self):
+        """The names of the ranks."""
+        return ['Domain',
+                'Phylum',
+                'Class',
+                'Order',
+                'Family',
+                'Genus',
+                'Species']
+
     def __init__(self, version, base_dir=None):
         # Attributes #
         self.version    = version
@@ -54,6 +65,7 @@ class SilvaMothur(Database):
 
     def download(self):
         self.dest.directory.create(safe=True)
+        self.dest.remove(safe=True)
         print "\nDownloading", self.url
         wget.download(self.url, out=self.dest.path)
 

@@ -17,10 +17,12 @@ class Foraminifera(Database):
 
     https://genev.unige.ch/research/laboratory/Jan-Pawlowski
 
-    You should place the file "foram_db_flo.fasta" in:  ~/databases/foraminifera/
+    You should place the file "foram_db_cor.fasta" in:  ~/databases/foraminifera/
     Then you can run this:
     
             from seqsearch.databases.foraminifera import foraminifera
+            foraminifera.process()
+            print pr_two.tax_depth_freq
 
     """
 
@@ -32,6 +34,19 @@ class Foraminifera(Database):
     /foram_mothur.fasta
     /foram_mothur.tax
     """
+
+    @property
+    def rank_names(self):
+        """The names of the ranks."""
+        return ['Domain',
+                'Kingdom',
+                'Phylum',
+                'Class',
+                'Order',
+                'Family',
+                'Tribe',
+                'Genus',
+                'Species']
 
     def __init__(self, base_dir=None):
         # Base directory #
@@ -45,7 +60,7 @@ class Foraminifera(Database):
         self.nickname = "foram_mothur"
 
     def process(self):
-        # The file that was received by email T_T #
+        # The file that was received by email without documentation T_T #
         raw = FASTA(self.p.cor)
         # Open files #
         self.alignment.create()
@@ -60,18 +75,20 @@ class Foraminifera(Database):
             for x in name: assert '\t' not in x
             # Make ranks #
             ranks = ['Eukaryota'                       , # Domain
+                     'Rhizaria'                        , # Kingdom
                      'Foraminifera'                    , # Phylum
                      name[0]                           , # Class
                      name[1]                           , # Order
-                     name[2] + " (" + name[3] + ")"    , # Family
+                     name[2]                           , # Family
+                     name[3]                           , # Tribe
                      name[4]                           , # Genus
                      name[5]]                            # Species
             # The taxonomy string #
             tax_line = ';'.join(ranks)
             # Add sequence to the new fasta file #
-            self.alignment.add_str(str(seq.seq), name=num)
+            self.alignment.add_str(str(seq.seq), name="foram" + num)
             # Add the taxonomy to the tax file #
-            self.taxonomy.add_str(num + '\t' + tax_line + '\n')
+            self.taxonomy.add_str("foram" + num + '\t' + tax_line + '\n')
         # Close files #
         self.alignment.close()
         self.taxonomy.close()

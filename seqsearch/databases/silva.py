@@ -56,6 +56,8 @@ class Silva(Database):
 
     def download(self):
         self.nr99_dest.directory.create(safe=True)
+        self.nr99_dest.remove(safe=True)
+        self.aligned_dest.remove(safe=True)
         print "\nDownloading", self.base_url + self.url + self.nr99_name
         wget.download(self.base_url + self.url + self.nr99_name,    out=self.nr99_dest.path)
         print "\nDownloading", self.base_url + self.url + self.aligned_name

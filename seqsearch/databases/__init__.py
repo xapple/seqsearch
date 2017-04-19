@@ -1,6 +1,6 @@
 # Built-in modules #
 import os, fnmatch
-from collections import OrderedDict
+from collections import OrderedDict, Counter
 
 # First party modules #
 from plumbing.autopaths import AutoPaths, FilePath
@@ -77,3 +77,14 @@ class Database(object):
         """All the sequences from all the raw files."""
         for fasta in self.raw_files:
             for seq in fasta: yield seq
+
+    #-------------------------------------------------------------------------#
+    @property_cached
+    def tax_depth_freq(self):
+        def depths():
+           with open(self.taxonomy, 'r') as handle:
+               for line in handle:
+                   line = line.strip('\n')
+                   otu_name, species = line.split('\t')
+                   yield len(species.split(';'))
+        return Counter(depths())
