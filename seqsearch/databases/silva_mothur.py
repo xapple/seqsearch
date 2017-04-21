@@ -36,14 +36,14 @@ class SilvaMothur(Database):
 
     @property
     def rank_names(self):
-        """The names of the ranks."""
-        return ['Domain',
-                'Phylum',
-                'Class',
-                'Order',
-                'Family',
-                'Genus',
-                'Species']
+        """The names of the ranks. Total 7 ranks."""
+        return ['Domain',    # 0
+                'Phylum',    # 1
+                'Class',     # 2
+                'Order',     # 3
+                'Family',    # 4
+                'Genus',     # 5
+                'Species']   # 6
 
     def __init__(self, version, base_dir=None):
         # Attributes #

@@ -19,6 +19,7 @@ class PrTwo(Database):
     https://figshare.com/articles/PR2_rRNA_gene_database/3803709
 
     To install:
+    
         from seqsearch.databases.pr_two import pr_two
         pr_two.download()
         pr_two.unzip()
@@ -40,7 +41,7 @@ class PrTwo(Database):
 
     @property
     def rank_names(self):
-        """The names of the ranks."""
+        """The names of the ranks. Total 9 ranks."""
         return ['Domain',   # 0
                 'Kingdom',  # 1
                 'Phylum',   # 2
@@ -71,13 +72,14 @@ class PrTwo(Database):
 
     def download(self):
         self.dest.directory.create(safe=True)
-        self.dest.remove(safe=True)
+        self.dest.remove()
         print "\nDownloading", self.url
         wget.download(self.url, out=self.dest.path)
 
     def unzip(self):
         self.dest.unzip_to(self.base_dir, single=False)
-        self.p.zip.unzip_to(self.base_dir, single=False)
+        self.p.archive_zip.unzip_to(self.base_dir, single=False)
+        self.p.pr2_zip.unzip_to(self.base_dir, single=False)
         self.p.fasta.move_to(self.alignment)
         self.p.taxo.move_to(self.taxonomy)
 

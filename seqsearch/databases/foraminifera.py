@@ -22,7 +22,7 @@ class Foraminifera(Database):
     
             from seqsearch.databases.foraminifera import foraminifera
             foraminifera.process()
-            print pr_two.tax_depth_freq
+            print foraminifera.tax_depth_freq
 
     """
 
@@ -37,16 +37,16 @@ class Foraminifera(Database):
 
     @property
     def rank_names(self):
-        """The names of the ranks."""
-        return ['Domain',
-                'Kingdom',
-                'Phylum',
-                'Class',
-                'Order',
-                'Family',
-                'Tribe',
-                'Genus',
-                'Species']
+        """The names of the ranks. Total 9 ranks."""
+        return ['Domain',   # 0
+                'Kingdom',  # 1
+                'Phylum',   # 2
+                'Class',    # 3
+                'Order',    # 4
+                'Family',   # 5
+                'Tribe',    # 6
+                'Genus',    # 7
+                'Species']  # 8
 
     def __init__(self, base_dir=None):
         # Base directory #
@@ -74,15 +74,15 @@ class Foraminifera(Database):
             for x in name: assert ';' not in x
             for x in name: assert '\t' not in x
             # Make ranks #
-            ranks = ['Eukaryota'                       , # Domain
-                     'Rhizaria'                        , # Kingdom
-                     'Foraminifera'                    , # Phylum
-                     name[0]                           , # Class
-                     name[1]                           , # Order
-                     name[2]                           , # Family
-                     name[3]                           , # Tribe
-                     name[4]                           , # Genus
-                     name[5]]                            # Species
+            ranks = ['Eukaryota'                       , # 0 Domain
+                     'Rhizaria'                        , # 1 Kingdom
+                     'Foraminifera'                    , # 2 Phylum
+                     name[0]                           , # 3 Class
+                     name[1]                           , # 4 Order
+                     name[2]                           , # 5 Family
+                     name[3]                           , # 6 Tribe
+                     name[4]                           , # 7 Genus
+                     name[5]]                            # 8 Species
             # The taxonomy string #
             tax_line = ';'.join(ranks)
             # Add sequence to the new fasta file #
