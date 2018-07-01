@@ -183,6 +183,7 @@ class BLASTdb(FASTA):
 
 ###############################################################################
 def install_blast(base_dir):
+    """Deprecated, look into 'home_linux/setup/bioinfo_tools'"""
     # Default location #
     if base_dir is None: base_dir = os.environ.get('HOME', '/') + '/programs/blast/'
     # Download from FTP #
