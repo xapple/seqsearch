@@ -2,6 +2,9 @@
 import os, fnmatch
 from collections import OrderedDict, Counter
 
+# Internal modules #
+from seqsearch.blast import BLASTdb
+
 # First party modules #
 from plumbing.autopaths import AutoPaths, FilePath
 from plumbing.cache import property_cached
@@ -11,6 +14,10 @@ from fasta import FASTA
 # Third party modules #
 from ftputil import FTPHost
 from tqdm import tqdm
+
+# Constants #
+home = os.environ.get('HOME', '~') + '/'
+base_directory = home + "databases/"
 
 ###############################################################################
 class Database(object):
@@ -56,6 +63,7 @@ class Database(object):
 
     def download(self):
         """Retrieve all files from the FTP site"""
+        self.base_dir.create_if_not_exists()
         for source,dest in tqdm(self.files_remaining.items()):
             dest.remove()
             self.ftp.download(source, dest)
@@ -66,11 +74,19 @@ class Database(object):
         """The files we have downloaded."""
         return map(FASTA, self.p.raw_dir.contents)
 
-    def unzip(self):
-        """Unzip them"""
-        for f in self.raw_files:
-            f.ungzip_to(self.p.unzipped_dir + f.prefix)
-            FilePath(self.p.unzipped_dir + f.prefix).permissions.only_readable()
+    def ungzip(self):
+        """Ungzip them"""
+        # Gzip #
+        for f in tqdm(self.raw_files):
+            destination = self.p.unzipped_dir + f.prefix
+            f.ungzip_to(destination)
+            destination.permissions.only_readable()
+
+    def untargz(self):
+        """Untarzip them"""
+        # Gzip #
+        for f in tqdm(self.raw_files): f.untargz_to(self.p.unzipped_dir)
+        for f in self.p.unzipped_dir: f.permissions.only_readable()
 
     @property
     def sequences(self):
@@ -78,7 +94,13 @@ class Database(object):
         for fasta in self.raw_files:
             for seq in fasta: yield seq
 
-    #-------------------------------------------------------------------------#
+    #------------------ Only for preformated BLAST databases -----------------#
+    @property_cached
+    def blast_db(self):
+        """A BLASTable version of the sequences."""
+        return BLASTdb(self.p.unzipped_dir + self.short_name, 'nucl')
+
+    #--------------------- Only for taxonomic databases ----------------------#
     @property_cached
     def tax_depth_freq(self):
         def depths():

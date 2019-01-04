@@ -17,7 +17,7 @@ class Tigrfam(Database):
     To install:
         from seqsearch.databases.tigrfam import tigrfam
         tigrfam.download()
-        tigrfam.unzip()
+        tigrfam.ungzip()
 
     It will put it in ~/databases/tigrfam
     """

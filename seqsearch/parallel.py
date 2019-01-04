@@ -71,20 +71,26 @@ class ParallelSeqSearch(SeqSearch):
 
     #-------------------------------- RUNNING --------------------------------#
     def run_local(self):
-        """Run the search locally"""
+        """Run the search locally."""
+        # Chop up the FASTA #
         self.splitable.split()
-        for query in self.queries: query.non_block_run()
-        for query in self.queries: query.wait()
+        # Case only one query #
+        if len(self.queries) == 1: self.queries[0].run()
+        # Case many queries #
+        else:
+            for query in self.queries: query.non_block_run()
+            for query in self.queries: query.wait()
+        # Join the results #
         self.join_outputs()
 
     def run_slurm(self):
-        """Run the search via SLURM"""
+        """Run the search via SLURM."""
         self.splitable.split()
         for query in self.queries: query.slurm_job.run()
         for query in self.queries: query.slurm_job.wait()
         self.join_outputs()
 
-    #-------------------------- BLAST IMPLEMTATION -------------------------#
+    #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_queries(self):
         """Make all BLAST search objects."""
@@ -98,7 +104,7 @@ class ParallelSeqSearch(SeqSearch):
                            slurm_params = self.slurm_params,
                            num          = p.num) for p in self.splitable.parts]
 
-    #-------------------------- VSEARCH IMPLEMTATION -------------------------#
+    #-------------------------- VSEARCH IMPLEMENTATION -------------------------#
     @property_cached
     def vsearch_queries(self):
         """Make all VSEARCH search objects."""

@@ -10,6 +10,7 @@ setup(
     author_email     = 'lucas.sinclair@me.com',
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
     packages         = ['seqsearch'],
-    install_requires = ['plumbing', 'fasta', 'biopython', 'sh', 'shell_command', 'decorator', 'humanfriendly'],
+    install_requires = ['plumbing', 'fasta', 'biopython', 'sh', 'shell_command', 'decorator',
+                        'humanfriendly', 'tqdm', 'ftputil'],
     long_description = open('README.md').read(),
 )

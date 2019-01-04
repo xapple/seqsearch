@@ -21,7 +21,7 @@ class Pfam(Database):
     To install:
         from seqsearch.databases.pfam import pfam
         pfam.download()
-        pfam.unzip()
+        pfam.ungzip()
 
     It will put it in ~/databases/pfam
     """
