@@ -4,6 +4,8 @@ setup(
     name             = 'seqsearch',
     version          = '1.0.4',
     description      = 'Sequence similarity searches made easy.',
+    long_description = open('README.md').read(),
+    long_description_content_type = 'text/markdown',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqsearch',
     author           = 'Lucas Sinclair',
