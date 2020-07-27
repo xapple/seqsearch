@@ -97,7 +97,7 @@ class SilvaMothur(Database):
         # The directory that contains all databases #
         if data_dir is None: data_dir = home + &#39;databases/&#39;
         # Base directory for paths #
-        self.base_dir  = data_dir + &#39;databases/&#39; + self.short_name + &#39;/&#39;
+        self.base_dir  = data_dir + self.short_name + &#39;/&#39;
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
         # Location of zip file remotely #
         self.url = self.base_url + &#34;silva.nr_v%s.tgz&#34; % self.version
@@ -113,13 +113,20 @@ class SilvaMothur(Database):
         self.nickname = &#34;nr_v%s&#34; % self.version
 
     def download(self):
+        # Make sure the directory exists #
         self.dest.directory.create(safe=True)
-        self.dest.remove(safe=True)
-        print(&#34;\n Downloading&#34;, self.url)
+        # Remove previous download #
+        self.dest.remove()
+        # Message #
+        print(&#34;\n Downloading &#39;%s&#39;&#34; % self.url)
+        # Download #
         import wget
-        wget.download(self.url, out=self.dest.path)
+        return wget.download(self.url, out=self.dest.path)
 
     def unzip(self):
+        # Message #
+        print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+        # Uncompress #
         archive = tarfile.open(self.dest, &#39;r:gz&#39;)
         archive.extractall(self.base_dir)
 
@@ -129,7 +136,6 @@ class SilvaMothur(Database):
         results are stored on the filesystem. Return False otherwise.
         &#34;&#34;&#34;
         return self.taxonomy.exists
-
 
 ###############################################################################
 silva_mothur = SilvaMothur()</code></pre>
@@ -205,7 +211,7 @@ corresponds to the version of the database, here 138.</p></div>
         # The directory that contains all databases #
         if data_dir is None: data_dir = home + &#39;databases/&#39;
         # Base directory for paths #
-        self.base_dir  = data_dir + &#39;databases/&#39; + self.short_name + &#39;/&#39;
+        self.base_dir  = data_dir + self.short_name + &#39;/&#39;
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
         # Location of zip file remotely #
         self.url = self.base_url + &#34;silva.nr_v%s.tgz&#34; % self.version
@@ -221,13 +227,20 @@ corresponds to the version of the database, here 138.</p></div>
         self.nickname = &#34;nr_v%s&#34; % self.version
 
     def download(self):
+        # Make sure the directory exists #
         self.dest.directory.create(safe=True)
-        self.dest.remove(safe=True)
-        print(&#34;\n Downloading&#34;, self.url)
+        # Remove previous download #
+        self.dest.remove()
+        # Message #
+        print(&#34;\n Downloading &#39;%s&#39;&#34; % self.url)
+        # Download #
         import wget
-        wget.download(self.url, out=self.dest.path)
+        return wget.download(self.url, out=self.dest.path)
 
     def unzip(self):
+        # Message #
+        print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+        # Uncompress #
         archive = tarfile.open(self.dest, &#39;r:gz&#39;)
         archive.extractall(self.base_dir)
 
@@ -303,6 +316,9 @@ def rank_names(self):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def unzip(self):
+    # Message #
+    print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+    # Uncompress #
     archive = tarfile.open(self.dest, &#39;r:gz&#39;)
     archive.extractall(self.base_dir)</code></pre>
 </details>
