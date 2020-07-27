@@ -64,7 +64,7 @@ class SilvaMothur(Database):
         # The directory that contains all databases #
         if data_dir is None: data_dir = home + 'databases/'
         # Base directory for paths #
-        self.base_dir  = data_dir + 'databases/' + self.short_name + '/'
+        self.base_dir  = data_dir + self.short_name + '/'
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
         # Location of zip file remotely #
         self.url = self.base_url + "silva.nr_v%s.tgz" % self.version
@@ -80,13 +80,20 @@ class SilvaMothur(Database):
         self.nickname = "nr_v%s" % self.version
 
     def download(self):
+        # Make sure the directory exists #
         self.dest.directory.create(safe=True)
-        self.dest.remove(safe=True)
-        print("\n Downloading", self.url)
+        # Remove previous download #
+        self.dest.remove()
+        # Message #
+        print("\n Downloading '%s'" % self.url)
+        # Download #
         import wget
-        wget.download(self.url, out=self.dest.path)
+        return wget.download(self.url, out=self.dest.path)
 
     def unzip(self):
+        # Message #
+        print("\n Extracting archive '%s'" % self.dest)
+        # Uncompress #
         archive = tarfile.open(self.dest, 'r:gz')
         archive.extractall(self.base_dir)
 
@@ -96,7 +103,6 @@ class SilvaMothur(Database):
         results are stored on the filesystem. Return False otherwise.
         """
         return self.taxonomy.exists
-
 
 ###############################################################################
 silva_mothur = SilvaMothur()
