@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 
 # Internal modules #
@@ -5,9 +14,11 @@ from seqsearch.databases import Database
 
 ###############################################################################
 class RefSeqBacteriaProtNR(Database):
-    """the RefSeq sequences for only bacteria, only protein, and only the
+    """
+    The RefSeq sequences for only bacteria, only protein, and only the
     non-redundant version. We will download the raw sequences by FTP
-    and format them as a blast database."""
+    and format them as a blast database.
+    """
 
     short_name = "refseq_bact_prot_nr"
     ftp_url    = "ftp.ncbi.nlm.nih.gov"
@@ -16,9 +27,11 @@ class RefSeqBacteriaProtNR(Database):
 
 ###############################################################################
 class RefSeqArchaeaProtNR(Database):
-    """the RefSeq sequences for only bacteria, only protein, and only the
+    """
+    The RefSeq sequences for only bacteria, only protein, and only the
     non-redundant version. We will download the raw sequences by FTP
-    and format them as a blast database."""
+    and format them as a blast database.
+    """
 
     short_name = "refseq_arch_prot_nr"
     ftp_url    = "ftp.ncbi.nlm.nih.gov"

@@ -1,6 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import time
-from urllib2 import HTTPError
 
 # Internal modules #
 
@@ -58,13 +66,14 @@ class UtilsNCBI(object):
         """Download from NCBI until it works. Will restart until reaching the python
         recursion limit. We don't want to get banned from NCBI so we have a little
         pause at every function call."""
+        from urllib2 import HTTPError
         time.sleep(0.5)
         try:
             response = Entrez.efetch(db="nuccore", id=chunk, retmode="xml")
             records  = list(Entrez.parse(response, validate=validate))
             return records
         except (HTTPError, CorruptedXMLError):
-            print "\nFailed downloading %i records, trying again\n" % len(chunk)
+            print("\nFailed downloading %i records, trying again\n" % len(chunk))
             return self.chunk_to_records(chunk)
 
     #-------------------------------------------------------------------------#

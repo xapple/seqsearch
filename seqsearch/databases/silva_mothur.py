@@ -1,42 +1,57 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import os, tarfile
 
 # First party modules #
-from seqsearch.databases import Database
-from fasta import FASTA
-from plumbing.autopaths import AutoPaths, FilePath
+from seqsearch.databases  import Database
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path  import FilePath
 
 # Third party modules #
-import wget
 
 # Constants #
 home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
 class SilvaMothur(Database):
-    """This is the SILVA version from mothur.
+    """
+    This is the SILVA database, in its specific version from mothur. Seen at:
 
     https://www.mothur.org/wiki/Silva_reference_files
 
     To install:
-        from seqsearch.databases.silva_mothur import silva_mothur
-        silva_mothur.download()
-        silva_mothur.unzip()
 
-    It will put it in ~/databases/silva_mothur_xxx/
+        >>> from seqsearch.databases.silva_mothur import silva_mothur
+        >>> silva_mothur.download()
+        >>> silva_mothur.unzip()
+
+    It will place the results in `~/databases/silva_mothur_xxx/` where xxx
+    corresponds to the version of the database, here 138.
     """
 
-    base_url   = "https://www.mothur.org/w/images/b/b4/"
+    base_url   = "https://mothur.s3.us-east-2.amazonaws.com/wiki/"
     short_name = "silva_mothur"
-    long_name  = 'The Silva version 128 database (mothur version)'
+    long_name  = "The Silva v138 database (mothur version)"
+    version    = "138"
 
     all_paths = """
-    /silva.tgz
-    """
+                /silva.tgz
+                """
 
     @property
     def rank_names(self):
-        """The names of the ranks. Total 7 ranks."""
+        """
+        The names of the taxonomic rank at each level.
+        There are a total of 7 ranks.
+        """
         return ['Domain',    # 0
                 'Phylum',    # 1
                 'Class',     # 2
@@ -45,37 +60,43 @@ class SilvaMothur(Database):
                 'Genus',     # 5
                 'Species']   # 6
 
-    def __init__(self, version, base_dir=None):
-        # Attributes #
-        self.version    = version
-        self.short_name = self.short_name + "_" + self.version
-        # Base directory #
-        if base_dir is None: base_dir = home
-        self.base_dir = base_dir + 'databases/' + self.short_name + '/'
-        self.p        = AutoPaths(self.base_dir, self.all_paths)
-        # URL #
-        self.url = self.base_url + "Silva.nr_v%s.tgz" % self.version
-        # The archive #
-        self.dest = self.p.tgz
-        # The results #
-        self.alignment = FilePath(self.base_dir + "silva.nr_v%s.align" % self.version)
-        self.taxonomy  = FilePath(self.base_dir + "silva.nr_v%s.tax"   % self.version)
+    def __init__(self, data_dir=None):
+        # The directory that contains all databases #
+        if data_dir is None: data_dir = home + 'databases/'
+        # Base directory for paths #
+        self.base_dir  = data_dir + 'databases/' + self.short_name + '/'
+        self.autopaths = AutoPaths(self.base_dir, self.all_paths)
+        # Location of zip file remotely #
+        self.url = self.base_url + "silva.nr_v%s.tgz" % self.version
+        # Location of zip file locally #
+        self.dest = self.autopaths.tgz
+        # The results after download #
+        self.alignment = self.base_dir + "silva.nr_v%s.align"
+        self.taxonomy  = self.base_dir + "silva.nr_v%s.tax"
+        # Make them FilePaths objects #
+        self.alignment = FilePath(self.alignment % self.version)
+        self.taxonomy  = FilePath(self.taxonomy  % self.version)
         # The part that mothur will use for naming files #
         self.nickname = "nr_v%s" % self.version
 
     def download(self):
         self.dest.directory.create(safe=True)
         self.dest.remove(safe=True)
-        print "\nDownloading", self.url
+        print("\n Downloading", self.url)
+        import wget
         wget.download(self.url, out=self.dest.path)
 
     def unzip(self):
-        # Extract #
         archive = tarfile.open(self.dest, 'r:gz')
         archive.extractall(self.base_dir)
-        # Optional testing #
-        if self.version == "128": assert self.alignment.md5 == '0b0593da5ee7d1041eb37385f831954e'
-        if self.version == "128": assert self.taxonomy.md5  == 'c4d39248146259637e0d0f3ae8bf7e0f'
+
+    def __bool__(self):
+        """
+        Return True if the silva database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        """
+        return self.taxonomy.exists
+
 
 ###############################################################################
-silva_mothur = SilvaMothur("128")
+silva_mothur = SilvaMothur()

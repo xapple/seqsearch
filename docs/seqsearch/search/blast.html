@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.3" />
+<title>seqsearch.search.blast API documentation</title>
+<meta name="description" content="Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>seqsearch.search.blast</code></h1>
+</header>
+<section id="section-intro">
+<p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+&#34;&#34;&#34;
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+&#34;&#34;&#34;
+
+# Built-in modules #
+import sys, os, multiprocessing, threading, shutil
+
+# Internal modules #
+from fasta import FASTA
+from autopaths.tmp_path import new_temp_path
+from autopaths.file_path import FilePath
+from plumbing.cache import property_cached
+from plumbing.slurm.job import JobSLURM
+
+# Third party modules #
+import sh
+from ftputil import FTPHost
+import Bio.Blast.NCBIXML
+
+###############################################################################
+class BLASTquery(object):
+    &#34;&#34;&#34;
+    A blast job. Possibly the standard BLAST algorithm or
+    BLASTP or BLASTX etc. Typically you could use it like this:
+
+         import sys, os
+         records_path = os.path.expanduser(sys.argv[1])
+         centers_path = &#39;centers.fasta&#39;
+         db = parallelblast.BLASTdb(centers_path)
+         db.makeblastdb()
+         params = {&#39;executable&#39;: &#34;~/share/blastplus/blastn&#34;,
+                   &#39;-outfmt&#39;: 0,
+                   &#39;-evalue&#39;: 1e-2,
+                   &#39;-perc_identity&#39;: 97,
+                   &#39;-num_threads&#39;: 16}
+         search = parallelblast.BLASTquery(records_path, db, params)
+         search.run()
+
+    You can also call search.non_block_run() to run maybe searches in parallel.
+    &#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.query)
+
+    def __init__(self, query_path, db_path,
+                 seq_type     = &#39;prot&#39; or &#39;nucl&#39;,     # The seq type of the query_path file
+                 params       = None,                 # Add extra params for the command line
+                 algorithm    = &#34;blastn&#34; or &#34;blastp&#34;, # Will be autodetermined with seq_type
+                 version      = &#34;plus&#34; or &#34;legacy&#34;,   # Either blast+ or the old `blastall`
+                 out_path     = None,                 # Where the results will be dropped
+                 executable   = None,                 # If you want a specific binary give the path
+                 cpus         = None,                 # The number of threads to use
+                 num          = None,                 # When parallelizing, the number of this thread
+                 slurm_params = None,                 # If you have special slurm parameters
+                 _out         = None,                 # Store the stdout at this path
+                 _err         = None):                # Store the stderr at this path
+        # Save attributes #
+        self.query        = FASTA(query_path)
+        self.db           = BLASTdb(db_path, seq_type)
+        self.seq_type     = seq_type
+        self.version      = version
+        self.algorithm    = algorithm
+        self.num          = num
+        self.params       = params if params else {}
+        self.slurm_params = slurm_params if slurm_params else {}
+        self._out         = _out
+        self._err         = _err
+        # Output #
+        if out_path is None:         self.out_path = self.query.prefix_path + &#39;.blastout&#39;
+        elif out_path.endswith(&#39;/&#39;): self.out_path = out_path + self.query.prefix + &#39;.blastout&#39;
+        else:                        self.out_path = out_path
+        # Make it a file path #
+        self.out_path = FilePath(self.out_path)
+        # Executable #
+        self.executable = FilePath(executable)
+        # Cores to use #
+        if cpus is None: self.cpus = multiprocessing.cpu_count()
+        else:            self.cpus = cpus
+        # Auto detect XML output #
+        if self.out_path.extension == &#39;.xml&#39;:
+            if self.version == &#39;legacy&#39;: self.params[&#39;-xxxx&#39;]   = &#39;5&#39;
+            if self.version == &#39;plus&#39;:   self.params[&#39;-outfmt&#39;] = &#39;5&#39;
+
+    @property
+    def command(self):
+        # Executable #
+        if self.executable:            cmd = [self.executable.path]
+        elif self.version == &#39;legacy&#39;: cmd = [&#34;blastall&#34;, &#39;-p&#39;, self.algorithm]
+        else:                          cmd = [self.algorithm]
+        # Essentials #
+        if self.version == &#39;legacy&#39;:
+            cmd += [&#39;-d&#39;,  self.db, &#39;-i&#39;,     self.query, &#39;-o&#39;,   self.out_path, &#39;-a&#39;,           self.cpus]
+        if self.version == &#39;plus&#39;:
+            cmd += [&#39;-db&#39;, self.db, &#39;-query&#39;, self.query, &#39;-out&#39;, self.out_path, &#39;-num_threads&#39;, self.cpus]
+        # Options #
+        for k,v in self.params.items(): cmd += [k, v]
+        # Return #
+        return map(str, cmd)
+
+    #-------------------------------- RUNNING --------------------------------#
+    def run(self):
+        &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+        out = self._out if self._out else &#39;/dev/null&#39;
+        err = self._err if self._err else &#39;/dev/null&#39;
+        sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
+        if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0: os.remove(&#34;error.log&#34;)
+
+    def non_block_run(self):
+        &#34;&#34;&#34;Special method to run the query in a thread locally without blocking.&#34;&#34;&#34;
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
+        self.thread.start()
+
+    def wait(self):
+        &#34;&#34;&#34;If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.&#34;&#34;&#34;
+        try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+        except KeyboardInterrupt: print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)
+
+    @property_cached
+    def slurm_job(self):
+        &#34;&#34;&#34;If you have access to a cluster with a SLURM queuing system, this property
+        will return a SLURMjob object from which you can submit and check the status
+        of the job.&#34;&#34;&#34;
+        return JobSLURM(&#39; &#39;.join(self.command), &#39;bash&#39;, self.out_path.directory, **self.slurm_params)
+
+    #------------------------------- FILTERING -------------------------------#
+    def filter(self, filtering):
+        &#34;&#34;&#34;We can do some special filtering on the results.
+        For the moment only minimum coverage and minimum identity.&#34;&#34;&#34;
+        # Conditions #
+        if &#39;min_coverage&#39; in filtering and &#39;qcovs&#39; not in self.params[&#39;-outfmt&#39;]:
+            raise Exception(&#34;Can&#39;t filter on minimum coverage because it wasn&#39;t included.&#34;)
+        if &#39;min_identity&#39; in filtering and &#39;pident&#39; not in self.params[&#39;-outfmt&#39;]:
+            raise Exception(&#34;Can&#39;t filter on minimum identity because it wasn&#39;t included.&#34;)
+        # Iterator #
+        def filter_lines(blastout):
+            cov_threshold = filtering.get(&#39;min_coverage&#39;, 0.0) * 100
+            idy_threshold = filtering.get(&#39;min_identity&#39;, 0.0) * 100
+            cov_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;qcovs&#39;) - 1
+            idy_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;pident&#39;) - 1
+            for line in blastout:
+                coverage = float(line.split()[cov_position])
+                identity = float(line.split()[idy_position])
+                if coverage &lt; cov_threshold: continue
+                if identity &lt; idy_threshold: continue
+                else: yield line
+        # Do it #
+        temp_path = new_temp_path()
+        with open(temp_path, &#39;w&#39;) as handle: handle.writelines(filter_lines(self.out_path))
+        os.remove(self.out_path)
+        shutil.move(temp_path, self.out_path)
+
+    @property
+    def results(self):
+        &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+        # Check for XML #
+        if self.params.get(&#39;-outfmt&#39;, 0) == &#39;5&#39;:
+            with open(self.out_path, &#39;rb&#39;) as handle:
+                for entry in Bio.Blast.NCBIXML.parse(handle): yield entry
+        # Default case #
+        else:
+            for line in self.out_path: yield line.split()
+
+###############################################################################
+class BLASTdb(FASTA):
+    &#34;&#34;&#34;A BLAST database one can search against.&#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def __init__(self, fasta_path, seq_type=&#39;nucl&#39; or &#39;prot&#39;):
+        if hasattr(fasta_path, &#39;seq_type&#39;): self.seq_type = fasta_path.seq_type
+        else:                               self.seq_type = seq_type
+        FASTA.__init__(self, fasta_path)
+
+    def makeblastdb(self, logfile=None, out=None):
+        # Message #
+        print(&#34;Calling `makeblastdb` on &#39;%s&#39;...&#34; % self)
+        # Options #
+        options = [&#39;-in&#39;, self.path, &#39;-dbtype&#39;, self.seq_type]
+        # Add a log file #
+        if logfile is not None: options += [&#39;-logfile&#39;, logfile]
+        # Call the program #
+        if out is not None: sh.makeblastdb(*options, _out=str(out))
+        else:               sh.makeblastdb(*options)
+
+###############################################################################
+def install_blast(base_dir):
+    &#34;&#34;&#34;Deprecated, look into &#39;home_linux/setup/bioinfo_tools&#39;
+    On Ubuntu: sudo apt-get install ncbi-blast+
+    &#34;&#34;&#34;
+    # Default location #
+    if base_dir is None: base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/programs/blast/&#39;
+    # Download from FTP #
+    ftp_url = &#34;ftp.ncbi.nlm.nih.gov&#34;
+    ftp_dir = &#34;/blast/executables/blast+/LATEST/&#34;
+    pattern = &#39;ncbi-blast-*+-src.zip&#39;
+    ftp = FTPHost(ftp_url, &#34;anonymous&#34;)
+    ftp.chdir(ftp_dir)
+    files = ftp.listdir(self.ftp.curdir)
+    ftp.download(source, dest)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="seqsearch.search.blast.install_blast"><code class="name flex">
+<span>def <span class="ident">install_blast</span></span>(<span>base_dir)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Deprecated, look into 'home_linux/setup/bioinfo_tools'
+On Ubuntu: sudo apt-get install ncbi-blast+</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def install_blast(base_dir):
+    &#34;&#34;&#34;Deprecated, look into &#39;home_linux/setup/bioinfo_tools&#39;
+    On Ubuntu: sudo apt-get install ncbi-blast+
+    &#34;&#34;&#34;
+    # Default location #
+    if base_dir is None: base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/programs/blast/&#39;
+    # Download from FTP #
+    ftp_url = &#34;ftp.ncbi.nlm.nih.gov&#34;
+    ftp_dir = &#34;/blast/executables/blast+/LATEST/&#34;
+    pattern = &#39;ncbi-blast-*+-src.zip&#39;
+    ftp = FTPHost(ftp_url, &#34;anonymous&#34;)
+    ftp.chdir(ftp_dir)
+    files = ftp.listdir(self.ftp.curdir)
+    ftp.download(source, dest)</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="seqsearch.search.blast.BLASTdb"><code class="flex name class">
+<span>class <span class="ident">BLASTdb</span></span>
+<span>(</span><span>path, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A BLAST database one can search against.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BLASTdb(FASTA):
+    &#34;&#34;&#34;A BLAST database one can search against.&#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def __init__(self, fasta_path, seq_type=&#39;nucl&#39; or &#39;prot&#39;):
+        if hasattr(fasta_path, &#39;seq_type&#39;): self.seq_type = fasta_path.seq_type
+        else:                               self.seq_type = seq_type
+        FASTA.__init__(self, fasta_path)
+
+    def makeblastdb(self, logfile=None, out=None):
+        # Message #
+        print(&#34;Calling `makeblastdb` on &#39;%s&#39;...&#34; % self)
+        # Options #
+        options = [&#39;-in&#39;, self.path, &#39;-dbtype&#39;, self.seq_type]
+        # Add a log file #
+        if logfile is not None: options += [&#39;-logfile&#39;, logfile]
+        # Call the program #
+        if out is not None: sh.makeblastdb(*options, _out=str(out))
+        else:               sh.makeblastdb(*options)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>fasta.core.FASTA</li>
+<li>autopaths.file_path.FilePath</li>
+<li>autopaths.base_path.BasePath</li>
+<li>builtins.str</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.search.blast.BLASTdb.makeblastdb"><code class="name flex">
+<span>def <span class="ident">makeblastdb</span></span>(<span>self, logfile=None, out=None)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def makeblastdb(self, logfile=None, out=None):
+    # Message #
+    print(&#34;Calling `makeblastdb` on &#39;%s&#39;...&#34; % self)
+    # Options #
+    options = [&#39;-in&#39;, self.path, &#39;-dbtype&#39;, self.seq_type]
+    # Add a log file #
+    if logfile is not None: options += [&#39;-logfile&#39;, logfile]
+    # Call the program #
+    if out is not None: sh.makeblastdb(*options, _out=str(out))
+    else:               sh.makeblastdb(*options)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery"><code class="flex name class">
+<span>class <span class="ident">BLASTquery</span></span>
+<span>(</span><span>query_path, db_path, seq_type='prot', params=None, algorithm='blastn', version='plus', out_path=None, executable=None, cpus=None, num=None, slurm_params=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A blast job. Possibly the standard BLAST algorithm or
+BLASTP or BLASTX etc. Typically you could use it like this:</p>
+<pre><code> import sys, os
+ records_path = os.path.expanduser(sys.argv[1])
+ centers_path = 'centers.fasta'
+ db = parallelblast.BLASTdb(centers_path)
+ db.makeblastdb()
+ params = {'executable': "~/share/blastplus/blastn",
+           '-outfmt': 0,
+           '-evalue': 1e-2,
+           '-perc_identity': 97,
+           '-num_threads': 16}
+ search = parallelblast.BLASTquery(records_path, db, params)
+ search.run()
+</code></pre>
+<p>You can also call search.non_block_run() to run maybe searches in parallel.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class BLASTquery(object):
+    &#34;&#34;&#34;
+    A blast job. Possibly the standard BLAST algorithm or
+    BLASTP or BLASTX etc. Typically you could use it like this:
+
+         import sys, os
+         records_path = os.path.expanduser(sys.argv[1])
+         centers_path = &#39;centers.fasta&#39;
+         db = parallelblast.BLASTdb(centers_path)
+         db.makeblastdb()
+         params = {&#39;executable&#39;: &#34;~/share/blastplus/blastn&#34;,
+                   &#39;-outfmt&#39;: 0,
+                   &#39;-evalue&#39;: 1e-2,
+                   &#39;-perc_identity&#39;: 97,
+                   &#39;-num_threads&#39;: 16}
+         search = parallelblast.BLASTquery(records_path, db, params)
+         search.run()
+
+    You can also call search.non_block_run() to run maybe searches in parallel.
+    &#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.query)
+
+    def __init__(self, query_path, db_path,
+                 seq_type     = &#39;prot&#39; or &#39;nucl&#39;,     # The seq type of the query_path file
+                 params       = None,                 # Add extra params for the command line
+                 algorithm    = &#34;blastn&#34; or &#34;blastp&#34;, # Will be autodetermined with seq_type
+                 version      = &#34;plus&#34; or &#34;legacy&#34;,   # Either blast+ or the old `blastall`
+                 out_path     = None,                 # Where the results will be dropped
+                 executable   = None,                 # If you want a specific binary give the path
+                 cpus         = None,                 # The number of threads to use
+                 num          = None,                 # When parallelizing, the number of this thread
+                 slurm_params = None,                 # If you have special slurm parameters
+                 _out         = None,                 # Store the stdout at this path
+                 _err         = None):                # Store the stderr at this path
+        # Save attributes #
+        self.query        = FASTA(query_path)
+        self.db           = BLASTdb(db_path, seq_type)
+        self.seq_type     = seq_type
+        self.version      = version
+        self.algorithm    = algorithm
+        self.num          = num
+        self.params       = params if params else {}
+        self.slurm_params = slurm_params if slurm_params else {}
+        self._out         = _out
+        self._err         = _err
+        # Output #
+        if out_path is None:         self.out_path = self.query.prefix_path + &#39;.blastout&#39;
+        elif out_path.endswith(&#39;/&#39;): self.out_path = out_path + self.query.prefix + &#39;.blastout&#39;
+        else:                        self.out_path = out_path
+        # Make it a file path #
+        self.out_path = FilePath(self.out_path)
+        # Executable #
+        self.executable = FilePath(executable)
+        # Cores to use #
+        if cpus is None: self.cpus = multiprocessing.cpu_count()
+        else:            self.cpus = cpus
+        # Auto detect XML output #
+        if self.out_path.extension == &#39;.xml&#39;:
+            if self.version == &#39;legacy&#39;: self.params[&#39;-xxxx&#39;]   = &#39;5&#39;
+            if self.version == &#39;plus&#39;:   self.params[&#39;-outfmt&#39;] = &#39;5&#39;
+
+    @property
+    def command(self):
+        # Executable #
+        if self.executable:            cmd = [self.executable.path]
+        elif self.version == &#39;legacy&#39;: cmd = [&#34;blastall&#34;, &#39;-p&#39;, self.algorithm]
+        else:                          cmd = [self.algorithm]
+        # Essentials #
+        if self.version == &#39;legacy&#39;:
+            cmd += [&#39;-d&#39;,  self.db, &#39;-i&#39;,     self.query, &#39;-o&#39;,   self.out_path, &#39;-a&#39;,           self.cpus]
+        if self.version == &#39;plus&#39;:
+            cmd += [&#39;-db&#39;, self.db, &#39;-query&#39;, self.query, &#39;-out&#39;, self.out_path, &#39;-num_threads&#39;, self.cpus]
+        # Options #
+        for k,v in self.params.items(): cmd += [k, v]
+        # Return #
+        return map(str, cmd)
+
+    #-------------------------------- RUNNING --------------------------------#
+    def run(self):
+        &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+        out = self._out if self._out else &#39;/dev/null&#39;
+        err = self._err if self._err else &#39;/dev/null&#39;
+        sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
+        if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0: os.remove(&#34;error.log&#34;)
+
+    def non_block_run(self):
+        &#34;&#34;&#34;Special method to run the query in a thread locally without blocking.&#34;&#34;&#34;
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
+        self.thread.start()
+
+    def wait(self):
+        &#34;&#34;&#34;If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.&#34;&#34;&#34;
+        try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+        except KeyboardInterrupt: print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)
+
+    @property_cached
+    def slurm_job(self):
+        &#34;&#34;&#34;If you have access to a cluster with a SLURM queuing system, this property
+        will return a SLURMjob object from which you can submit and check the status
+        of the job.&#34;&#34;&#34;
+        return JobSLURM(&#39; &#39;.join(self.command), &#39;bash&#39;, self.out_path.directory, **self.slurm_params)
+
+    #------------------------------- FILTERING -------------------------------#
+    def filter(self, filtering):
+        &#34;&#34;&#34;We can do some special filtering on the results.
+        For the moment only minimum coverage and minimum identity.&#34;&#34;&#34;
+        # Conditions #
+        if &#39;min_coverage&#39; in filtering and &#39;qcovs&#39; not in self.params[&#39;-outfmt&#39;]:
+            raise Exception(&#34;Can&#39;t filter on minimum coverage because it wasn&#39;t included.&#34;)
+        if &#39;min_identity&#39; in filtering and &#39;pident&#39; not in self.params[&#39;-outfmt&#39;]:
+            raise Exception(&#34;Can&#39;t filter on minimum identity because it wasn&#39;t included.&#34;)
+        # Iterator #
+        def filter_lines(blastout):
+            cov_threshold = filtering.get(&#39;min_coverage&#39;, 0.0) * 100
+            idy_threshold = filtering.get(&#39;min_identity&#39;, 0.0) * 100
+            cov_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;qcovs&#39;) - 1
+            idy_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;pident&#39;) - 1
+            for line in blastout:
+                coverage = float(line.split()[cov_position])
+                identity = float(line.split()[idy_position])
+                if coverage &lt; cov_threshold: continue
+                if identity &lt; idy_threshold: continue
+                else: yield line
+        # Do it #
+        temp_path = new_temp_path()
+        with open(temp_path, &#39;w&#39;) as handle: handle.writelines(filter_lines(self.out_path))
+        os.remove(self.out_path)
+        shutil.move(temp_path, self.out_path)
+
+    @property
+    def results(self):
+        &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+        # Check for XML #
+        if self.params.get(&#39;-outfmt&#39;, 0) == &#39;5&#39;:
+            with open(self.out_path, &#39;rb&#39;) as handle:
+                for entry in Bio.Blast.NCBIXML.parse(handle): yield entry
+        # Default case #
+        else:
+            for line in self.out_path: yield line.split()</code></pre>
+</details>
+<h3>Instance variables</h3>
+<dl>
+<dt id="seqsearch.search.blast.BLASTquery.command"><code class="name">var <span class="ident">command</span></code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def command(self):
+    # Executable #
+    if self.executable:            cmd = [self.executable.path]
+    elif self.version == &#39;legacy&#39;: cmd = [&#34;blastall&#34;, &#39;-p&#39;, self.algorithm]
+    else:                          cmd = [self.algorithm]
+    # Essentials #
+    if self.version == &#39;legacy&#39;:
+        cmd += [&#39;-d&#39;,  self.db, &#39;-i&#39;,     self.query, &#39;-o&#39;,   self.out_path, &#39;-a&#39;,           self.cpus]
+    if self.version == &#39;plus&#39;:
+        cmd += [&#39;-db&#39;, self.db, &#39;-query&#39;, self.query, &#39;-out&#39;, self.out_path, &#39;-num_threads&#39;, self.cpus]
+    # Options #
+    for k,v in self.params.items(): cmd += [k, v]
+    # Return #
+    return map(str, cmd)</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery.results"><code class="name">var <span class="ident">results</span></code></dt>
+<dd>
+<div class="desc"><p>Parse the results.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def results(self):
+    &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+    # Check for XML #
+    if self.params.get(&#39;-outfmt&#39;, 0) == &#39;5&#39;:
+        with open(self.out_path, &#39;rb&#39;) as handle:
+            for entry in Bio.Blast.NCBIXML.parse(handle): yield entry
+    # Default case #
+    else:
+        for line in self.out_path: yield line.split()</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery.slurm_job"><code class="name">var <span class="ident">slurm_job</span></code></dt>
+<dd>
+<div class="desc"><p>If you have access to a cluster with a SLURM queuing system, this property
+will return a SLURMjob object from which you can submit and check the status
+of the job.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.search.blast.BLASTquery.filter"><code class="name flex">
+<span>def <span class="ident">filter</span></span>(<span>self, filtering)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>We can do some special filtering on the results.
+For the moment only minimum coverage and minimum identity.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter(self, filtering):
+    &#34;&#34;&#34;We can do some special filtering on the results.
+    For the moment only minimum coverage and minimum identity.&#34;&#34;&#34;
+    # Conditions #
+    if &#39;min_coverage&#39; in filtering and &#39;qcovs&#39; not in self.params[&#39;-outfmt&#39;]:
+        raise Exception(&#34;Can&#39;t filter on minimum coverage because it wasn&#39;t included.&#34;)
+    if &#39;min_identity&#39; in filtering and &#39;pident&#39; not in self.params[&#39;-outfmt&#39;]:
+        raise Exception(&#34;Can&#39;t filter on minimum identity because it wasn&#39;t included.&#34;)
+    # Iterator #
+    def filter_lines(blastout):
+        cov_threshold = filtering.get(&#39;min_coverage&#39;, 0.0) * 100
+        idy_threshold = filtering.get(&#39;min_identity&#39;, 0.0) * 100
+        cov_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;qcovs&#39;) - 1
+        idy_position = self.params[&#39;-outfmt&#39;].strip(&#39;&#34;&#39;).split().index(&#39;pident&#39;) - 1
+        for line in blastout:
+            coverage = float(line.split()[cov_position])
+            identity = float(line.split()[idy_position])
+            if coverage &lt; cov_threshold: continue
+            if identity &lt; idy_threshold: continue
+            else: yield line
+    # Do it #
+    temp_path = new_temp_path()
+    with open(temp_path, &#39;w&#39;) as handle: handle.writelines(filter_lines(self.out_path))
+    os.remove(self.out_path)
+    shutil.move(temp_path, self.out_path)</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery.non_block_run"><code class="name flex">
+<span>def <span class="ident">non_block_run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Special method to run the query in a thread locally without blocking.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def non_block_run(self):
+    &#34;&#34;&#34;Special method to run the query in a thread locally without blocking.&#34;&#34;&#34;
+    self.thread = threading.Thread(target=self.run)
+    self.thread.daemon = True # So that they die when we die
+    self.thread.start()</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Simply run the BLAST search locally.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(self):
+    &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+    out = self._out if self._out else &#39;/dev/null&#39;
+    err = self._err if self._err else &#39;/dev/null&#39;
+    sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
+    if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0: os.remove(&#34;error.log&#34;)</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.blast.BLASTquery.wait"><code class="name flex">
+<span>def <span class="ident">wait</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If you have run the query in a non-blocking way, call this method to pause
+until the query is finished.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wait(self):
+    &#34;&#34;&#34;If you have run the query in a non-blocking way, call this method to pause
+    until the query is finished.&#34;&#34;&#34;
+    try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+    except KeyboardInterrupt: print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="seqsearch.search" href="index.html">seqsearch.search</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="seqsearch.search.blast.install_blast" href="#seqsearch.search.blast.install_blast">install_blast</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="seqsearch.search.blast.BLASTdb" href="#seqsearch.search.blast.BLASTdb">BLASTdb</a></code></h4>
+<ul class="">
+<li><code><a title="seqsearch.search.blast.BLASTdb.makeblastdb" href="#seqsearch.search.blast.BLASTdb.makeblastdb">makeblastdb</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="seqsearch.search.blast.BLASTquery" href="#seqsearch.search.blast.BLASTquery">BLASTquery</a></code></h4>
+<ul class="two-column">
+<li><code><a title="seqsearch.search.blast.BLASTquery.command" href="#seqsearch.search.blast.BLASTquery.command">command</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.filter" href="#seqsearch.search.blast.BLASTquery.filter">filter</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.non_block_run" href="#seqsearch.search.blast.BLASTquery.non_block_run">non_block_run</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.results" href="#seqsearch.search.blast.BLASTquery.results">results</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.run" href="#seqsearch.search.blast.BLASTquery.run">run</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.slurm_job" href="#seqsearch.search.blast.BLASTquery.slurm_job">slurm_job</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.wait" href="#seqsearch.search.blast.BLASTquery.wait">wait</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.3</a>.</p>
+</footer>
+</body>
+</html>

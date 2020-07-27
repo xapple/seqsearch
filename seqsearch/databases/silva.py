@@ -1,20 +1,33 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import os
 
 # First party modules #
 from seqsearch.databases import Database
 from fasta import FASTA
-from plumbing.autopaths import AutoPaths
+from autopaths.auto_paths import AutoPaths
 
 # Third party modules #
-import wget
 
 # Constants #
 home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
 class Silva(Database):
-    """SILVA provides comprehensive, quality checked and regularly updated datasets of aligned small (16S/18S, SSU) and large subunit (23S/28S, LSU) ribosomal RNA (rRNA) sequences for all three domains of life (Bacteria, Archaea and Eukarya). SILVA are the official databases of the software package ARB.
+    """
+    SILVA provides comprehensive, quality checked and regularly updated
+    datasets of aligned small (16S/18S, SSU) and large subunit (23S/28S, LSU)
+    ribosomal RNA (rRNA) sequences for all three domains of life
+    (Bacteria, Archaea and Eukarya).
+    SILVA are the official databases of the software package ARB.
 
     https://www.arb-silva.de
 
@@ -58,9 +71,10 @@ class Silva(Database):
         self.nr99_dest.directory.create(safe=True)
         self.nr99_dest.remove(safe=True)
         self.aligned_dest.remove(safe=True)
-        print "\nDownloading", self.base_url + self.url + self.nr99_name
+        import wget
+        print("\nDownloading", self.base_url + self.url + self.nr99_name)
         wget.download(self.base_url + self.url + self.nr99_name,    out=self.nr99_dest.path)
-        print "\nDownloading", self.base_url + self.url + self.aligned_name
+        print("\nDownloading", self.base_url + self.url + self.aligned_name)
         wget.download(self.base_url + self.url + self.aligned_name, out=self.aligned_dest.path)
 
     def unzip(self):

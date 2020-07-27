@@ -1,12 +1,19 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import os, fnmatch
 from collections import OrderedDict, Counter
 
-# Internal modules #
-from seqsearch.blast import BLASTdb
-
 # First party modules #
-from plumbing.autopaths import AutoPaths, FilePath
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path import FilePath
 from plumbing.cache import property_cached
 from plumbing.common import natural_sort
 from fasta import FASTA
@@ -35,7 +42,7 @@ class Database(object):
         # Base directory #
         if base_dir is None: base_dir = os.environ.get('HOME', '/') + '/'
         self.base_dir = base_dir + 'databases/' + self.short_name + '/'
-        self.p        = AutoPaths(self.base_dir, self.all_paths)
+        self.autopaths        = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached
     def ftp(self):
@@ -50,10 +57,10 @@ class Database(object):
         if hasattr(self, "pattern"):
             files = self.ftp.listdir(self.ftp.curdir)
             files.sort(key=natural_sort)
-            return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in files
-                                if fnmatch.fnmatch(f, self.pattern))
+            return OrderedDict((f, FilePath(self.autopaths.raw_dir+f)) for f in files
+                               if fnmatch.fnmatch(f, self.pattern))
         if hasattr(self, "files"):
-            return OrderedDict((f, FilePath(self.p.raw_dir+f)) for f in self.files)
+            return OrderedDict((f, FilePath(self.autopaths.raw_dir+f)) for f in self.files)
 
     @property
     def files_remaining(self):
@@ -62,7 +69,7 @@ class Database(object):
                            if dest.count_bytes != self.ftp.path.getsize(source))
 
     def download(self):
-        """Retrieve all files from the FTP site"""
+        """Retrieve all files from the FTP site."""
         self.base_dir.create_if_not_exists()
         for source,dest in tqdm(self.files_remaining.items()):
             dest.remove()
@@ -72,21 +79,21 @@ class Database(object):
     @property
     def raw_files(self):
         """The files we have downloaded."""
-        return map(FASTA, self.p.raw_dir.contents)
+        return map(FASTA, self.autopaths.raw_dir.contents)
 
     def ungzip(self):
-        """Ungzip them"""
+        """Ungzip them."""
         # Gzip #
         for f in tqdm(self.raw_files):
-            destination = self.p.unzipped_dir + f.prefix
+            destination = self.autopaths.unzipped_dir+f.prefix
             f.ungzip_to(destination)
             destination.permissions.only_readable()
 
     def untargz(self):
-        """Untarzip them"""
+        """Untarzip them."""
         # Gzip #
-        for f in tqdm(self.raw_files): f.untargz_to(self.p.unzipped_dir)
-        for f in self.p.unzipped_dir: f.permissions.only_readable()
+        for f in tqdm(self.raw_files): f.untargz_to(self.autopaths.unzipped_dir)
+        for f in self.autopaths.unzipped_dir: f.permissions.only_readable()
 
     @property
     def sequences(self):
@@ -94,11 +101,12 @@ class Database(object):
         for fasta in self.raw_files:
             for seq in fasta: yield seq
 
-    #------------------ Only for preformated BLAST databases -----------------#
+    #------------------ Only for preformatted BLAST databases ----------------#
     @property_cached
     def blast_db(self):
         """A BLASTable version of the sequences."""
-        return BLASTdb(self.p.unzipped_dir + self.short_name, 'nucl')
+        from seqsearch.search.blast import BLASTdb
+        return BLASTdb(self.autopaths.unzipped_dir+self.short_name, 'nucl')
 
     #--------------------- Only for taxonomic databases ----------------------#
     @property_cached

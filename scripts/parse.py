@@ -1,7 +1,7 @@
 # Built-in modules #
 
 # Internal modules #
-from plumbing.autopaths import FilePath
+from autopaths.file_path import FilePath
 
 # Third party modules #
 

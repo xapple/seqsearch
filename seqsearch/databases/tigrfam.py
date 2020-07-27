@@ -1,3 +1,12 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 
 # First party modules #
@@ -7,7 +16,8 @@ from fasta import FASTA
 
 ###############################################################################
 class Tigrfam(Database):
-    """The TIGRFAMs is a resource consisting of curated multiple sequence
+    """
+    The TIGRFAMs is a resource consisting of curated multiple sequence
     alignments, Hidden Markov Models (HMMs) for protein sequence
     classification, and associated information designed to support automated
     annotation of (mostly prokaryotic) proteins.
@@ -36,13 +46,13 @@ class Tigrfam(Database):
 
     @property_cached
     def hmm_db(self):
-        hmm_db = self.p.HMM
+        hmm_db = self.autopaths.HMM
         hmm_db.seq_type = 'hmm_prot'
         return hmm_db
 
     @property_cached
     def seeds(self):
-        seeds = FASTA(self.p.SEED)
+        seeds = FASTA(self.autopaths.SEED)
         return seeds
 
 ###############################################################################

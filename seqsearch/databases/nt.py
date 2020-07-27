@@ -1,21 +1,30 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 
 # Internal modules #
-
 from seqsearch.databases import Database
-from seqsearch           import SeqSearch
+from seqsearch.search    import SeqSearch
 
 # First party modules #
-from plumbing.tmpstuff   import new_temp_dir
+from autopaths.tmp_path import new_temp_dir
 from fasta import FASTA
 
 ###############################################################################
 class NucleotideDatabase(Database):
-    """The Nucleotide database is a collection of sequences from several sources,
+    """
+    The Nucleotide database is a collection of sequences from several sources,
      including GenBank, RefSeq, TPA and PDB.
-     
+
      To install:
-     
+
         from seqsearch.databases.nt import nt
         nt.download()
         nt.untargz()
@@ -65,7 +74,7 @@ class NucleotideDatabase(Database):
         # Run it #
         search.run()
         # Print result #
-        print "Success", directory
+        print("Success", directory)
 
 ###############################################################################
 nt = NucleotideDatabase("nucl")

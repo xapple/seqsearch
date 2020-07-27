@@ -1,20 +1,29 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import math, multiprocessing
 
 # Internal modules #
-from seqsearch import SeqSearch
-from seqsearch.blast import BLASTquery
-from seqsearch.vsearch import VSEARCHquery
+from seqsearch.search import SeqSearch
+from seqsearch.search.blast import BLASTquery
+from seqsearch.search.vsearch import VSEARCHquery
 from plumbing.cache import property_cached
 from fasta.splitable import SplitableFASTA
 
 # Third party modules #
-import humanfriendly
 from shell_command import shell_output
 
 ################################################################################
 class ParallelSeqSearch(SeqSearch):
-    """The same thing as a SeqSearch but operates by chopping in the input up into
+    """
+    The same thing as a SeqSearch but operates by chopping in the input up into
     smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
 
     You can specify the number of parts, the size in MB or GB that each part should approximately have,
@@ -39,6 +48,7 @@ class ParallelSeqSearch(SeqSearch):
         if num_parts:
             self.num_parts = num_parts
         if part_size:
+            import humanfriendly
             self.bytes_target = humanfriendly.parse_size(part_size)
             self.num_parts = int(math.ceil(input_fasta.count_bytes / self.bytes_target))
         if seqs_per_part:

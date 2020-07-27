@@ -1,5 +1,11 @@
-# Futures #
-from __future__ import division
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
 
 # Built-in modules #
 import warnings, multiprocessing
@@ -10,7 +16,7 @@ from seqsearch.databases.tigrfam import tigrfam
 
 # First party modules #
 from fasta import FASTA
-from plumbing.autopaths import FilePath
+from autopaths.file_path import FilePath
 
 # Third party modules #
 import sh

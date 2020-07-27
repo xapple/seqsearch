@@ -1,20 +1,31 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
 import urllib
 from collections import OrderedDict
 
 # Internal modules #
-from seqsearch.blast import BLASTdb
 from seqsearch.databases import base_directory
 
 # First party modules #
 from fasta import FASTA
-from plumbing.autopaths import AutoPaths, FilePath
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path import FilePath
 from plumbing.csv_tables import TSVTable
 
 ###############################################################################
 class String(object):
-    """The STRING database.
-    http://string.embl.de/newstring_cgi/show_download_page.pl"""
+    """
+    The STRING database. See:
+    http://string.embl.de/newstring_cgi/show_download_page.pl
+    """
 
     base_url = "http://string.embl.de/newstring_download/"
     short_name = "string"
@@ -36,7 +47,7 @@ class String(object):
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
     @property
-    def files_to_retrive(self):
+    def files_to_retrieve(self):
         """The files we want to download with their destinations."""
         result = OrderedDict()
         result[self.base_url + "protein.sequences.v9.1.fa.gz"] = FilePath(self.p.raw_proteins)
@@ -47,7 +58,7 @@ class String(object):
     def files_remaining(self):
         """The files we haven't downloaded yet based on size checks."""
         get_size_http = lambda url: urllib.urlopen(url).info().getheaders("Content-Length")[0]
-        return OrderedDict((source, dest) for source, dest in self.files_to_retrive.items()
+        return OrderedDict((source, dest) for source, dest in self.files_to_retrieve.items()
                            if dest.count_bytes != get_size_http(source))
 
     def download(self):
@@ -81,6 +92,7 @@ class String(object):
         """A BLASTable version of the sequences."""
         if not self.p.blast_fasta.exists:
             self.p.unzipped_proteins.link_to(self.p.blast_fasta, safe=True)
+        from seqsearch.search.blast import BLASTdb
         blast_db = BLASTdb(self.p.blast_fasta, 'prot')
         if not self.p.pin.exists:
             blast_db.makeblastdb(logfile=self.p.logfile, out=self.p.out)

@@ -1,25 +1,34 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
-import os, tarfile
+import os
 
 # First party modules #
 from seqsearch.databases import Database
-from fasta import FASTA
-from plumbing.autopaths import AutoPaths, FilePath
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path import FilePath
 
 # Third party modules #
-import wget
 
 # Constants #
 home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
 class PrTwo(Database):
-    """This is the PT2 database.
+    """
+    This is the PR2 database.
 
     https://figshare.com/articles/PR2_rRNA_gene_database/3803709
 
     To install:
-    
+
         from seqsearch.databases.pr_two import pr_two
         pr_two.download()
         pr_two.unzip()
@@ -73,7 +82,8 @@ class PrTwo(Database):
     def download(self):
         self.dest.directory.create(safe=True)
         self.dest.remove()
-        print "\nDownloading", self.url
+        print("\nDownloading", self.url)
+        import wget
         wget.download(self.url, out=self.dest.path)
 
     def unzip(self):

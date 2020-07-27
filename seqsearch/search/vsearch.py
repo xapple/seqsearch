@@ -1,10 +1,19 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Futures #
 from __future__ import division
 
 # Built-in modules #
 
 # Internal modules #
-from plumbing.autopaths import FilePath
+from autopaths.file_path import FilePath
 from fasta import FASTA
 
 # Third party modules #

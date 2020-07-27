@@ -1,13 +1,19 @@
-# Futures #
-from __future__ import division
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
 
 # Built-in modules #
 import sys, os, multiprocessing, threading, shutil
 
 # Internal modules #
 from fasta import FASTA
-from plumbing.tmpstuff import new_temp_path
-from plumbing.autopaths import FilePath
+from autopaths.tmp_path import new_temp_path
+from autopaths.file_path import FilePath
 from plumbing.cache import property_cached
 from plumbing.slurm.job import JobSLURM
 
@@ -18,24 +24,25 @@ import Bio.Blast.NCBIXML
 
 ###############################################################################
 class BLASTquery(object):
-    """A blast job. Possibly the standard BLAST algorithm or
-       BLASTP or BLASTX etc. Typically you could use it like this:
+    """
+    A blast job. Possibly the standard BLAST algorithm or
+    BLASTP or BLASTX etc. Typically you could use it like this:
 
-            import sys, os
-            records_path = os.path.expanduser(sys.argv[1])
-            centers_path = 'centers.fasta'
-            db = parallelblast.BLASTdb(centers_path)
-            db.makeblastdb()
-            params = {'executable': "~/share/blastplus/blastn",
-                      '-outfmt': 0,
-                      '-evalue': 1e-2,
-                      '-perc_identity': 97,
-                      '-num_threads': 16}
-            search = parallelblast.BLASTquery(records_path, db, params)
-            search.run()
+         import sys, os
+         records_path = os.path.expanduser(sys.argv[1])
+         centers_path = 'centers.fasta'
+         db = parallelblast.BLASTdb(centers_path)
+         db.makeblastdb()
+         params = {'executable': "~/share/blastplus/blastn",
+                   '-outfmt': 0,
+                   '-evalue': 1e-2,
+                   '-perc_identity': 97,
+                   '-num_threads': 16}
+         search = parallelblast.BLASTquery(records_path, db, params)
+         search.run()
 
-       You can also call search.non_block_run() to run maybe searches in parallel.
-       """
+    You can also call search.non_block_run() to run maybe searches in parallel.
+    """
 
     def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.query)
 
@@ -112,7 +119,7 @@ class BLASTquery(object):
         """If you have run the query in a non-blocking way, call this method to pause
         until the query is finished."""
         try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
-        except KeyboardInterrupt: print "Stopped waiting on BLAST thread number %i" % self.num
+        except KeyboardInterrupt: print("Stopped waiting on BLAST thread number %i" % self.num)
 
     @property_cached
     def slurm_job(self):
@@ -172,7 +179,7 @@ class BLASTdb(FASTA):
 
     def makeblastdb(self, logfile=None, out=None):
         # Message #
-        print "Calling `makeblastdb` on '%s'..." % self
+        print("Calling `makeblastdb` on '%s'..." % self)
         # Options #
         options = ['-in', self.path, '-dbtype', self.seq_type]
         # Add a log file #

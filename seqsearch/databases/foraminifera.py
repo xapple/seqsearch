@@ -1,10 +1,20 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+"""
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+"""
+
 # Built-in modules #
-import os, tarfile
+import os
 
 # First party modules #
 from seqsearch.databases import Database
 from fasta import FASTA
-from plumbing.autopaths import AutoPaths, FilePath
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path import FilePath
 
 # Third party modules #
 
@@ -13,13 +23,14 @@ home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
 class Foraminifera(Database):
-    """This is a custom database containing exlcusively Foraminifera sequences.
+    """
+    This is a custom database containing exclusively Foraminifera sequences.
 
     https://genev.unige.ch/research/laboratory/Jan-Pawlowski
 
     You should place the file "foram_db_cor.fasta" in:  ~/databases/foraminifera/
     Then you can run this:
-    
+
             from seqsearch.databases.foraminifera import foraminifera
             foraminifera.process()
             print foraminifera.tax_depth_freq
@@ -60,7 +71,7 @@ class Foraminifera(Database):
         self.nickname = "foram_mothur"
 
     def process(self):
-        # The file that was received by email without documentation T_T #
+        # The file that was received by email without documentation #
         raw = FASTA(self.p.cor)
         # Open files #
         self.alignment.create()

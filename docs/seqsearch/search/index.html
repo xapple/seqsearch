@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.3" />
+<title>seqsearch.search API documentation</title>
+<meta name="description" content="Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>seqsearch.search</code></h1>
+</header>
+<section id="section-intro">
+<p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+&#34;&#34;&#34;
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+&#34;&#34;&#34;
+
+# Built-in modules #
+import multiprocessing
+
+# Internal modules #
+from seqsearch.search.blast    import BLASTquery, BLASTdb
+from seqsearch.search.vsearch  import VSEARCHquery
+from seqsearch.search.hmmer    import HmmQuery
+from plumbing.cache     import property_cached
+from autopaths.file_path import FilePath
+
+# Third party modules #
+
+################################################################################
+class SeqSearch(object):
+    &#34;&#34;&#34;
+    A sequence similarity search. Could use different algorithms such
+    as BLAST, VSEARCH, HMMER, BLAT etc.
+
+    Input: - Series of sequences in a FASTA file.
+           - The type of the sequences.
+           - A database to search against.
+           - The type of algorithm to use. Currently BLAST or VSEARCH.
+           - Number of threads to use.
+           - The desired output path.
+           - An extra set of parameters to be given to the search command.
+           - The filtering options:
+              * BLAST supported:   - e-value
+                                   - Maximum targets
+                                   - Minimum identity (via manual output format)
+                                   - Minimum query coverage (via manual output format)
+              * VSEARCH supported: - ?
+              * HMMER supported:   - e-value
+
+    Output: - List of identifiers in the database
+              (object with significance value and identity attached)
+
+    Other possible alogrithms:
+        * http://www.ncbi.nlm.nih.gov/pubmed/11932250
+        * http://ab.inf.uni-tuebingen.de/software/pauda/
+        * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
+        * Diamond
+    &#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
+
+    def __init__(self, input_fasta, database,
+                 seq_type    = &#39;prot&#39; or &#39;nucl&#39;,      # What sequence type is the input fasta
+                 algorithm   = &#39;blast&#39; or &#39;vsearch&#39;,  # Which implementation do you want
+                 num_threads = None,                  # How many processes to use
+                 filtering   = None,                  # The result filtering options
+                 out_path    = None,                  # Where the out file will be
+                 params      = None,                  # Add extra params for the command line
+                 _out        = None,                  # Store the stdout at this path
+                 _err        = None):                 # Store the stderr at this path
+        # Base parameters #
+        self.input_fasta = input_fasta
+        self.database    = database
+        self.seq_type    = seq_type
+        self._out        = _out
+        self._err        = _err
+        # Optional #
+        self.algorithm = algorithm
+        # The filtering options #
+        if filtering is None: self.filtering = {}
+        else:                 self.filtering = filtering
+        # Output path #
+        if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
+        else: self.out_path = FilePath(out_path)
+        # Number of cores to use #
+        if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
+        else:                   self.num_threads = num_threads
+        # Extra params to be given to the search algorithm #
+        if params is None: self.params = {}
+        else:              self.params = params
+
+    @property
+    def query(self):
+        &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+        if self.algorithm == &#39;blast&#39;:   return self.blast_query
+        if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
+        if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
+        raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)
+
+    def run(self):
+        &#34;&#34;&#34;Run the search.&#34;&#34;&#34;
+        return self.query.run()
+
+    def filter(self):
+        &#34;&#34;&#34;Filter the results accordingly.&#34;&#34;&#34;
+        return self.query.filter(self.filtering)
+
+    @property
+    def results(self):
+        &#34;&#34;&#34;Parse the results in a meaningful manner.&#34;&#34;&#34;
+        return self.query.results
+
+    #-------------------------- BLAST IMPLEMENTATION -------------------------#
+    @property_cached
+    def blast_params(self):
+        &#34;&#34;&#34;A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options.&#34;&#34;&#34;
+        params = self.params.copy()
+        if &#39;e_value&#39;      in self.filtering: params[&#39;-evalue&#39;]          = self.filtering[&#39;e_value&#39;]
+        if &#39;max_targets&#39;  in self.filtering: params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        return params
+
+    def select_blast_algo(self):
+        &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
+        self.database = BLASTdb(self.database)
+        if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
+        if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
+        if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;
+        if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;tblastn&#39;
+
+    @property_cached
+    def blast_query(self):
+        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        return BLASTquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.blast_params,
+                          algorithm  = self.select_blast_algo(),
+                          version    = &#34;plus&#34;,
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path,
+                          _out       = self._out,
+                          _err       = self._err)
+
+    #------------------------- VSEARCH IMPLEMENTATION ------------------------#
+    @property_cached
+    def vsearch_query(self):
+        &#34;&#34;&#34;Make a VSEARCH search object.&#34;&#34;&#34;
+        params = {}
+        query = VSEARCHquery(self.input_fasta, self.database, params)
+        return query
+
+    #-------------------------- HMMER IMPLEMENTATION -------------------------#
+    @property_cached
+    def hmmer_params(self):
+        params = self.params.copy()
+        if &#39;e_value&#39; in self.filtering: params[&#39;-E&#39;] = self.filtering[&#39;e_value&#39;]
+        return params
+
+    @property_cached
+    def hmmer_query(self):
+        &#34;&#34;&#34;Make a HMMER search object.&#34;&#34;&#34;
+        return HmmQuery(query_path = self.input_fasta,
+                        db_path    = self.database,
+                        seq_type   = self.seq_type,
+                        params     = self.hmmer_params,
+                        cpus       = self.num_threads,
+                        out_path   = self.out_path)</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="seqsearch.search.blast" href="blast.html">seqsearch.search.blast</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
+</dd>
+<dt><code class="name"><a title="seqsearch.search.hmmer" href="hmmer.html">seqsearch.search.hmmer</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
+</dd>
+<dt><code class="name"><a title="seqsearch.search.ncbi" href="ncbi.html">seqsearch.search.ncbi</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
+</dd>
+<dt><code class="name"><a title="seqsearch.search.parallel" href="parallel.html">seqsearch.search.parallel</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
+</dd>
+<dt><code class="name"><a title="seqsearch.search.vsearch" href="vsearch.html">seqsearch.search.vsearch</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="seqsearch.search.SeqSearch"><code class="flex name class">
+<span>class <span class="ident">SeqSearch</span></span>
+<span>(</span><span>input_fasta, database, seq_type='prot', algorithm='blast', num_threads=None, filtering=None, out_path=None, params=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A sequence similarity search. Could use different algorithms such
+as BLAST, VSEARCH, HMMER, BLAT etc.</p>
+<p>Input: - Series of sequences in a FASTA file.
+- The type of the sequences.
+- A database to search against.
+- The type of algorithm to use. Currently BLAST or VSEARCH.
+- Number of threads to use.
+- The desired output path.
+- An extra set of parameters to be given to the search command.
+- The filtering options:
+* BLAST supported:
+- e-value
+- Maximum targets
+- Minimum identity (via manual output format)
+- Minimum query coverage (via manual output format)
+* VSEARCH supported: - ?
+* HMMER supported:
+- e-value</p>
+<p>Output: - List of identifiers in the database
+(object with significance value and identity attached)</p>
+<p>Other possible alogrithms:
+* <a href="http://www.ncbi.nlm.nih.gov/pubmed/11932250">http://www.ncbi.nlm.nih.gov/pubmed/11932250</a>
+* <a href="http://ab.inf.uni-tuebingen.de/software/pauda/">http://ab.inf.uni-tuebingen.de/software/pauda/</a>
+* <a href="http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/">http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/</a>
+* Diamond</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SeqSearch(object):
+    &#34;&#34;&#34;
+    A sequence similarity search. Could use different algorithms such
+    as BLAST, VSEARCH, HMMER, BLAT etc.
+
+    Input: - Series of sequences in a FASTA file.
+           - The type of the sequences.
+           - A database to search against.
+           - The type of algorithm to use. Currently BLAST or VSEARCH.
+           - Number of threads to use.
+           - The desired output path.
+           - An extra set of parameters to be given to the search command.
+           - The filtering options:
+              * BLAST supported:   - e-value
+                                   - Maximum targets
+                                   - Minimum identity (via manual output format)
+                                   - Minimum query coverage (via manual output format)
+              * VSEARCH supported: - ?
+              * HMMER supported:   - e-value
+
+    Output: - List of identifiers in the database
+              (object with significance value and identity attached)
+
+    Other possible alogrithms:
+        * http://www.ncbi.nlm.nih.gov/pubmed/11932250
+        * http://ab.inf.uni-tuebingen.de/software/pauda/
+        * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
+        * Diamond
+    &#34;&#34;&#34;
+
+    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
+
+    def __init__(self, input_fasta, database,
+                 seq_type    = &#39;prot&#39; or &#39;nucl&#39;,      # What sequence type is the input fasta
+                 algorithm   = &#39;blast&#39; or &#39;vsearch&#39;,  # Which implementation do you want
+                 num_threads = None,                  # How many processes to use
+                 filtering   = None,                  # The result filtering options
+                 out_path    = None,                  # Where the out file will be
+                 params      = None,                  # Add extra params for the command line
+                 _out        = None,                  # Store the stdout at this path
+                 _err        = None):                 # Store the stderr at this path
+        # Base parameters #
+        self.input_fasta = input_fasta
+        self.database    = database
+        self.seq_type    = seq_type
+        self._out        = _out
+        self._err        = _err
+        # Optional #
+        self.algorithm = algorithm
+        # The filtering options #
+        if filtering is None: self.filtering = {}
+        else:                 self.filtering = filtering
+        # Output path #
+        if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
+        else: self.out_path = FilePath(out_path)
+        # Number of cores to use #
+        if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
+        else:                   self.num_threads = num_threads
+        # Extra params to be given to the search algorithm #
+        if params is None: self.params = {}
+        else:              self.params = params
+
+    @property
+    def query(self):
+        &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+        if self.algorithm == &#39;blast&#39;:   return self.blast_query
+        if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
+        if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
+        raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)
+
+    def run(self):
+        &#34;&#34;&#34;Run the search.&#34;&#34;&#34;
+        return self.query.run()
+
+    def filter(self):
+        &#34;&#34;&#34;Filter the results accordingly.&#34;&#34;&#34;
+        return self.query.filter(self.filtering)
+
+    @property
+    def results(self):
+        &#34;&#34;&#34;Parse the results in a meaningful manner.&#34;&#34;&#34;
+        return self.query.results
+
+    #-------------------------- BLAST IMPLEMENTATION -------------------------#
+    @property_cached
+    def blast_params(self):
+        &#34;&#34;&#34;A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options.&#34;&#34;&#34;
+        params = self.params.copy()
+        if &#39;e_value&#39;      in self.filtering: params[&#39;-evalue&#39;]          = self.filtering[&#39;e_value&#39;]
+        if &#39;max_targets&#39;  in self.filtering: params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        return params
+
+    def select_blast_algo(self):
+        &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
+        self.database = BLASTdb(self.database)
+        if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
+        if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
+        if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;
+        if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;tblastn&#39;
+
+    @property_cached
+    def blast_query(self):
+        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        return BLASTquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.blast_params,
+                          algorithm  = self.select_blast_algo(),
+                          version    = &#34;plus&#34;,
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path,
+                          _out       = self._out,
+                          _err       = self._err)
+
+    #------------------------- VSEARCH IMPLEMENTATION ------------------------#
+    @property_cached
+    def vsearch_query(self):
+        &#34;&#34;&#34;Make a VSEARCH search object.&#34;&#34;&#34;
+        params = {}
+        query = VSEARCHquery(self.input_fasta, self.database, params)
+        return query
+
+    #-------------------------- HMMER IMPLEMENTATION -------------------------#
+    @property_cached
+    def hmmer_params(self):
+        params = self.params.copy()
+        if &#39;e_value&#39; in self.filtering: params[&#39;-E&#39;] = self.filtering[&#39;e_value&#39;]
+        return params
+
+    @property_cached
+    def hmmer_query(self):
+        &#34;&#34;&#34;Make a HMMER search object.&#34;&#34;&#34;
+        return HmmQuery(query_path = self.input_fasta,
+                        db_path    = self.database,
+                        seq_type   = self.seq_type,
+                        params     = self.hmmer_params,
+                        cpus       = self.num_threads,
+                        out_path   = self.out_path)</code></pre>
+</details>
+<h3>Subclasses</h3>
+<ul class="hlist">
+<li><a title="seqsearch.search.parallel.ParallelSeqSearch" href="parallel.html#seqsearch.search.parallel.ParallelSeqSearch">ParallelSeqSearch</a></li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="seqsearch.search.SeqSearch.blast_params"><code class="name">var <span class="ident">blast_params</span></code></dt>
+<dd>
+<div class="desc"><p>A dictionary of options to pass to the blast executable.
+The params should depend on the filtering options.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.blast_query"><code class="name">var <span class="ident">blast_query</span></code></dt>
+<dd>
+<div class="desc"><p>Make a BLAST search object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.hmmer_params"><code class="name">var <span class="ident">hmmer_params</span></code></dt>
+<dd>
+<div class="desc"><p>If you see the current source code in a seemingly unrelated part of
+an auto-generated documentation, it means the program making the
+documentation was unable to correctly traverse a decorated property.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.hmmer_query"><code class="name">var <span class="ident">hmmer_query</span></code></dt>
+<dd>
+<div class="desc"><p>Make a HMMER search object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.query"><code class="name">var <span class="ident">query</span></code></dt>
+<dd>
+<div class="desc"><p>The actual search object with all the relevant parameters.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def query(self):
+    &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+    if self.algorithm == &#39;blast&#39;:   return self.blast_query
+    if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
+    if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
+    raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.results"><code class="name">var <span class="ident">results</span></code></dt>
+<dd>
+<div class="desc"><p>Parse the results in a meaningful manner.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def results(self):
+    &#34;&#34;&#34;Parse the results in a meaningful manner.&#34;&#34;&#34;
+    return self.query.results</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.vsearch_query"><code class="name">var <span class="ident">vsearch_query</span></code></dt>
+<dd>
+<div class="desc"><p>Make a VSEARCH search object.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.search.SeqSearch.filter"><code class="name flex">
+<span>def <span class="ident">filter</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Filter the results accordingly.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def filter(self):
+    &#34;&#34;&#34;Filter the results accordingly.&#34;&#34;&#34;
+    return self.query.filter(self.filtering)</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.run"><code class="name flex">
+<span>def <span class="ident">run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Run the search.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def run(self):
+    &#34;&#34;&#34;Run the search.&#34;&#34;&#34;
+    return self.query.run()</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.SeqSearch.select_blast_algo"><code class="name flex">
+<span>def <span class="ident">select_blast_algo</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Depends on the query type and the database type.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def select_blast_algo(self):
+    &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
+    self.database = BLASTdb(self.database)
+    if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
+    if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
+    if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;
+    if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;tblastn&#39;</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="seqsearch" href="../index.html">seqsearch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="seqsearch.search.blast" href="blast.html">seqsearch.search.blast</a></code></li>
+<li><code><a title="seqsearch.search.hmmer" href="hmmer.html">seqsearch.search.hmmer</a></code></li>
+<li><code><a title="seqsearch.search.ncbi" href="ncbi.html">seqsearch.search.ncbi</a></code></li>
+<li><code><a title="seqsearch.search.parallel" href="parallel.html">seqsearch.search.parallel</a></code></li>
+<li><code><a title="seqsearch.search.vsearch" href="vsearch.html">seqsearch.search.vsearch</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="seqsearch.search.SeqSearch" href="#seqsearch.search.SeqSearch">SeqSearch</a></code></h4>
+<ul class="two-column">
+<li><code><a title="seqsearch.search.SeqSearch.blast_params" href="#seqsearch.search.SeqSearch.blast_params">blast_params</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.blast_query" href="#seqsearch.search.SeqSearch.blast_query">blast_query</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.filter" href="#seqsearch.search.SeqSearch.filter">filter</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.hmmer_params" href="#seqsearch.search.SeqSearch.hmmer_params">hmmer_params</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.hmmer_query" href="#seqsearch.search.SeqSearch.hmmer_query">hmmer_query</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.query" href="#seqsearch.search.SeqSearch.query">query</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.results" href="#seqsearch.search.SeqSearch.results">results</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.run" href="#seqsearch.search.SeqSearch.run">run</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.select_blast_algo" href="#seqsearch.search.SeqSearch.select_blast_algo">select_blast_algo</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.vsearch_query" href="#seqsearch.search.SeqSearch.vsearch_query">vsearch_query</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.3</a>.</p>
+</footer>
+</body>
+</html>
