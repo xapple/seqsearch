@@ -10,7 +10,7 @@ setup(
     author_email     = 'lucas.sinclair@me.com',
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
     packages         = find_packages(),
-    install_requires = ['plumbing>=2.8.5', 'autopaths>=1.4.4', 'fasta>=2.0.9',
+    install_requires = ['plumbing>=2.8.9', 'autopaths>=1.4.6', 'fasta>=2.1.0',
                         'biopython', 'decorator', 'sh', 'tqdm', 'ftputil',
                         'wget'],
     long_description = open('README.md').read(),
