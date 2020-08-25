@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.8.4" />
+<title>seqsearch.databases.mothur.rdp API documentation</title>
+<meta name="description" content="Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.18.1/highlight.min.js" integrity="sha256-eOgo0OtLL4cdq7RdwRUiGKLX9XsIJ7nGhWEKbohmVAQ=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>seqsearch.databases.mothur.rdp</code></h1>
+</header>
+<section id="section-intro">
+<p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+&#34;&#34;&#34;
+Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio
+&#34;&#34;&#34;
+
+# Built-in modules #
+import os, tarfile
+
+# First party modules #
+from seqsearch.databases  import Database
+from autopaths.auto_paths import AutoPaths
+from autopaths.file_path  import FilePath
+
+# Third party modules #
+
+# Constants #
+home = os.environ.get(&#39;HOME&#39;, &#39;~&#39;) + &#39;/&#39;
+
+###############################################################################
+class RdpMothur(Database):
+    &#34;&#34;&#34;
+    This is the RDP database, in its specific version from mothur. Seen at:
+
+    https://mothur.org/wiki/rdp_reference_files/
+
+    To install:
+
+        &gt;&gt;&gt; from seqsearch.databases.mothur.rdp import rdp_mothur
+        &gt;&gt;&gt; rdp_mothur.download()
+        &gt;&gt;&gt; rdp_mothur.unzip()
+
+    It will place the results in `~/databases/rdp_mothur/`.
+
+    This database is from March 2016.
+    &#34;&#34;&#34;
+
+    nickname   = &#34;rdp&#34;
+    tag        = &#34;rdp&#34;
+    short_name = &#34;rdp_mothur&#34;
+    long_name  = &#34;The RDP v16 database (mothur version)&#34;
+    version    = &#34;16&#34;
+    base_name  = &#34;trainset16_022016.rdp&#34;
+    base_url   = &#34;https://mothur.s3.us-east-2.amazonaws.com/wiki/&#34;
+
+    all_paths = &#34;&#34;&#34;
+                /rdp.tgz
+                &#34;&#34;&#34;
+
+    @property
+    def rank_names(self):
+        &#34;&#34;&#34;
+        The names of the taxonomic rank at each level.
+        There are a total of 7 ranks.
+        &#34;&#34;&#34;
+        return [&#39;Domain&#39;,    # 0
+                &#39;Phylum&#39;,    # 1
+                &#39;Class&#39;,     # 2
+                &#39;Order&#39;,     # 3
+                &#39;Family&#39;,    # 4
+                &#39;Genus&#39;,     # 5
+                &#39;Species&#39;]   # 6
+
+    def __init__(self, data_dir=None):
+        # The directory that contains all databases #
+        if data_dir is None: data_dir = home + &#39;databases/&#39;
+        # Base directory for paths #
+        self.base_dir  = data_dir + self.short_name + &#39;/&#39;
+        self.autopaths = AutoPaths(self.base_dir, self.all_paths)
+        # Location of zip file remotely #
+        self.url = self.base_url + self.base_name + &#34;.tgz&#34;
+        # Location of zip file locally #
+        self.dest = self.autopaths.tgz
+        # The results after download #
+        prefix = self.base_dir + self.base_name + &#39;/&#39; + self.base_name
+        self.alignment = FilePath(prefix + &#34;.fasta&#34;)
+        self.taxonomy  = FilePath(prefix + &#34;.tax&#34;)
+
+    def download(self):
+        # Make sure the directory exists #
+        self.dest.directory.create(safe=True)
+        # Remove previous download #
+        self.dest.remove()
+        # Message #
+        print(&#34;\n Downloading &#39;%s&#39;&#34; % self.url)
+        # Download #
+        import wget
+        return wget.download(self.url, out=self.dest.path)
+
+    def unzip(self):
+        # Message #
+        print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+        # Uncompress #
+        archive = tarfile.open(self.dest, &#39;r:gz&#39;)
+        archive.extractall(self.base_dir)
+
+    def __bool__(self):
+        &#34;&#34;&#34;
+        Return True if the silva database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        &#34;&#34;&#34;
+        return self.taxonomy.exists
+
+###############################################################################
+rdp_mothur = RdpMothur()</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur"><code class="flex name class">
+<span>class <span class="ident">RdpMothur</span></span>
+<span>(</span><span>data_dir=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This is the RDP database, in its specific version from mothur. Seen at:</p>
+<p><a href="https://mothur.org/wiki/rdp_reference_files/">https://mothur.org/wiki/rdp_reference_files/</a></p>
+<p>To install:</p>
+<pre><code>&gt;&gt;&gt; from seqsearch.databases.mothur.rdp import rdp_mothur
+&gt;&gt;&gt; rdp_mothur.download()
+&gt;&gt;&gt; rdp_mothur.unzip()
+</code></pre>
+<p>It will place the results in <code>~/databases/rdp_mothur/</code>.</p>
+<p>This database is from March 2016.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class RdpMothur(Database):
+    &#34;&#34;&#34;
+    This is the RDP database, in its specific version from mothur. Seen at:
+
+    https://mothur.org/wiki/rdp_reference_files/
+
+    To install:
+
+        &gt;&gt;&gt; from seqsearch.databases.mothur.rdp import rdp_mothur
+        &gt;&gt;&gt; rdp_mothur.download()
+        &gt;&gt;&gt; rdp_mothur.unzip()
+
+    It will place the results in `~/databases/rdp_mothur/`.
+
+    This database is from March 2016.
+    &#34;&#34;&#34;
+
+    nickname   = &#34;rdp&#34;
+    tag        = &#34;rdp&#34;
+    short_name = &#34;rdp_mothur&#34;
+    long_name  = &#34;The RDP v16 database (mothur version)&#34;
+    version    = &#34;16&#34;
+    base_name  = &#34;trainset16_022016.rdp&#34;
+    base_url   = &#34;https://mothur.s3.us-east-2.amazonaws.com/wiki/&#34;
+
+    all_paths = &#34;&#34;&#34;
+                /rdp.tgz
+                &#34;&#34;&#34;
+
+    @property
+    def rank_names(self):
+        &#34;&#34;&#34;
+        The names of the taxonomic rank at each level.
+        There are a total of 7 ranks.
+        &#34;&#34;&#34;
+        return [&#39;Domain&#39;,    # 0
+                &#39;Phylum&#39;,    # 1
+                &#39;Class&#39;,     # 2
+                &#39;Order&#39;,     # 3
+                &#39;Family&#39;,    # 4
+                &#39;Genus&#39;,     # 5
+                &#39;Species&#39;]   # 6
+
+    def __init__(self, data_dir=None):
+        # The directory that contains all databases #
+        if data_dir is None: data_dir = home + &#39;databases/&#39;
+        # Base directory for paths #
+        self.base_dir  = data_dir + self.short_name + &#39;/&#39;
+        self.autopaths = AutoPaths(self.base_dir, self.all_paths)
+        # Location of zip file remotely #
+        self.url = self.base_url + self.base_name + &#34;.tgz&#34;
+        # Location of zip file locally #
+        self.dest = self.autopaths.tgz
+        # The results after download #
+        prefix = self.base_dir + self.base_name + &#39;/&#39; + self.base_name
+        self.alignment = FilePath(prefix + &#34;.fasta&#34;)
+        self.taxonomy  = FilePath(prefix + &#34;.tax&#34;)
+
+    def download(self):
+        # Make sure the directory exists #
+        self.dest.directory.create(safe=True)
+        # Remove previous download #
+        self.dest.remove()
+        # Message #
+        print(&#34;\n Downloading &#39;%s&#39;&#34; % self.url)
+        # Download #
+        import wget
+        return wget.download(self.url, out=self.dest.path)
+
+    def unzip(self):
+        # Message #
+        print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+        # Uncompress #
+        archive = tarfile.open(self.dest, &#39;r:gz&#39;)
+        archive.extractall(self.base_dir)
+
+    def __bool__(self):
+        &#34;&#34;&#34;
+        Return True if the silva database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        &#34;&#34;&#34;
+        return self.taxonomy.exists</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="seqsearch.databases.Database" href="../index.html#seqsearch.databases.Database">Database</a></li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.all_paths"><code class="name">var <span class="ident">all_paths</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.base_name"><code class="name">var <span class="ident">base_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.base_url"><code class="name">var <span class="ident">base_url</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.long_name"><code class="name">var <span class="ident">long_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.nickname"><code class="name">var <span class="ident">nickname</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.short_name"><code class="name">var <span class="ident">short_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.tag"><code class="name">var <span class="ident">tag</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.version"><code class="name">var <span class="ident">version</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Instance variables</h3>
+<dl>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.rank_names"><code class="name">var <span class="ident">rank_names</span></code></dt>
+<dd>
+<div class="desc"><p>The names of the taxonomic rank at each level.
+There are a total of 7 ranks.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def rank_names(self):
+    &#34;&#34;&#34;
+    The names of the taxonomic rank at each level.
+    There are a total of 7 ranks.
+    &#34;&#34;&#34;
+    return [&#39;Domain&#39;,    # 0
+            &#39;Phylum&#39;,    # 1
+            &#39;Class&#39;,     # 2
+            &#39;Order&#39;,     # 3
+            &#39;Family&#39;,    # 4
+            &#39;Genus&#39;,     # 5
+            &#39;Species&#39;]   # 6</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.databases.mothur.rdp.RdpMothur.unzip"><code class="name flex">
+<span>def <span class="ident">unzip</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def unzip(self):
+    # Message #
+    print(&#34;\n Extracting archive &#39;%s&#39;&#34; % self.dest)
+    # Uncompress #
+    archive = tarfile.open(self.dest, &#39;r:gz&#39;)
+    archive.extractall(self.base_dir)</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="seqsearch.databases.Database" href="../index.html#seqsearch.databases.Database">Database</a></b></code>:
+<ul class="hlist">
+<li><code><a title="seqsearch.databases.Database.blast_db" href="../index.html#seqsearch.databases.Database.blast_db">blast_db</a></code></li>
+<li><code><a title="seqsearch.databases.Database.download" href="../index.html#seqsearch.databases.Database.download">download</a></code></li>
+<li><code><a title="seqsearch.databases.Database.files_remaining" href="../index.html#seqsearch.databases.Database.files_remaining">files_remaining</a></code></li>
+<li><code><a title="seqsearch.databases.Database.files_to_retrive" href="../index.html#seqsearch.databases.Database.files_to_retrive">files_to_retrive</a></code></li>
+<li><code><a title="seqsearch.databases.Database.ftp" href="../index.html#seqsearch.databases.Database.ftp">ftp</a></code></li>
+<li><code><a title="seqsearch.databases.Database.raw_files" href="../index.html#seqsearch.databases.Database.raw_files">raw_files</a></code></li>
+<li><code><a title="seqsearch.databases.Database.sequences" href="../index.html#seqsearch.databases.Database.sequences">sequences</a></code></li>
+<li><code><a title="seqsearch.databases.Database.tax_depth_freq" href="../index.html#seqsearch.databases.Database.tax_depth_freq">tax_depth_freq</a></code></li>
+<li><code><a title="seqsearch.databases.Database.ungzip" href="../index.html#seqsearch.databases.Database.ungzip">ungzip</a></code></li>
+<li><code><a title="seqsearch.databases.Database.untargz" href="../index.html#seqsearch.databases.Database.untargz">untargz</a></code></li>
+</ul>
+</li>
+</ul>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="seqsearch.databases.mothur" href="index.html">seqsearch.databases.mothur</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="seqsearch.databases.mothur.rdp.RdpMothur" href="#seqsearch.databases.mothur.rdp.RdpMothur">RdpMothur</a></code></h4>
+<ul class="two-column">
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.all_paths" href="#seqsearch.databases.mothur.rdp.RdpMothur.all_paths">all_paths</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.base_name" href="#seqsearch.databases.mothur.rdp.RdpMothur.base_name">base_name</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.base_url" href="#seqsearch.databases.mothur.rdp.RdpMothur.base_url">base_url</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.long_name" href="#seqsearch.databases.mothur.rdp.RdpMothur.long_name">long_name</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.nickname" href="#seqsearch.databases.mothur.rdp.RdpMothur.nickname">nickname</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.rank_names" href="#seqsearch.databases.mothur.rdp.RdpMothur.rank_names">rank_names</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.short_name" href="#seqsearch.databases.mothur.rdp.RdpMothur.short_name">short_name</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.tag" href="#seqsearch.databases.mothur.rdp.RdpMothur.tag">tag</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.unzip" href="#seqsearch.databases.mothur.rdp.RdpMothur.unzip">unzip</a></code></li>
+<li><code><a title="seqsearch.databases.mothur.rdp.RdpMothur.version" href="#seqsearch.databases.mothur.rdp.RdpMothur.version">version</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.8.4</a>.</p>
+</footer>
+</body>
+</html>
