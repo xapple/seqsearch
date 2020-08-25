@@ -29,18 +29,18 @@ class SilvaMothur(Database):
 
     To install:
 
-        >>> from seqsearch.databases.silva_mothur import silva_mothur
+        >>> from seqsearch.databases.mothur.silva import silva_mothur
         >>> silva_mothur.download()
         >>> silva_mothur.unzip()
 
-    It will place the results in `~/databases/silva_mothur_xxx/` where xxx
-    corresponds to the version of the database, here 138.
+    It will place the results in `~/databases/silva_mothur/`.
     """
 
-    base_url   = "https://mothur.s3.us-east-2.amazonaws.com/wiki/"
+    tag        = "silva"
     short_name = "silva_mothur"
     long_name  = "The Silva v138 database (mothur version)"
     version    = "138"
+    base_url   = "https://mothur.s3.us-east-2.amazonaws.com/wiki/"
 
     all_paths = """
                 /silva.tgz
