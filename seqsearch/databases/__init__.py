@@ -27,7 +27,7 @@ home = os.environ.get('HOME', '~') + '/'
 base_directory = home + "databases/"
 
 ###############################################################################
-class Database(object):
+class Database:
     """General database object to inherit from."""
 
     all_paths = """
