@@ -1,5 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
-Copied and adapted from https://bitbucket.org/peterjc/galaxy-central/src/5cefd5d5536e/tools/ncbi_blast_plus/blast.py
+Copied and adapted from:
+
+https://bitbucket.org/peterjc/galaxy-central/src/5cefd5d5536e/tools/ncbi_blast_plus/blast.py
 
 Tested working with BLAST 2.2.28+
 
@@ -8,8 +13,10 @@ More info at: http://www.biostars.org/p/53946/
 
 ###############################################################################
 def merge_blast_xml(inputs, output):
-    """Will merge the results from several BLAST searches
-    when XML output is used."""
+    """
+    Will merge the results from several BLAST searches
+    when XML output is used.
+    """
     for i,handle in enumerate(inputs):
         path = handle.name
         header = handle.readline()
