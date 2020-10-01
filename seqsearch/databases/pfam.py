@@ -82,7 +82,7 @@ class SpecificFamily(object):
 
     def __init__(self, fam_name):
         self.fam_name = fam_name
-        self.base_dir = DirectoryPath(pfam.autopaths.specific_dir+self.fam_name)
+        self.base_dir = DirectoryPath(pfam.autopaths.specific_dir + self.fam_name)
         self.p        = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached

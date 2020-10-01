@@ -76,7 +76,7 @@ class ParallelSeqSearch(SeqSearch):
         raise NotImplemented(self.algorithm)
 
     def join_outputs(self):
-        """Join the outputs"""
+        """Join the outputs."""
         shell_output('cat %s > %s' % (' '.join(q.out_path for q in self.queries), self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#

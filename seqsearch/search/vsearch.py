@@ -7,9 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 """
 
-# Futures #
-from __future__ import division
-
 # Built-in modules #
 
 # Internal modules #

@@ -24,12 +24,16 @@ Entrez.email = "I don't know who will be running this script"
 
 ###############################################################################
 class UtilsNCBI(object):
-    """An object that takes care of extracting NCBI information via the eutils
-    http://www.ncbi.nlm.nih.gov/books/NBK25499/"""
+    """
+    An object that takes care of extracting NCBI information via the eutils
+    http://www.ncbi.nlm.nih.gov/books/NBK25499/
+    """
 
     def gi_num_to_tax(self, id_num):
-        """How to convert a single GI identification number to taxonomy info
-        Can also accept a list of GI numbers in the parameter `id_num`"""
+        """
+        How to convert a single GI identification number to taxonomy info
+        Can also accept a list of GI numbers in the parameter `id_num`
+        """
         if isinstance(id_num, list):
             gb_entries = Entrez.efetch(db="nuccore", id=id_num, rettype="fasta", retmode="xml")
             gb_records = Entrez.read(gb_entries)
@@ -63,9 +67,11 @@ class UtilsNCBI(object):
         return result
 
     def chunk_to_records(self, chunk, validate=False):
-        """Download from NCBI until it works. Will restart until reaching the python
+        """
+        Download from NCBI until it works. Will restart until reaching the python
         recursion limit. We don't want to get banned from NCBI so we have a little
-        pause at every function call."""
+        pause at every function call.
+        """
         from urllib2 import HTTPError
         time.sleep(0.5)
         try:

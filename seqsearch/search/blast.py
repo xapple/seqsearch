@@ -12,14 +12,13 @@ import sys, os, multiprocessing, threading, shutil
 
 # Internal modules #
 from fasta import FASTA
-from autopaths.tmp_path import new_temp_path
+from autopaths.tmp_path  import new_temp_path
 from autopaths.file_path import FilePath
-from plumbing.cache import property_cached
-from plumbing.slurm.job import JobSLURM
+from plumbing.cache      import property_cached
+from plumbing.slurm.job  import JobSLURM
 
 # Third party modules #
 import sh
-from ftputil import FTPHost
 import Bio.Blast.NCBIXML
 
 ###############################################################################
@@ -49,30 +48,36 @@ class BLASTquery(object):
     def __init__(self, query_path, db_path,
                  seq_type     = 'prot' or 'nucl',     # The seq type of the query_path file
                  params       = None,                 # Add extra params for the command line
-                 algorithm    = "blastn" or "blastp", # Will be autodetermined with seq_type
+                 algorithm    = "blastn" or "blastp", # Will be auto-determined with seq_type
                  version      = "plus" or "legacy",   # Either blast+ or the old `blastall`
                  out_path     = None,                 # Where the results will be dropped
                  executable   = None,                 # If you want a specific binary give the path
                  cpus         = None,                 # The number of threads to use
-                 num          = None,                 # When parallelizing, the number of this thread
+                 num          = None,                 # When parallelized, the number of this thread
                  slurm_params = None,                 # If you have special slurm parameters
                  _out         = None,                 # Store the stdout at this path
                  _err         = None):                # Store the stderr at this path
-        # Save attributes #
-        self.query        = FASTA(query_path)
-        self.db           = BLASTdb(db_path, seq_type)
+        # Main input #
+        self.query = FASTA(query_path)
+        # The database to search against #
+        self.db = BLASTdb(db_path, seq_type)
+        # Other attributes #
         self.seq_type     = seq_type
         self.version      = version
         self.algorithm    = algorithm
         self.num          = num
         self.params       = params if params else {}
         self.slurm_params = slurm_params if slurm_params else {}
+        # The standard output and error #
         self._out         = _out
         self._err         = _err
-        # Output #
-        if out_path is None:         self.out_path = self.query.prefix_path + '.blastout'
-        elif out_path.endswith('/'): self.out_path = out_path + self.query.prefix + '.blastout'
-        else:                        self.out_path = out_path
+        # Output defaults #
+        if out_path is None:
+            self.out_path = self.query.prefix_path + '.blastout'
+        elif out_path.endswith('/'):
+            self.out_path = out_path + self.query.prefix + '.blastout'
+        else:
+            self.out_path = out_path
         # Make it a file path #
         self.out_path = FilePath(self.out_path)
         # Executable #
@@ -118,8 +123,10 @@ class BLASTquery(object):
     def wait(self):
         """If you have run the query in a non-blocking way, call this method to pause
         until the query is finished."""
-        try: self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
-        except KeyboardInterrupt: print("Stopped waiting on BLAST thread number %i" % self.num)
+        try:
+            self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+        except KeyboardInterrupt:
+            print("Stopped waiting on BLAST thread number %i" % self.num)
 
     @property_cached
     def slurm_job(self):
@@ -187,19 +194,3 @@ class BLASTdb(FASTA):
         # Call the program #
         if out is not None: sh.makeblastdb(*options, _out=str(out))
         else:               sh.makeblastdb(*options)
-
-###############################################################################
-def install_blast(base_dir):
-    """Deprecated, look into 'home_linux/setup/bioinfo_tools'
-    On Ubuntu: sudo apt-get install ncbi-blast+
-    """
-    # Default location #
-    if base_dir is None: base_dir = os.environ.get('HOME', '/') + '/programs/blast/'
-    # Download from FTP #
-    ftp_url = "ftp.ncbi.nlm.nih.gov"
-    ftp_dir = "/blast/executables/blast+/LATEST/"
-    pattern = 'ncbi-blast-*+-src.zip'
-    ftp = FTPHost(ftp_url, "anonymous")
-    ftp.chdir(ftp_dir)
-    files = ftp.listdir(self.ftp.curdir)
-    ftp.download(source, dest)
