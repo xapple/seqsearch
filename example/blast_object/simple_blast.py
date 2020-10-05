@@ -6,13 +6,11 @@ Written by Lucas Sinclair.
 MIT Licensed.
 Contact at www.sinclair.bio
 
-Development script to test some of the methods in the `seqsearch` package
-and try out different things. This script can safely be ignored
-and is meant simply as a sandbox.
+A script to demonstrate the usage of the `BLASTquery` class.
 
 Typically you would run this file from a command line like this:
 
-     ipython3 -i -- ~/deploy/seqsearch/scripts/tmp_code.py
+     ipython3 -i -- ~/deploy/seqsearch/scripts/simple_blast.py
 """
 
 # Built-in modules #
@@ -40,4 +38,4 @@ db = ncbi_16s.blast_db
 query = BLASTquery(seqs, db)
 
 # Run #
-query()
+query.run()
