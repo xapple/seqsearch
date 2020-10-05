@@ -104,7 +104,7 @@ class BLASTquery(object):
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
-        return map(str, cmd)
+        return list(map(str, cmd))
 
     #-------------------------------- RUNNING --------------------------------#
     def run(self):
