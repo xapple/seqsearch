@@ -83,7 +83,7 @@ class BLASTquery(object):
         # Executable #
         self.executable = FilePath(executable)
         # Cores to use #
-        if cpus is None: self.cpus = multiprocessing.cpu_count()
+        if cpus is None: self.cpus = min(multiprocessing.cpu_count(), 32)
         else:            self.cpus = cpus
         # Auto detect XML output #
         if self.out_path.extension == '.xml':
@@ -96,9 +96,10 @@ class BLASTquery(object):
         if self.executable:            cmd = [self.executable.path]
         elif self.version == 'legacy': cmd = ["blastall", '-p', self.algorithm]
         else:                          cmd = [self.algorithm]
-        # Essentials #
+        # The legacy version #
         if self.version == 'legacy':
             cmd += ['-d',  self.db, '-i',     self.query, '-o',   self.out_path, '-a',           self.cpus]
+        # The standard version #
         if self.version == 'plus':
             cmd += ['-db', self.db, '-query', self.query, '-out', self.out_path, '-num_threads', self.cpus]
         # Options #
@@ -107,12 +108,19 @@ class BLASTquery(object):
         return list(map(str, cmd))
 
     #-------------------------------- RUNNING --------------------------------#
-    def run(self):
+    def run(self, verbose=False):
         """Simply run the BLAST search locally."""
-        out = self._out if self._out else '/dev/null'
-        err = self._err if self._err else '/dev/null'
+        # Determine if standard output is to be kept #
+        out = self._out if self._out is not None else '/dev/null'
+        err = self._err if self._err is not None else '/dev/null'
+        # Optionally print the command #
+        if verbose:
+            print("Running BLAST command:\n    %s" % ' '.join(self.command))
+        # Run it #
         sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
-        if os.path.exists("error.log") and os.path.getsize("error.log") == 0: os.remove("error.log")
+        # Clean up #
+        if os.path.exists("error.log") and os.path.getsize("error.log") == 0:
+            os.remove("error.log")
 
     def non_block_run(self):
         """Special method to run the query in a thread locally without blocking."""
@@ -137,8 +145,10 @@ class BLASTquery(object):
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):
-        """We can do some special filtering on the results.
-        For the moment only minimum coverage and minimum identity."""
+        """
+        We can do some special filtering on the results.
+        For the moment only minimum coverage and minimum identity.
+        """
         # Conditions #
         if 'min_coverage' in filtering and 'qcovs' not in self.params['-outfmt']:
             raise Exception("Can't filter on minimum coverage because it wasn't included.")
@@ -158,7 +168,8 @@ class BLASTquery(object):
                 else: yield line
         # Do it #
         temp_path = new_temp_path()
-        with open(temp_path, 'w') as handle: handle.writelines(filter_lines(self.out_path))
+        with open(temp_path, 'w') as handle:
+            handle.writelines(filter_lines(self.out_path))
         os.remove(self.out_path)
         shutil.move(temp_path, self.out_path)
 

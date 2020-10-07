@@ -33,10 +33,13 @@ class NCBI16S(Database):
         >>> ncbi_16s.download()
         >>> ncbi_16s.untargz()
 
-    It will place the resulting files in ~/databases/ncbi_16s/
+    It will place the resulting files in "~/databases/ncbi_16s/".
     """
 
+    tag        = "ncbi_16s"
     short_name = "ncbi_16s"
+    long_name  = 'The NCBI 16S RNA database'
+
     base_url   = "ftp://ftp.ncbi.nlm.nih.gov/blast/db/"
     ftp_url    = "ftp.ncbi.nlm.nih.gov"
     ftp_dir    = "/blast/db/"

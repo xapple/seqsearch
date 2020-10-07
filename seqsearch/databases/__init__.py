@@ -97,7 +97,7 @@ class Database:
             destination.permissions.only_readable()
 
     def untargz(self):
-        """Untarzip them."""
+        """Untargzip them."""
         # Gzip #
         for f in tqdm(self.raw_files): f.untargz_to(self.autopaths.unzipped_dir)
         for f in self.autopaths.unzipped_dir: f.permissions.only_readable()

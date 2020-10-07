@@ -51,7 +51,8 @@ class SeqSearch(object):
         * Diamond
     """
 
-    def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.input_fasta)
+    def __repr__(self):
+        return '<%s object on %s>' % (self.__class__.__name__, self.input_fasta)
 
     def __init__(self, input_fasta, database,
                  seq_type    = 'prot' or 'nucl',      # What sequence type is the input fasta
@@ -136,8 +137,12 @@ class SeqSearch(object):
     @property_cached
     def blast_query(self):
         """Make a BLAST search object."""
-        # In case we got a path, convert it #
-        self.database = BLASTdb(self.database)
+        # In case we got a database object, use the blastdb attribute #
+        if hasattr(self.database, 'blast_db'):
+            self.database = self.database.blast_db
+        # In case we got a path, convert it to a BLASTdb #
+        else:
+            self.database = BLASTdb(self.database)
         # Make the query #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,

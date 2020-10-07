@@ -39,3 +39,7 @@ search = SeqSearch(seqs, db)
 
 # Run #
 search.run()
+
+# Show results #
+for r in search.results:
+    print(r)
