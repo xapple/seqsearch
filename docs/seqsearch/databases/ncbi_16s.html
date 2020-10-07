@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>seqsearch.databases.nt API documentation</title>
+<title>seqsearch.databases.ncbi_16s API documentation</title>
 <meta name="description" content="Written by Lucas Sinclair.
 MIT Licensed.
 Contact at www.sinclair.bio" />
@@ -21,7 +21,7 @@ Contact at www.sinclair.bio" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>seqsearch.databases.nt</code></h1>
+<h1 class="title">Module <code>seqsearch.databases.ncbi_16s</code></h1>
 </header>
 <section id="section-intro">
 <p>Written by Lucas Sinclair.
@@ -41,76 +41,46 @@ Contact at www.sinclair.bio
 &#34;&#34;&#34;
 
 # Built-in modules #
-
-# Internal modules #
-from seqsearch.databases import Database
-from seqsearch.search    import SeqSearch
+import os
 
 # First party modules #
-from autopaths.tmp_path import new_temp_dir
-from fasta import FASTA
+from seqsearch.databases import Database
+
+# Third party modules #
+
+# Constants #
+home = os.environ.get(&#39;HOME&#39;, &#39;~&#39;) + &#39;/&#39;
 
 ###############################################################################
-class NucleotideDatabase(Database):
+class NCBI16S(Database):
     &#34;&#34;&#34;
-    The Nucleotide database is a collection of sequences from several sources,
-     including GenBank, RefSeq, TPA and PDB.
+    The NCBI provides a database of 16S ribosomal sequences.
+    The exact title is &#34;Bacteria and Archaea: 16S ribosomal RNA project&#34;.
+    More information is available at:
 
-     To install:
+    https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/
 
-        from seqsearch.databases.nt import nt
-        nt.download()
-        nt.untargz()
-        nt.test()
+    To install:
 
-    It will put it in ~/databases/nt
+        &gt;&gt;&gt; from seqsearch.databases.ncbi_16s import ncbi_16s
+        &gt;&gt;&gt; ncbi_16s.download()
+        &gt;&gt;&gt; ncbi_16s.untargz()
+
+    It will place the resulting files in &#34;~/databases/ncbi_16s/&#34;.
     &#34;&#34;&#34;
 
-    short_name = &#34;nt&#34;
-    long_name  = &#34;The Nucleotide database (NCBI)&#34;
+    tag        = &#34;ncbi_16s&#34;
+    short_name = &#34;ncbi_16s&#34;
+    long_name  = &#39;The NCBI 16S RNA database&#39;
+
+    base_url   = &#34;ftp://ftp.ncbi.nlm.nih.gov/blast/db/&#34;
     ftp_url    = &#34;ftp.ncbi.nlm.nih.gov&#34;
     ftp_dir    = &#34;/blast/db/&#34;
-    pattern    = &#39;nt.*.tar.gz&#39;
-
-    def test(self):
-        &#34;&#34;&#34;Search one sequence, and see if it works.&#34;&#34;&#34;
-        # New directory #
-        directory = new_temp_dir()
-        # A randomly chosen sequence (Homo sapiens mRNA for prepro cortistatin) #
-        seq = &#34;&#34;&#34;ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC
-        CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC
-        CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG
-        AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC
-        CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG
-        TTTAATTACAGACCTGAA&#34;&#34;&#34;
-        seq = seq.replace(&#39;\n&#39;,&#39;&#39;)
-        seq = seq.replace(&#39; &#39;,&#39;&#39;)
-        # Make input #
-        input_fasta = FASTA(directory + &#39;input.fasta&#39;)
-        input_fasta.create()
-        input_fasta.add_str(seq, &#34;My test sequence&#34;)
-        input_fasta.close()
-        # Make output #
-        out_path = directory + &#39;output.blast&#39;
-        # Make extras parameters #
-        params = {&#39;-outfmt&#39;: 0,
-                  &#39;-evalue&#39;: 1e-5,
-                  &#39;-perc_identity&#39;: 99}
-        # Make the search #
-        search = SeqSearch(input_fasta,
-                           self.blast_db,
-                           &#39;nucl&#39;,
-                           &#39;blast&#39;,
-                           num_threads = 1,
-                           out_path    = out_path,
-                           params      = params)
-        # Run it #
-        search.run()
-        # Print result #
-        print(&#34;Success&#34;, directory)
+    files      = [&#39;16S_ribosomal_RNA.tar.gz&#39;]
+    db_name    = &#39;16S_ribosomal_RNA&#39;
 
 ###############################################################################
-nt = NucleotideDatabase(&#34;nucl&#34;)</code></pre>
+ncbi_16s = NCBI16S(&#39;nucl&#39;)</code></pre>
 </details>
 </section>
 <section>
@@ -122,81 +92,51 @@ nt = NucleotideDatabase(&#34;nucl&#34;)</code></pre>
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="seqsearch.databases.nt.NucleotideDatabase"><code class="flex name class">
-<span>class <span class="ident">NucleotideDatabase</span></span>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S"><code class="flex name class">
+<span>class <span class="ident">NCBI16S</span></span>
 <span>(</span><span>seq_type=None, base_dir=None)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>The Nucleotide database is a collection of sequences from several sources,
-including GenBank, RefSeq, TPA and PDB.</p>
+<div class="desc"><p>The NCBI provides a database of 16S ribosomal sequences.
+The exact title is "Bacteria and Archaea: 16S ribosomal RNA project".
+More information is available at:</p>
+<p><a href="https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/">https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/</a></p>
 <p>To install:</p>
-<pre><code>from seqsearch.databases.nt import nt
-nt.download()
-nt.untargz()
-nt.test()
+<pre><code>&gt;&gt;&gt; from seqsearch.databases.ncbi_16s import ncbi_16s
+&gt;&gt;&gt; ncbi_16s.download()
+&gt;&gt;&gt; ncbi_16s.untargz()
 </code></pre>
-<p>It will put it in ~/databases/nt</p></div>
+<p>It will place the resulting files in "~/databases/ncbi_16s/".</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class NucleotideDatabase(Database):
+<pre><code class="python">class NCBI16S(Database):
     &#34;&#34;&#34;
-    The Nucleotide database is a collection of sequences from several sources,
-     including GenBank, RefSeq, TPA and PDB.
+    The NCBI provides a database of 16S ribosomal sequences.
+    The exact title is &#34;Bacteria and Archaea: 16S ribosomal RNA project&#34;.
+    More information is available at:
 
-     To install:
+    https://www.ncbi.nlm.nih.gov/refseq/targetedloci/16S_process/
 
-        from seqsearch.databases.nt import nt
-        nt.download()
-        nt.untargz()
-        nt.test()
+    To install:
 
-    It will put it in ~/databases/nt
+        &gt;&gt;&gt; from seqsearch.databases.ncbi_16s import ncbi_16s
+        &gt;&gt;&gt; ncbi_16s.download()
+        &gt;&gt;&gt; ncbi_16s.untargz()
+
+    It will place the resulting files in &#34;~/databases/ncbi_16s/&#34;.
     &#34;&#34;&#34;
 
-    short_name = &#34;nt&#34;
-    long_name  = &#34;The Nucleotide database (NCBI)&#34;
+    tag        = &#34;ncbi_16s&#34;
+    short_name = &#34;ncbi_16s&#34;
+    long_name  = &#39;The NCBI 16S RNA database&#39;
+
+    base_url   = &#34;ftp://ftp.ncbi.nlm.nih.gov/blast/db/&#34;
     ftp_url    = &#34;ftp.ncbi.nlm.nih.gov&#34;
     ftp_dir    = &#34;/blast/db/&#34;
-    pattern    = &#39;nt.*.tar.gz&#39;
-
-    def test(self):
-        &#34;&#34;&#34;Search one sequence, and see if it works.&#34;&#34;&#34;
-        # New directory #
-        directory = new_temp_dir()
-        # A randomly chosen sequence (Homo sapiens mRNA for prepro cortistatin) #
-        seq = &#34;&#34;&#34;ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC
-        CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC
-        CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG
-        AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC
-        CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG
-        TTTAATTACAGACCTGAA&#34;&#34;&#34;
-        seq = seq.replace(&#39;\n&#39;,&#39;&#39;)
-        seq = seq.replace(&#39; &#39;,&#39;&#39;)
-        # Make input #
-        input_fasta = FASTA(directory + &#39;input.fasta&#39;)
-        input_fasta.create()
-        input_fasta.add_str(seq, &#34;My test sequence&#34;)
-        input_fasta.close()
-        # Make output #
-        out_path = directory + &#39;output.blast&#39;
-        # Make extras parameters #
-        params = {&#39;-outfmt&#39;: 0,
-                  &#39;-evalue&#39;: 1e-5,
-                  &#39;-perc_identity&#39;: 99}
-        # Make the search #
-        search = SeqSearch(input_fasta,
-                           self.blast_db,
-                           &#39;nucl&#39;,
-                           &#39;blast&#39;,
-                           num_threads = 1,
-                           out_path    = out_path,
-                           params      = params)
-        # Run it #
-        search.run()
-        # Print result #
-        print(&#34;Success&#34;, directory)</code></pre>
+    files      = [&#39;16S_ribosomal_RNA.tar.gz&#39;]
+    db_name    = &#39;16S_ribosomal_RNA&#39;</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -204,75 +144,37 @@ nt.test()
 </ul>
 <h3>Class variables</h3>
 <dl>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.ftp_dir"><code class="name">var <span class="ident">ftp_dir</span></code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.base_url"><code class="name">var <span class="ident">base_url</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.ftp_url"><code class="name">var <span class="ident">ftp_url</span></code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.db_name"><code class="name">var <span class="ident">db_name</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.long_name"><code class="name">var <span class="ident">long_name</span></code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.files"><code class="name">var <span class="ident">files</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.pattern"><code class="name">var <span class="ident">pattern</span></code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.ftp_dir"><code class="name">var <span class="ident">ftp_dir</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.short_name"><code class="name">var <span class="ident">short_name</span></code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.ftp_url"><code class="name">var <span class="ident">ftp_url</span></code></dt>
 <dd>
 <div class="desc"></div>
 </dd>
-</dl>
-<h3>Methods</h3>
-<dl>
-<dt id="seqsearch.databases.nt.NucleotideDatabase.test"><code class="name flex">
-<span>def <span class="ident">test</span></span>(<span>self)</span>
-</code></dt>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.long_name"><code class="name">var <span class="ident">long_name</span></code></dt>
 <dd>
-<div class="desc"><p>Search one sequence, and see if it works.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def test(self):
-    &#34;&#34;&#34;Search one sequence, and see if it works.&#34;&#34;&#34;
-    # New directory #
-    directory = new_temp_dir()
-    # A randomly chosen sequence (Homo sapiens mRNA for prepro cortistatin) #
-    seq = &#34;&#34;&#34;ACAAGATGCCATTGTCCCCCGGCCTCCTGCTGCTGCTGCTCTCCGGGGCCACGGCCACCGCTGCCCTGCC
-    CCTGGAGGGTGGCCCCACCGGCCGAGACAGCGAGCATATGCAGGAAGCGGCAGGAATAAGGAAAAGCAGC
-    CTCCTGACTTTCCTCGCTTGGTGGTTTGAGTGGACCTCCCAGGCCAGTGCCGGGCCCCTCATAGGAGAGG
-    AAGCTCGGGAGGTGGCCAGGCGGCAGGAAGGCGCACCCCCCCAGCAATCCGCGCGCCGGGACAGAATGCC
-    CTGCAGGAACTTCTTCTGGAAGACCTTCTCCTCCTGCAAATAAAACCTCACCCATGAATGCTCACGCAAG
-    TTTAATTACAGACCTGAA&#34;&#34;&#34;
-    seq = seq.replace(&#39;\n&#39;,&#39;&#39;)
-    seq = seq.replace(&#39; &#39;,&#39;&#39;)
-    # Make input #
-    input_fasta = FASTA(directory + &#39;input.fasta&#39;)
-    input_fasta.create()
-    input_fasta.add_str(seq, &#34;My test sequence&#34;)
-    input_fasta.close()
-    # Make output #
-    out_path = directory + &#39;output.blast&#39;
-    # Make extras parameters #
-    params = {&#39;-outfmt&#39;: 0,
-              &#39;-evalue&#39;: 1e-5,
-              &#39;-perc_identity&#39;: 99}
-    # Make the search #
-    search = SeqSearch(input_fasta,
-                       self.blast_db,
-                       &#39;nucl&#39;,
-                       &#39;blast&#39;,
-                       num_threads = 1,
-                       out_path    = out_path,
-                       params      = params)
-    # Run it #
-    search.run()
-    # Print result #
-    print(&#34;Success&#34;, directory)</code></pre>
-</details>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.short_name"><code class="name">var <span class="ident">short_name</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt id="seqsearch.databases.ncbi_16s.NCBI16S.tag"><code class="name">var <span class="ident">tag</span></code></dt>
+<dd>
+<div class="desc"></div>
 </dd>
 </dl>
 <h3>Inherited members</h3>
@@ -310,14 +212,16 @@ nt.test()
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
-<h4><code><a title="seqsearch.databases.nt.NucleotideDatabase" href="#seqsearch.databases.nt.NucleotideDatabase">NucleotideDatabase</a></code></h4>
+<h4><code><a title="seqsearch.databases.ncbi_16s.NCBI16S" href="#seqsearch.databases.ncbi_16s.NCBI16S">NCBI16S</a></code></h4>
 <ul class="two-column">
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.ftp_dir" href="#seqsearch.databases.nt.NucleotideDatabase.ftp_dir">ftp_dir</a></code></li>
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.ftp_url" href="#seqsearch.databases.nt.NucleotideDatabase.ftp_url">ftp_url</a></code></li>
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.long_name" href="#seqsearch.databases.nt.NucleotideDatabase.long_name">long_name</a></code></li>
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.pattern" href="#seqsearch.databases.nt.NucleotideDatabase.pattern">pattern</a></code></li>
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.short_name" href="#seqsearch.databases.nt.NucleotideDatabase.short_name">short_name</a></code></li>
-<li><code><a title="seqsearch.databases.nt.NucleotideDatabase.test" href="#seqsearch.databases.nt.NucleotideDatabase.test">test</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.base_url" href="#seqsearch.databases.ncbi_16s.NCBI16S.base_url">base_url</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.db_name" href="#seqsearch.databases.ncbi_16s.NCBI16S.db_name">db_name</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.files" href="#seqsearch.databases.ncbi_16s.NCBI16S.files">files</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.ftp_dir" href="#seqsearch.databases.ncbi_16s.NCBI16S.ftp_dir">ftp_dir</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.ftp_url" href="#seqsearch.databases.ncbi_16s.NCBI16S.ftp_url">ftp_url</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.long_name" href="#seqsearch.databases.ncbi_16s.NCBI16S.long_name">long_name</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.short_name" href="#seqsearch.databases.ncbi_16s.NCBI16S.short_name">short_name</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s.NCBI16S.tag" href="#seqsearch.databases.ncbi_16s.NCBI16S.tag">tag</a></code></li>
 </ul>
 </li>
 </ul>

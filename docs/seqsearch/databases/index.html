@@ -45,15 +45,16 @@ import os, fnmatch
 from collections import OrderedDict, Counter
 
 # First party modules #
-from autopaths.auto_paths import AutoPaths
-from autopaths.file_path import FilePath
-from plumbing.cache import property_cached
-from plumbing.common import natural_sort
 from fasta import FASTA
+from autopaths.auto_paths import AutoPaths
+from autopaths.dir_path   import DirectoryPath
+from autopaths.file_path  import FilePath
+from plumbing.cache       import property_cached
+from plumbing.common      import natural_sort
 
 # Third party modules #
 from ftputil import FTPHost
-from tqdm import tqdm
+from tqdm    import tqdm
 
 # Constants #
 home = os.environ.get(&#39;HOME&#39;, &#39;~&#39;) + &#39;/&#39;
@@ -69,23 +70,27 @@ class Database:
     /blast_db/
     &#34;&#34;&#34;
 
-    def __init__(self, seq_type, base_dir=None):
-        # Attributes #
+    def __init__(self, seq_type=None, base_dir=None):
+        # The sequence type is either &#39;prot&#39; or &#39;nucl&#39; #
         self.seq_type = seq_type
-        # Base directory #
-        if base_dir is None: base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/&#39;
+        # The default base directory #
+        if base_dir is None:
+            base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/&#39;
+        # Make base_dir object #
         self.base_dir = base_dir + &#39;databases/&#39; + self.short_name + &#39;/&#39;
-        self.autopaths        = AutoPaths(self.base_dir, self.all_paths)
+        self.base_dir = DirectoryPath(self.base_dir)
+        # Make autopaths object #
+        self.autopaths = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached
     def ftp(self):
-        &#34;&#34;&#34;If the data is to be obtained by FTP here is the ftputil object.&#34;&#34;&#34;
+        &#34;&#34;&#34;If the data is to be obtained by FTP, here is the ftputil object.&#34;&#34;&#34;
         ftp = FTPHost(self.ftp_url, &#34;anonymous&#34;)
         ftp.chdir(self.ftp_dir)
         return ftp
 
     @property_cached
-    def files_to_retrive(self):
+    def files_to_retrieve(self):
         &#34;&#34;&#34;The files we want to download with their destinations.&#34;&#34;&#34;
         if hasattr(self, &#34;pattern&#34;):
             files = self.ftp.listdir(self.ftp.curdir)
@@ -98,13 +103,15 @@ class Database:
     @property
     def files_remaining(self):
         &#34;&#34;&#34;The files we haven&#39;t downloaded yet based on size checks.&#34;&#34;&#34;
-        return OrderedDict((source,dest) for source,dest in self.files_to_retrive.items()
+        return OrderedDict((source,dest) for source, dest in self.files_to_retrieve.items()
                            if dest.count_bytes != self.ftp.path.getsize(source))
 
     def download(self):
         &#34;&#34;&#34;Retrieve all files from the FTP site.&#34;&#34;&#34;
+        # Create the directory #
         self.base_dir.create_if_not_exists()
-        for source,dest in tqdm(self.files_remaining.items()):
+        # Loop over files #
+        for source, dest in tqdm(self.files_remaining.items()):
             dest.remove()
             self.ftp.download(source, dest)
             dest.permissions.only_readable()
@@ -123,7 +130,7 @@ class Database:
             destination.permissions.only_readable()
 
     def untargz(self):
-        &#34;&#34;&#34;Untarzip them.&#34;&#34;&#34;
+        &#34;&#34;&#34;Untargzip them.&#34;&#34;&#34;
         # Gzip #
         for f in tqdm(self.raw_files): f.untargz_to(self.autopaths.unzipped_dir)
         for f in self.autopaths.unzipped_dir: f.permissions.only_readable()
@@ -138,18 +145,23 @@ class Database:
     @property_cached
     def blast_db(self):
         &#34;&#34;&#34;A BLASTable version of the sequences.&#34;&#34;&#34;
+        # Import #
         from seqsearch.search.blast import BLASTdb
-        return BLASTdb(self.autopaths.unzipped_dir+self.short_name, &#39;nucl&#39;)
+        # Create object #
+        db = BLASTdb(self.autopaths.unzipped_dir + self.db_name,
+                     self.seq_type)
+        # Return #
+        return db
 
     #--------------------- Only for taxonomic databases ----------------------#
     @property_cached
     def tax_depth_freq(self):
         def depths():
-           with open(self.taxonomy, &#39;r&#39;) as handle:
-               for line in handle:
-                   line = line.strip(&#39;\n&#39;)
-                   otu_name, species = line.split(&#39;\t&#39;)
-                   yield len(species.split(&#39;;&#39;))
+            with open(self.taxonomy, &#39;r&#39;) as handle:
+                for line in handle:
+                    line = line.strip(&#39;\n&#39;)
+                    otu_name, species = line.split(&#39;\t&#39;)
+                    yield len(species.split(&#39;;&#39;))
         return Counter(depths())</code></pre>
 </details>
 </section>
@@ -165,6 +177,12 @@ Contact at www.sinclair.bio</p></div>
 <dt><code class="name"><a title="seqsearch.databases.mothur" href="mothur/index.html">seqsearch.databases.mothur</a></code></dt>
 <dd>
 <div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="seqsearch.databases.ncbi_16s" href="ncbi_16s.html">seqsearch.databases.ncbi_16s</a></code></dt>
+<dd>
+<div class="desc"><p>Written by Lucas Sinclair.
+MIT Licensed.
+Contact at www.sinclair.bio</p></div>
 </dd>
 <dt><code class="name"><a title="seqsearch.databases.nr" href="nr.html">seqsearch.databases.nr</a></code></dt>
 <dd>
@@ -225,7 +243,7 @@ Contact at www.sinclair.bio</p></div>
 <dl>
 <dt id="seqsearch.databases.Database"><code class="flex name class">
 <span>class <span class="ident">Database</span></span>
-<span>(</span><span>seq_type, base_dir=None)</span>
+<span>(</span><span>seq_type=None, base_dir=None)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>General database object to inherit from.</p></div>
@@ -242,23 +260,27 @@ Contact at www.sinclair.bio</p></div>
     /blast_db/
     &#34;&#34;&#34;
 
-    def __init__(self, seq_type, base_dir=None):
-        # Attributes #
+    def __init__(self, seq_type=None, base_dir=None):
+        # The sequence type is either &#39;prot&#39; or &#39;nucl&#39; #
         self.seq_type = seq_type
-        # Base directory #
-        if base_dir is None: base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/&#39;
+        # The default base directory #
+        if base_dir is None:
+            base_dir = os.environ.get(&#39;HOME&#39;, &#39;/&#39;) + &#39;/&#39;
+        # Make base_dir object #
         self.base_dir = base_dir + &#39;databases/&#39; + self.short_name + &#39;/&#39;
-        self.autopaths        = AutoPaths(self.base_dir, self.all_paths)
+        self.base_dir = DirectoryPath(self.base_dir)
+        # Make autopaths object #
+        self.autopaths = AutoPaths(self.base_dir, self.all_paths)
 
     @property_cached
     def ftp(self):
-        &#34;&#34;&#34;If the data is to be obtained by FTP here is the ftputil object.&#34;&#34;&#34;
+        &#34;&#34;&#34;If the data is to be obtained by FTP, here is the ftputil object.&#34;&#34;&#34;
         ftp = FTPHost(self.ftp_url, &#34;anonymous&#34;)
         ftp.chdir(self.ftp_dir)
         return ftp
 
     @property_cached
-    def files_to_retrive(self):
+    def files_to_retrieve(self):
         &#34;&#34;&#34;The files we want to download with their destinations.&#34;&#34;&#34;
         if hasattr(self, &#34;pattern&#34;):
             files = self.ftp.listdir(self.ftp.curdir)
@@ -271,13 +293,15 @@ Contact at www.sinclair.bio</p></div>
     @property
     def files_remaining(self):
         &#34;&#34;&#34;The files we haven&#39;t downloaded yet based on size checks.&#34;&#34;&#34;
-        return OrderedDict((source,dest) for source,dest in self.files_to_retrive.items()
+        return OrderedDict((source,dest) for source, dest in self.files_to_retrieve.items()
                            if dest.count_bytes != self.ftp.path.getsize(source))
 
     def download(self):
         &#34;&#34;&#34;Retrieve all files from the FTP site.&#34;&#34;&#34;
+        # Create the directory #
         self.base_dir.create_if_not_exists()
-        for source,dest in tqdm(self.files_remaining.items()):
+        # Loop over files #
+        for source, dest in tqdm(self.files_remaining.items()):
             dest.remove()
             self.ftp.download(source, dest)
             dest.permissions.only_readable()
@@ -296,7 +320,7 @@ Contact at www.sinclair.bio</p></div>
             destination.permissions.only_readable()
 
     def untargz(self):
-        &#34;&#34;&#34;Untarzip them.&#34;&#34;&#34;
+        &#34;&#34;&#34;Untargzip them.&#34;&#34;&#34;
         # Gzip #
         for f in tqdm(self.raw_files): f.untargz_to(self.autopaths.unzipped_dir)
         for f in self.autopaths.unzipped_dir: f.permissions.only_readable()
@@ -311,18 +335,23 @@ Contact at www.sinclair.bio</p></div>
     @property_cached
     def blast_db(self):
         &#34;&#34;&#34;A BLASTable version of the sequences.&#34;&#34;&#34;
+        # Import #
         from seqsearch.search.blast import BLASTdb
-        return BLASTdb(self.autopaths.unzipped_dir+self.short_name, &#39;nucl&#39;)
+        # Create object #
+        db = BLASTdb(self.autopaths.unzipped_dir + self.db_name,
+                     self.seq_type)
+        # Return #
+        return db
 
     #--------------------- Only for taxonomic databases ----------------------#
     @property_cached
     def tax_depth_freq(self):
         def depths():
-           with open(self.taxonomy, &#39;r&#39;) as handle:
-               for line in handle:
-                   line = line.strip(&#39;\n&#39;)
-                   otu_name, species = line.split(&#39;\t&#39;)
-                   yield len(species.split(&#39;;&#39;))
+            with open(self.taxonomy, &#39;r&#39;) as handle:
+                for line in handle:
+                    line = line.strip(&#39;\n&#39;)
+                    otu_name, species = line.split(&#39;\t&#39;)
+                    yield len(species.split(&#39;;&#39;))
         return Counter(depths())</code></pre>
 </details>
 <h3>Subclasses</h3>
@@ -331,6 +360,7 @@ Contact at www.sinclair.bio</p></div>
 <li><a title="seqsearch.databases.mothur.greengenes.GreengenesMothur" href="mothur/greengenes.html#seqsearch.databases.mothur.greengenes.GreengenesMothur">GreengenesMothur</a></li>
 <li><a title="seqsearch.databases.mothur.rdp.RdpMothur" href="mothur/rdp.html#seqsearch.databases.mothur.rdp.RdpMothur">RdpMothur</a></li>
 <li><a title="seqsearch.databases.mothur.silva.SilvaMothur" href="mothur/silva.html#seqsearch.databases.mothur.silva.SilvaMothur">SilvaMothur</a></li>
+<li><a title="seqsearch.databases.ncbi_16s.NCBI16S" href="ncbi_16s.html#seqsearch.databases.ncbi_16s.NCBI16S">NCBI16S</a></li>
 <li><a title="seqsearch.databases.nt.NucleotideDatabase" href="nt.html#seqsearch.databases.nt.NucleotideDatabase">NucleotideDatabase</a></li>
 <li><a title="seqsearch.databases.pfam.Pfam" href="pfam.html#seqsearch.databases.pfam.Pfam">Pfam</a></li>
 <li><a title="seqsearch.databases.pr_two.PrTwo" href="pr_two.html#seqsearch.databases.pr_two.PrTwo">PrTwo</a></li>
@@ -388,11 +418,11 @@ Contact at www.sinclair.bio</p></div>
 <pre><code class="python">@property
 def files_remaining(self):
     &#34;&#34;&#34;The files we haven&#39;t downloaded yet based on size checks.&#34;&#34;&#34;
-    return OrderedDict((source,dest) for source,dest in self.files_to_retrive.items()
+    return OrderedDict((source,dest) for source, dest in self.files_to_retrieve.items()
                        if dest.count_bytes != self.ftp.path.getsize(source))</code></pre>
 </details>
 </dd>
-<dt id="seqsearch.databases.Database.files_to_retrive"><code class="name">var <span class="ident">files_to_retrive</span></code></dt>
+<dt id="seqsearch.databases.Database.files_to_retrieve"><code class="name">var <span class="ident">files_to_retrieve</span></code></dt>
 <dd>
 <div class="desc"><p>The files we want to download with their destinations.</p></div>
 <details class="source">
@@ -424,7 +454,7 @@ def files_remaining(self):
 </dd>
 <dt id="seqsearch.databases.Database.ftp"><code class="name">var <span class="ident">ftp</span></code></dt>
 <dd>
-<div class="desc"><p>If the data is to be obtained by FTP here is the ftputil object.</p></div>
+<div class="desc"><p>If the data is to be obtained by FTP, here is the ftputil object.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -525,8 +555,10 @@ documentation was unable to correctly traverse a decorated property.</p></div>
 </summary>
 <pre><code class="python">def download(self):
     &#34;&#34;&#34;Retrieve all files from the FTP site.&#34;&#34;&#34;
+    # Create the directory #
     self.base_dir.create_if_not_exists()
-    for source,dest in tqdm(self.files_remaining.items()):
+    # Loop over files #
+    for source, dest in tqdm(self.files_remaining.items()):
         dest.remove()
         self.ftp.download(source, dest)
         dest.permissions.only_readable()</code></pre>
@@ -554,13 +586,13 @@ documentation was unable to correctly traverse a decorated property.</p></div>
 <span>def <span class="ident">untargz</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Untarzip them.</p></div>
+<div class="desc"><p>Untargzip them.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def untargz(self):
-    &#34;&#34;&#34;Untarzip them.&#34;&#34;&#34;
+    &#34;&#34;&#34;Untargzip them.&#34;&#34;&#34;
     # Gzip #
     for f in tqdm(self.raw_files): f.untargz_to(self.autopaths.unzipped_dir)
     for f in self.autopaths.unzipped_dir: f.permissions.only_readable()</code></pre>
@@ -586,6 +618,7 @@ documentation was unable to correctly traverse a decorated property.</p></div>
 <ul>
 <li><code><a title="seqsearch.databases.foraminifera" href="foraminifera.html">seqsearch.databases.foraminifera</a></code></li>
 <li><code><a title="seqsearch.databases.mothur" href="mothur/index.html">seqsearch.databases.mothur</a></code></li>
+<li><code><a title="seqsearch.databases.ncbi_16s" href="ncbi_16s.html">seqsearch.databases.ncbi_16s</a></code></li>
 <li><code><a title="seqsearch.databases.nr" href="nr.html">seqsearch.databases.nr</a></code></li>
 <li><code><a title="seqsearch.databases.nt" href="nt.html">seqsearch.databases.nt</a></code></li>
 <li><code><a title="seqsearch.databases.pfam" href="pfam.html">seqsearch.databases.pfam</a></code></li>
@@ -605,7 +638,7 @@ documentation was unable to correctly traverse a decorated property.</p></div>
 <li><code><a title="seqsearch.databases.Database.blast_db" href="#seqsearch.databases.Database.blast_db">blast_db</a></code></li>
 <li><code><a title="seqsearch.databases.Database.download" href="#seqsearch.databases.Database.download">download</a></code></li>
 <li><code><a title="seqsearch.databases.Database.files_remaining" href="#seqsearch.databases.Database.files_remaining">files_remaining</a></code></li>
-<li><code><a title="seqsearch.databases.Database.files_to_retrive" href="#seqsearch.databases.Database.files_to_retrive">files_to_retrive</a></code></li>
+<li><code><a title="seqsearch.databases.Database.files_to_retrieve" href="#seqsearch.databases.Database.files_to_retrieve">files_to_retrieve</a></code></li>
 <li><code><a title="seqsearch.databases.Database.ftp" href="#seqsearch.databases.Database.ftp">ftp</a></code></li>
 <li><code><a title="seqsearch.databases.Database.raw_files" href="#seqsearch.databases.Database.raw_files">raw_files</a></code></li>
 <li><code><a title="seqsearch.databases.Database.sequences" href="#seqsearch.databases.Database.sequences">sequences</a></code></li>

@@ -57,12 +57,16 @@ Entrez.email = &#34;I don&#39;t know who will be running this script&#34;
 
 ###############################################################################
 class UtilsNCBI(object):
-    &#34;&#34;&#34;An object that takes care of extracting NCBI information via the eutils
-    http://www.ncbi.nlm.nih.gov/books/NBK25499/&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    An object that takes care of extracting NCBI information via the eutils
+    http://www.ncbi.nlm.nih.gov/books/NBK25499/
+    &#34;&#34;&#34;
 
     def gi_num_to_tax(self, id_num):
-        &#34;&#34;&#34;How to convert a single GI identification number to taxonomy info
-        Can also accept a list of GI numbers in the parameter `id_num`&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        How to convert a single GI identification number to taxonomy info
+        Can also accept a list of GI numbers in the parameter `id_num`
+        &#34;&#34;&#34;
         if isinstance(id_num, list):
             gb_entries = Entrez.efetch(db=&#34;nuccore&#34;, id=id_num, rettype=&#34;fasta&#34;, retmode=&#34;xml&#34;)
             gb_records = Entrez.read(gb_entries)
@@ -96,9 +100,11 @@ class UtilsNCBI(object):
         return result
 
     def chunk_to_records(self, chunk, validate=False):
-        &#34;&#34;&#34;Download from NCBI until it works. Will restart until reaching the python
+        &#34;&#34;&#34;
+        Download from NCBI until it works. Will restart until reaching the python
         recursion limit. We don&#39;t want to get banned from NCBI so we have a little
-        pause at every function call.&#34;&#34;&#34;
+        pause at every function call.
+        &#34;&#34;&#34;
         from urllib2 import HTTPError
         time.sleep(0.5)
         try:
@@ -139,12 +145,16 @@ class UtilsNCBI(object):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class UtilsNCBI(object):
-    &#34;&#34;&#34;An object that takes care of extracting NCBI information via the eutils
-    http://www.ncbi.nlm.nih.gov/books/NBK25499/&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    An object that takes care of extracting NCBI information via the eutils
+    http://www.ncbi.nlm.nih.gov/books/NBK25499/
+    &#34;&#34;&#34;
 
     def gi_num_to_tax(self, id_num):
-        &#34;&#34;&#34;How to convert a single GI identification number to taxonomy info
-        Can also accept a list of GI numbers in the parameter `id_num`&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        How to convert a single GI identification number to taxonomy info
+        Can also accept a list of GI numbers in the parameter `id_num`
+        &#34;&#34;&#34;
         if isinstance(id_num, list):
             gb_entries = Entrez.efetch(db=&#34;nuccore&#34;, id=id_num, rettype=&#34;fasta&#34;, retmode=&#34;xml&#34;)
             gb_records = Entrez.read(gb_entries)
@@ -178,9 +188,11 @@ class UtilsNCBI(object):
         return result
 
     def chunk_to_records(self, chunk, validate=False):
-        &#34;&#34;&#34;Download from NCBI until it works. Will restart until reaching the python
+        &#34;&#34;&#34;
+        Download from NCBI until it works. Will restart until reaching the python
         recursion limit. We don&#39;t want to get banned from NCBI so we have a little
-        pause at every function call.&#34;&#34;&#34;
+        pause at every function call.
+        &#34;&#34;&#34;
         from urllib2 import HTTPError
         time.sleep(0.5)
         try:
@@ -214,9 +226,11 @@ pause at every function call.</p></div>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def chunk_to_records(self, chunk, validate=False):
-    &#34;&#34;&#34;Download from NCBI until it works. Will restart until reaching the python
+    &#34;&#34;&#34;
+    Download from NCBI until it works. Will restart until reaching the python
     recursion limit. We don&#39;t want to get banned from NCBI so we have a little
-    pause at every function call.&#34;&#34;&#34;
+    pause at every function call.
+    &#34;&#34;&#34;
     from urllib2 import HTTPError
     time.sleep(0.5)
     try:
@@ -239,8 +253,10 @@ Can also accept a list of GI numbers in the parameter <code>id_num</code></p></d
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def gi_num_to_tax(self, id_num):
-    &#34;&#34;&#34;How to convert a single GI identification number to taxonomy info
-    Can also accept a list of GI numbers in the parameter `id_num`&#34;&#34;&#34;
+    &#34;&#34;&#34;
+    How to convert a single GI identification number to taxonomy info
+    Can also accept a list of GI numbers in the parameter `id_num`
+    &#34;&#34;&#34;
     if isinstance(id_num, list):
         gb_entries = Entrez.efetch(db=&#34;nuccore&#34;, id=id_num, rettype=&#34;fasta&#34;, retmode=&#34;xml&#34;)
         gb_records = Entrez.read(gb_entries)

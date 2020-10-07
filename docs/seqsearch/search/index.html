@@ -44,11 +44,11 @@ Contact at www.sinclair.bio
 import multiprocessing
 
 # Internal modules #
-from seqsearch.search.blast    import BLASTquery, BLASTdb
-from seqsearch.search.vsearch  import VSEARCHquery
-from seqsearch.search.hmmer    import HmmQuery
-from plumbing.cache     import property_cached
-from autopaths.file_path import FilePath
+from seqsearch.search.blast   import BLASTquery, BLASTdb
+from seqsearch.search.vsearch import VSEARCHquery
+from seqsearch.search.hmmer   import HmmQuery
+from plumbing.cache           import property_cached
+from autopaths.file_path      import FilePath
 
 # Third party modules #
 
@@ -76,14 +76,16 @@ class SeqSearch(object):
     Output: - List of identifiers in the database
               (object with significance value and identity attached)
 
-    Other possible alogrithms:
+    Other possible algorithms:
+
         * http://www.ncbi.nlm.nih.gov/pubmed/11932250
         * http://ab.inf.uni-tuebingen.de/software/pauda/
         * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
         * Diamond
     &#34;&#34;&#34;
 
-    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
+    def __repr__(self):
+        return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
 
     def __init__(self, input_fasta, database,
                  seq_type    = &#39;prot&#39; or &#39;nucl&#39;,      # What sequence type is the input fasta
@@ -106,8 +108,10 @@ class SeqSearch(object):
         if filtering is None: self.filtering = {}
         else:                 self.filtering = filtering
         # Output path #
-        if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
-        else: self.out_path = FilePath(out_path)
+        if out_path is None:
+            self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
+        else:
+            self.out_path = FilePath(out_path)
         # Number of cores to use #
         if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
         else:                   self.num_threads = num_threads
@@ -118,10 +122,13 @@ class SeqSearch(object):
     @property
     def query(self):
         &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+        # Pick the right attribute #
         if self.algorithm == &#39;blast&#39;:   return self.blast_query
         if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
         if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
-        raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)
+        # Otherwise raise an exception #
+        msg = &#34;The algorithm &#39;%s&#39; is not supported&#34;
+        raise NotImplemented(msg % self.algorithm)
 
     def run(self):
         &#34;&#34;&#34;Run the search.&#34;&#34;&#34;
@@ -139,16 +146,22 @@ class SeqSearch(object):
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_params(self):
-        &#34;&#34;&#34;A dictionary of options to pass to the blast executable.
-        The params should depend on the filtering options.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options.
+        &#34;&#34;&#34;
+        # Make a copy #
         params = self.params.copy()
-        if &#39;e_value&#39;      in self.filtering: params[&#39;-evalue&#39;]          = self.filtering[&#39;e_value&#39;]
-        if &#39;max_targets&#39;  in self.filtering: params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Modify #
+        if &#39;e_value&#39; in self.filtering:
+            params[&#39;-evalue&#39;] = self.filtering[&#39;e_value&#39;]
+        if &#39;max_targets&#39;  in self.filtering:
+            params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Return #
         return params
 
     def select_blast_algo(self):
         &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
-        self.database = BLASTdb(self.database)
         if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
         if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
         if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;
@@ -157,6 +170,13 @@ class SeqSearch(object):
     @property_cached
     def blast_query(self):
         &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        # In case we got a database object, use the blastdb attribute #
+        if hasattr(self.database, &#39;blast_db&#39;):
+            self.database = self.database.blast_db
+        # In case we got a path, convert it to a BLASTdb #
+        else:
+            self.database = BLASTdb(self.database)
+        # Make the query #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,
                           seq_type   = self.seq_type,
@@ -261,11 +281,12 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
 - e-value</p>
 <p>Output: - List of identifiers in the database
 (object with significance value and identity attached)</p>
-<p>Other possible alogrithms:
-* <a href="http://www.ncbi.nlm.nih.gov/pubmed/11932250">http://www.ncbi.nlm.nih.gov/pubmed/11932250</a>
-* <a href="http://ab.inf.uni-tuebingen.de/software/pauda/">http://ab.inf.uni-tuebingen.de/software/pauda/</a>
-* <a href="http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/">http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/</a>
-* Diamond</p></div>
+<p>Other possible algorithms:</p>
+<pre><code>* &lt;http://www.ncbi.nlm.nih.gov/pubmed/11932250&gt;
+* &lt;http://ab.inf.uni-tuebingen.de/software/pauda/&gt;
+* &lt;http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/&gt;
+* Diamond
+</code></pre></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -293,14 +314,16 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
     Output: - List of identifiers in the database
               (object with significance value and identity attached)
 
-    Other possible alogrithms:
+    Other possible algorithms:
+
         * http://www.ncbi.nlm.nih.gov/pubmed/11932250
         * http://ab.inf.uni-tuebingen.de/software/pauda/
         * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
         * Diamond
     &#34;&#34;&#34;
 
-    def __repr__(self): return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
+    def __repr__(self):
+        return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.input_fasta)
 
     def __init__(self, input_fasta, database,
                  seq_type    = &#39;prot&#39; or &#39;nucl&#39;,      # What sequence type is the input fasta
@@ -323,8 +346,10 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
         if filtering is None: self.filtering = {}
         else:                 self.filtering = filtering
         # Output path #
-        if out_path is None: self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
-        else: self.out_path = FilePath(out_path)
+        if out_path is None:
+            self.out_path = FilePath(self.input_fasta.prefix_path + &#39;.&#39; + algorithm + &#39;out&#39;)
+        else:
+            self.out_path = FilePath(out_path)
         # Number of cores to use #
         if num_threads is None: self.num_threads = min(multiprocessing.cpu_count(), 32)
         else:                   self.num_threads = num_threads
@@ -335,10 +360,13 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
     @property
     def query(self):
         &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+        # Pick the right attribute #
         if self.algorithm == &#39;blast&#39;:   return self.blast_query
         if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
         if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
-        raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)
+        # Otherwise raise an exception #
+        msg = &#34;The algorithm &#39;%s&#39; is not supported&#34;
+        raise NotImplemented(msg % self.algorithm)
 
     def run(self):
         &#34;&#34;&#34;Run the search.&#34;&#34;&#34;
@@ -356,16 +384,22 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_params(self):
-        &#34;&#34;&#34;A dictionary of options to pass to the blast executable.
-        The params should depend on the filtering options.&#34;&#34;&#34;
+        &#34;&#34;&#34;
+        A dictionary of options to pass to the blast executable.
+        The params should depend on the filtering options.
+        &#34;&#34;&#34;
+        # Make a copy #
         params = self.params.copy()
-        if &#39;e_value&#39;      in self.filtering: params[&#39;-evalue&#39;]          = self.filtering[&#39;e_value&#39;]
-        if &#39;max_targets&#39;  in self.filtering: params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Modify #
+        if &#39;e_value&#39; in self.filtering:
+            params[&#39;-evalue&#39;] = self.filtering[&#39;e_value&#39;]
+        if &#39;max_targets&#39;  in self.filtering:
+            params[&#39;-max_target_seqs&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Return #
         return params
 
     def select_blast_algo(self):
         &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
-        self.database = BLASTdb(self.database)
         if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
         if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
         if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;
@@ -374,6 +408,13 @@ as BLAST, VSEARCH, HMMER, BLAT etc.</p>
     @property_cached
     def blast_query(self):
         &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        # In case we got a database object, use the blastdb attribute #
+        if hasattr(self.database, &#39;blast_db&#39;):
+            self.database = self.database.blast_db
+        # In case we got a path, convert it to a BLASTdb #
+        else:
+            self.database = BLASTdb(self.database)
+        # Make the query #
         return BLASTquery(query_path = self.input_fasta,
                           db_path    = self.database,
                           seq_type   = self.seq_type,
@@ -549,10 +590,13 @@ documentation was unable to correctly traverse a decorated property.</p></div>
 <pre><code class="python">@property
 def query(self):
     &#34;&#34;&#34;The actual search object with all the relevant parameters.&#34;&#34;&#34;
+    # Pick the right attribute #
     if self.algorithm == &#39;blast&#39;:   return self.blast_query
     if self.algorithm == &#39;vsearch&#39;: return self.vsearch_query
     if self.algorithm == &#39;hmmer&#39;:   return self.hmmer_query
-    raise NotImplemented(&#34;The algorithm &#39;%s&#39; is not supported&#34; % self.algorithm)</code></pre>
+    # Otherwise raise an exception #
+    msg = &#34;The algorithm &#39;%s&#39; is not supported&#34;
+    raise NotImplemented(msg % self.algorithm)</code></pre>
 </details>
 </dd>
 <dt id="seqsearch.search.SeqSearch.results"><code class="name">var <span class="ident">results</span></code></dt>
@@ -640,7 +684,6 @@ def results(self):
 </summary>
 <pre><code class="python">def select_blast_algo(self):
     &#34;&#34;&#34;Depends on the query type and the database type.&#34;&#34;&#34;
-    self.database = BLASTdb(self.database)
     if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;nucl&#39;: return &#39;blastn&#39;
     if self.seq_type == &#39;prot&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastp&#39;
     if self.seq_type == &#39;nucl&#39; and self.database.seq_type == &#39;prot&#39;: return &#39;blastx&#39;

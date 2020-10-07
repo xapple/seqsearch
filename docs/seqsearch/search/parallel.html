@@ -109,7 +109,7 @@ class ParallelSeqSearch(SeqSearch):
         raise NotImplemented(self.algorithm)
 
     def join_outputs(self):
-        &#34;&#34;&#34;Join the outputs&#34;&#34;&#34;
+        &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
         shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#
@@ -234,7 +234,7 @@ compute nodes using the SLURM system.</p></div>
         raise NotImplemented(self.algorithm)
 
     def join_outputs(self):
-        &#34;&#34;&#34;Join the outputs&#34;&#34;&#34;
+        &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
         shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#
@@ -396,13 +396,13 @@ def queries(self):
 <span>def <span class="ident">join_outputs</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>Join the outputs</p></div>
+<div class="desc"><p>Join the outputs.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def join_outputs(self):
-    &#34;&#34;&#34;Join the outputs&#34;&#34;&#34;
+    &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
     shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))</code></pre>
 </details>
 </dd>
