@@ -10,12 +10,12 @@ Contact at www.sinclair.bio
 # Built-in modules #
 import math, multiprocessing
 
-# Internal modules #
-from seqsearch.search import SeqSearch
-from seqsearch.search.blast import BLASTquery
+# First party modules #
+from seqsearch.search         import SeqSearch
+from seqsearch.search.blast   import BLASTquery
 from seqsearch.search.vsearch import VSEARCHquery
-from plumbing.cache import property_cached
-from fasta.splitable import SplitableFASTA
+from plumbing.cache           import property_cached
+from fasta.splitable          import SplitableFASTA
 
 # Third party modules #
 from shell_command import shell_output
@@ -24,15 +24,17 @@ from shell_command import shell_output
 class ParallelSeqSearch(SeqSearch):
     """
     The same thing as a SeqSearch but operates by chopping in the input up into
-    smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
+    smaller pieces and running the algorithm on each piece separately, finally
+    joining the outputs.
 
-    You can specify the number of parts, the size in MB or GB that each part should approximately have,
-    or even how many sequences should be in each part. Specify only one of the three options.
+    You can specify the number of parts, the size in MB or GB that each part
+    should approximately have, or even how many sequences should be in each
+    part. Specify only one of the three options.
 
     You can place the pieces in a specific directory.
 
-    In addition, the pieces can be run separately on the local machine, or distributed to different
-    compute nodes using the SLURM system.
+    In addition, the pieces can be run separately on the local machine,
+    or distributed to different compute nodes using the SLURM system.
     """
 
     def __init__(self, input_fasta, database,
@@ -40,7 +42,7 @@ class ParallelSeqSearch(SeqSearch):
                  part_size     = None,   # What size in MB should a fasta piece be
                  seqs_per_part = None,   # How many sequences in one fasta piece
                  slurm_params  = None,   # Additional parameters for possible SLURM jobs
-                 parts_dir     = None,   # If you want a special direcotry for the fasta pieces
+                 parts_dir     = None,   # If you want a special directory for the fasta pieces
                  **kwargs):
         # Determine number of parts #
         self.num_parts = None
@@ -55,7 +57,8 @@ class ParallelSeqSearch(SeqSearch):
             self.num_parts = int(math.ceil(input_fasta.count / seqs_per_part))
         # Default case #
         if self.num_parts is None:
-            self.num_parts = kwargs.get('num_threads', min(multiprocessing.cpu_count(), 32))
+            default = min(multiprocessing.cpu_count(), 32)
+            self.num_parts = kwargs.get('num_threads', default)
         # In case the user has some special slurm params #
         self.slurm_params = slurm_params
         # In case the user wants a special parts directory #
@@ -66,7 +69,9 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def splitable(self):
         """The input fasta file as it is, but with the ability to split it."""
-        return SplitableFASTA(self.input_fasta, self.num_parts, base_dir=self.parts_dir)
+        return SplitableFASTA(self.input_fasta,
+                              self.num_parts,
+                              base_dir=self.parts_dir)
 
     @property
     def queries(self):
@@ -77,7 +82,8 @@ class ParallelSeqSearch(SeqSearch):
 
     def join_outputs(self):
         """Join the outputs."""
-        shell_output('cat %s > %s' % (' '.join(q.out_path for q in self.queries), self.out_path))
+        all_files = ' '.join(q.out_path for q in self.queries)
+        shell_output('cat %s > %s' % (all_files, self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#
     def run_local(self):
@@ -93,13 +99,6 @@ class ParallelSeqSearch(SeqSearch):
         # Join the results #
         self.join_outputs()
 
-    def run_slurm(self):
-        """Run the search via SLURM."""
-        self.splitable.split()
-        for query in self.queries: query.slurm_job.run()
-        for query in self.queries: query.slurm_job.wait()
-        self.join_outputs()
-
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_queries(self):
@@ -109,7 +108,6 @@ class ParallelSeqSearch(SeqSearch):
                            seq_type     = self.seq_type,
                            params       = self.blast_params,
                            algorithm    = self.select_blast_algo(),
-                           version      = "plus",
                            cpus         = 1,
                            slurm_params = self.slurm_params,
                            num          = p.num) for p in self.splitable.parts]
@@ -118,4 +116,5 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def vsearch_queries(self):
         """Make all VSEARCH search objects."""
-        return [VSEARCHquery(p, self.database, self.vsearch_params) for p in self.splitable.parts]
+        return [VSEARCHquery(p, self.database, self.vsearch_params)
+                for p in self.splitable.parts]

@@ -8,14 +8,12 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import sys, os, multiprocessing, threading, shutil
+import os, multiprocessing, threading, shutil
 
-# Internal modules #
+# First party modules #
 from fasta import FASTA
 from autopaths.tmp_path  import new_temp_path
 from autopaths.file_path import FilePath
-from plumbing.cache      import property_cached
-from plumbing.slurm.job  import JobSLURM
 
 # Third party modules #
 import sh
@@ -30,26 +28,26 @@ class BLASTquery(object):
          import sys, os
          records_path = os.path.expanduser(sys.argv[1])
          centers_path = 'centers.fasta'
-         db = parallelblast.BLASTdb(centers_path)
+         db = seqsearch.BLASTdb(centers_path)
          db.makeblastdb()
          params = {'executable': "~/share/blastplus/blastn",
                    '-outfmt': 0,
                    '-evalue': 1e-2,
                    '-perc_identity': 97,
                    '-num_threads': 16}
-         search = parallelblast.BLASTquery(records_path, db, params)
+         search = seqsearch.BLASTquery(records_path, db, params)
          search.run()
 
-    You can also call search.non_block_run() to run maybe searches in parallel.
+    You can also call search.non_block_run() to run many searches in parallel.
     """
 
-    def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.query)
+    def __repr__(self):
+        return '<%s object on %s>' % (self.__class__.__name__, self.query)
 
     def __init__(self, query_path, db_path,
                  seq_type     = 'prot' or 'nucl',     # The seq type of the query_path file
                  params       = None,                 # Add extra params for the command line
                  algorithm    = "blastn" or "blastp", # Will be auto-determined with seq_type
-                 version      = "plus" or "legacy",   # Either blast+ or the old `blastall`
                  out_path     = None,                 # Where the results will be dropped
                  executable   = None,                 # If you want a specific binary give the path
                  cpus         = None,                 # The number of threads to use
@@ -63,7 +61,6 @@ class BLASTquery(object):
         self.db = BLASTdb(db_path, seq_type)
         # Other attributes #
         self.seq_type     = seq_type
-        self.version      = version
         self.algorithm    = algorithm
         self.num          = num
         self.params       = params if params else {}
@@ -86,22 +83,17 @@ class BLASTquery(object):
         if cpus is None: self.cpus = min(multiprocessing.cpu_count(), 32)
         else:            self.cpus = cpus
         # Auto detect XML output #
-        if self.out_path.extension == '.xml':
-            if self.version == 'legacy': self.params['-xxxx']   = '5'
-            if self.version == 'plus':   self.params['-outfmt'] = '5'
+        if self.out_path.extension == '.xml': self.params['-outfmt'] = '5'
 
     @property
     def command(self):
         # Executable #
         if self.executable:            cmd = [self.executable.path]
-        elif self.version == 'legacy': cmd = ["blastall", '-p', self.algorithm]
         else:                          cmd = [self.algorithm]
-        # The legacy version #
-        if self.version == 'legacy':
-            cmd += ['-d',  self.db, '-i',     self.query, '-o',   self.out_path, '-a',           self.cpus]
-        # The standard version #
-        if self.version == 'plus':
-            cmd += ['-db', self.db, '-query', self.query, '-out', self.out_path, '-num_threads', self.cpus]
+        cmd += ['-db',          self.db,
+                '-query',       self.query,
+                '-out',         self.out_path,
+                '-num_threads', self.cpus]
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
@@ -123,25 +115,20 @@ class BLASTquery(object):
             os.remove("error.log")
 
     def non_block_run(self):
-        """Special method to run the query in a thread locally without blocking."""
+        """Special method to run the query in a thread without blocking."""
         self.thread = threading.Thread(target=self.run)
         self.thread.daemon = True # So that they die when we die
         self.thread.start()
 
     def wait(self):
-        """If you have run the query in a non-blocking way, call this method to pause
-        until the query is finished."""
+        """
+        If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.
+        """
         try:
-            self.thread.join(sys.maxint) # maxint timeout so that we can Ctrl-C them
+            self.thread.join(999999999) # Large timeout so that we can Ctrl-C
         except KeyboardInterrupt:
             print("Stopped waiting on BLAST thread number %i" % self.num)
-
-    @property_cached
-    def slurm_job(self):
-        """If you have access to a cluster with a SLURM queuing system, this property
-        will return a SLURMjob object from which you can submit and check the status
-        of the job."""
-        return JobSLURM(' '.join(self.command), 'bash', self.out_path.directory, **self.slurm_params)
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):

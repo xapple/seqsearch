@@ -38,7 +38,9 @@ class HmmQuery(object):
     dependencies = []
 
     def __nonzero__(self): return bool(self.out_path)
-    def __repr__(self): return '<%s object on %s>' % (self.__class__.__name__, self.query)
+
+    def __repr__(self):
+        return '<%s object on %s>' % (self.__class__.__name__, self.query)
 
     def __init__(self, query_path,                    # The input sequences
                  db_path      = pfam.hmm_db,          # The database to search
@@ -62,9 +64,12 @@ class HmmQuery(object):
         if db_path == 'pfam':    self.db = pfam.hmm_db
         if db_path == 'tigrfam': self.db = tigrfam.hmm_db
         # Output #
-        if out_path is None:         self.out_path = FilePath(self.query.prefix_path + '.hmmout')
-        elif out_path.endswith('/'): self.out_path = FilePath(out_path + self.query.prefix + '.hmmout')
-        else:                        self.out_path = FilePath(out_path)
+        if out_path is None:
+            self.out_path = FilePath(self.query.prefix_path + '.hmmout')
+        elif out_path.endswith('/'):
+            self.out_path = FilePath(out_path + self.query.prefix + '.hmmout')
+        else:
+            self.out_path = FilePath(out_path)
 
     @property
     def command(self):
