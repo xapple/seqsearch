@@ -14,7 +14,7 @@
 # Distribution #
 /build/
 /dist/
-/fasta.egg-info/
+/seqsearch.egg-info/
 
 # Testing #
 /.pytest_cache/
