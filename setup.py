@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 
 setup(
     name             = 'seqsearch',
@@ -9,7 +9,7 @@ setup(
     author           = 'Lucas Sinclair',
     author_email     = 'lucas.sinclair@me.com',
     classifiers      = ['Topic :: Scientific/Engineering :: Bio-Informatics'],
-    packages         = find_packages(),
+    packages         = find_namespace_packages(),
     install_requires = ['plumbing>=2.8.9', 'autopaths>=1.4.6', 'fasta>=2.1.0',
                         'biopython', 'decorator', 'sh', 'tqdm', 'ftputil',
                         'wget'],
