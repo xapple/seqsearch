@@ -20,8 +20,7 @@ from plumbing.cache       import property_cached
 from plumbing.common      import natural_sort
 
 # Third party modules #
-from ftputil import FTPHost
-from tqdm    import tqdm
+from tqdm import tqdm
 
 # Constants #
 home = os.environ.get('HOME', '~') + '/'
@@ -52,6 +51,7 @@ class Database:
     @property_cached
     def ftp(self):
         """If the data is to be obtained by FTP, here is the ftputil object."""
+        from ftputil import FTPHost
         ftp = FTPHost(self.ftp_url, "anonymous")
         ftp.chdir(self.ftp_dir)
         return ftp
