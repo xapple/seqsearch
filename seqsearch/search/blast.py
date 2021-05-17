@@ -8,19 +8,22 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import os, multiprocessing, threading, shutil
+import os, threading, shutil
 
 # First party modules #
 from fasta import FASTA
 from autopaths.tmp_path  import new_temp_path
-from autopaths.file_path import FilePath
+
+# Internal modules #
+from seqsearch.search.core import CoreSearch
 
 # Third party modules #
 import sh
 import Bio.Blast.NCBIXML
+from Bio import SearchIO
 
 ###############################################################################
-class BLASTquery(object):
+class BLASTquery(CoreSearch):
     """
     A blast job. Possibly the standard BLAST algorithm or
     BLASTP or BLASTX etc. Typically you could use it like this:
@@ -41,55 +44,20 @@ class BLASTquery(object):
     You can also call search.non_block_run() to run many searches in parallel.
     """
 
-    def __repr__(self):
-        return '<%s object on %s>' % (self.__class__.__name__, self.query)
-
-    def __init__(self, query_path, db_path,
-                 seq_type     = 'prot' or 'nucl',     # The seq type of the query_path file
-                 params       = None,                 # Add extra params for the command line
-                 algorithm    = "blastn" or "blastp", # Will be auto-determined with seq_type
-                 out_path     = None,                 # Where the results will be dropped
-                 executable   = None,                 # If you want a specific binary give the path
-                 cpus         = None,                 # The number of threads to use
-                 num          = None,                 # When parallelized, the number of this thread
-                 slurm_params = None,                 # If you have special slurm parameters
-                 _out         = None,                 # Store the stdout at this path
-                 _err         = None):                # Store the stderr at this path
-        # Main input #
-        self.query = FASTA(query_path)
-        # The database to search against #
-        self.db = BLASTdb(db_path, seq_type)
-        # Other attributes #
-        self.seq_type     = seq_type
-        self.algorithm    = algorithm
-        self.num          = num
-        self.params       = params if params else {}
-        self.slurm_params = slurm_params if slurm_params else {}
-        # The standard output and error #
-        self._out         = _out
-        self._err         = _err
-        # Output defaults #
-        if out_path is None:
-            self.out_path = self.query.prefix_path + '.blastout'
-        elif out_path.endswith('/'):
-            self.out_path = out_path + self.query.prefix + '.blastout'
-        else:
-            self.out_path = out_path
-        # Make it a file path #
-        self.out_path = FilePath(self.out_path)
-        # Executable #
-        self.executable = FilePath(executable)
-        # Cores to use #
-        if cpus is None: self.cpus = min(multiprocessing.cpu_count(), 32)
-        else:            self.cpus = cpus
+    def __init__(self, *args, **kwargs):
+        # Parent constructor #
+        super(BLASTquery, self).__init__(*args, **kwargs)
         # Auto detect XML output #
         if self.out_path.extension == '.xml': self.params['-outfmt'] = '5'
+        # The database to search against #
+        self.db = BLASTdb(self.db, self.seq_type)
 
     @property
     def command(self):
         # Executable #
-        if self.executable:            cmd = [self.executable.path]
-        else:                          cmd = [self.algorithm]
+        if self.executable: cmd = [str(self.executable)]
+        else:               cmd = [self.algorithm]
+        # Other parameters
         cmd += ['-db',          self.db,
                 '-query',       self.query,
                 '-out',         self.out_path,
@@ -102,17 +70,21 @@ class BLASTquery(object):
     #-------------------------------- RUNNING --------------------------------#
     def run(self, verbose=False):
         """Simply run the BLAST search locally."""
-        # Determine if standard output is to be kept #
-        out = self._out if self._out is not None else '/dev/null'
-        err = self._err if self._err is not None else '/dev/null'
+        # Create the output directory if it doesn't exist #
+        self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print("Running BLAST command:\n    %s" % ' '.join(self.command))
         # Run it #
-        sh.Command(self.command[0])(self.command[1:], _out=out, _err=err)
+        cmd = sh.Command(self.command[0])
+        result = cmd(self.command[1:],
+                     _out = self._out,
+                     _err = self._err)
         # Clean up #
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0:
             os.remove("error.log")
+        # Return #
+        return result
 
     def non_block_run(self):
         """Special method to run the query in a thread without blocking."""
@@ -126,7 +98,8 @@ class BLASTquery(object):
         until the query is finished.
         """
         try:
-            self.thread.join(999999999) # Large timeout so that we can Ctrl-C
+            # We set a large timeout so that we can Ctrl-C the process
+            self.thread.join(999999999)
         except KeyboardInterrupt:
             print("Stopped waiting on BLAST thread number %i" % self.num)
 
@@ -137,22 +110,27 @@ class BLASTquery(object):
         For the moment only minimum coverage and minimum identity.
         """
         # Conditions #
-        if 'min_coverage' in filtering and 'qcovs' not in self.params['-outfmt']:
-            raise Exception("Can't filter on minimum coverage because it wasn't included.")
-        if 'min_identity' in filtering and 'pident' not in self.params['-outfmt']:
-            raise Exception("Can't filter on minimum identity because it wasn't included.")
+        if 'min_coverage' in filtering and \
+           'qcovs' not in self.params['-outfmt']:
+            msg = "Can't filter on minimum coverage because it wasn't included."
+            raise Exception(msg)
+        if 'min_identity' in filtering and \
+           'pident' not in self.params['-outfmt']:
+            msg = "Can't filter on minimum identity because it wasn't included."
+            raise Exception(msg)
         # Iterator #
         def filter_lines(blastout):
             cov_threshold = filtering.get('min_coverage', 0.0) * 100
             idy_threshold = filtering.get('min_identity', 0.0) * 100
-            cov_position = self.params['-outfmt'].strip('"').split().index('qcovs') - 1
-            idy_position = self.params['-outfmt'].strip('"').split().index('pident') - 1
+            outfmt_str    = self.params['-outfmt'].strip('"').split()
+            cov_position  = outfmt_str.index('qcovs')  - 1
+            idy_position  = outfmt_str.index('pident') - 1
             for line in blastout:
                 coverage = float(line.split()[cov_position])
                 identity = float(line.split()[idy_position])
                 if coverage < cov_threshold: continue
                 if identity < idy_threshold: continue
-                else: yield line
+                else:yield line
         # Do it #
         temp_path = new_temp_path()
         with open(temp_path, 'w') as handle:
@@ -160,35 +138,53 @@ class BLASTquery(object):
         os.remove(self.out_path)
         shutil.move(temp_path, self.out_path)
 
+    #----------------------------- PARSE RESULTS -----------------------------#
     @property
     def results(self):
         """Parse the results."""
+        # Get the first number of the outfmt #
+        outfmt_str = self.params.get('-outfmt', '0').strip('"').split()
+        number = outfmt_str[0]
         # Check for XML #
-        if self.params.get('-outfmt', 0) == '5':
+        if number == '5':
             with open(self.out_path, 'rb') as handle:
-                for entry in Bio.Blast.NCBIXML.parse(handle): yield entry
+                for entry in Bio.Blast.NCBIXML.parse(handle):
+                    yield entry
+        # Check for tabular #
+        elif number == '6':
+            with open(self.out_path, 'rt') as handle:
+                for entry in SearchIO.parse(handle, 'blast-tab'):
+                    yield entry
+        # Check for tabular with comments #
+        elif number == '7':
+            with open(self.out_path, 'rt') as handle:
+                for entry in SearchIO.parse(handle, 'blast-tab', comments=True):
+                    yield entry
         # Default case #
         else:
-            for line in self.out_path: yield line.split()
+            for line in self.out_path:
+                yield line.split()
 
 ###############################################################################
 class BLASTdb(FASTA):
     """A BLAST database one can search against."""
 
-    def __repr__(self): return '<%s on "%s">' % (self.__class__.__name__, self.path)
+    def __repr__(self):
+        return '<%s on "%s">' % (self.__class__.__name__, self.path)
 
     def __init__(self, fasta_path, seq_type='nucl' or 'prot'):
+        # Check if the FASTA already has the seq_type set #
         if hasattr(fasta_path, 'seq_type'): self.seq_type = fasta_path.seq_type
         else:                               self.seq_type = seq_type
+        # Call parent constructor #
         FASTA.__init__(self, fasta_path)
 
-    def makeblastdb(self, logfile=None, out=None):
+    def makedb(self, logfile=None, stdout=None, verbose=False):
         # Message #
-        print("Calling `makeblastdb` on '%s'..." % self)
+        if verbose: print("Calling `makeblastdb` on '%s'..." % self)
         # Options #
         options = ['-in', self.path, '-dbtype', self.seq_type]
         # Add a log file #
         if logfile is not None: options += ['-logfile', logfile]
         # Call the program #
-        if out is not None: sh.makeblastdb(*options, _out=str(out))
-        else:               sh.makeblastdb(*options)
+        sh.makeblastdb(*options, _out=stdout)
