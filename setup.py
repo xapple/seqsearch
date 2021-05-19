@@ -2,7 +2,7 @@ from setuptools import setup, find_namespace_packages
 
 setup(
     name             = 'seqsearch',
-    version          = '2.0.2',
+    version          = '2.0.3',
     description      = 'Sequence similarity searches (e.g. BLAST) made easy.',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqsearch',
