@@ -19,7 +19,7 @@ with open(readme_path, encoding='utf-8') as handle: readme = handle.read()
 # Call setup #
 setup(
     name             = 'seqsearch',
-    version          = '2.0.6',
+    version          = '2.0.7',
     description      = 'Sequence similarity searches (e.g. BLAST) made easy.',
     license          = 'MIT',
     url              = 'https://github.com/xapple/seqsearch',
