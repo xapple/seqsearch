@@ -110,6 +110,14 @@ class VSEARCHdb(FASTA):
     def __repr__(self):
         return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
 
+    def __bool__(self):
+        &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
+        return bool(self.replace_extension(&#39;udb&#39;))
+
+    def create_if_not_exists(self, *args, **kwargs):
+        &#34;&#34;&#34;If the indexed database has not been generated, generate it.&#34;&#34;&#34;
+        if not self: return self.makedb(*args, **kwargs)
+
     def makedb(self, output=None, stdout=None, verbose=False):
         # Message #
         if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
@@ -146,6 +154,14 @@ class VSEARCHdb(FASTA):
     def __repr__(self):
         return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
 
+    def __bool__(self):
+        &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
+        return bool(self.replace_extension(&#39;udb&#39;))
+
+    def create_if_not_exists(self, *args, **kwargs):
+        &#34;&#34;&#34;If the indexed database has not been generated, generate it.&#34;&#34;&#34;
+        if not self: return self.makedb(*args, **kwargs)
+
     def makedb(self, output=None, stdout=None, verbose=False):
         # Message #
         if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
@@ -165,6 +181,20 @@ class VSEARCHdb(FASTA):
 </ul>
 <h3>Methods</h3>
 <dl>
+<dt id="seqsearch.search.vsearch.VSEARCHdb.create_if_not_exists"><code class="name flex">
+<span>def <span class="ident">create_if_not_exists</span></span>(<span>self, *args, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If the indexed database has not been generated, generate it.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def create_if_not_exists(self, *args, **kwargs):
+    &#34;&#34;&#34;If the indexed database has not been generated, generate it.&#34;&#34;&#34;
+    if not self: return self.makedb(*args, **kwargs)</code></pre>
+</details>
+</dd>
 <dt id="seqsearch.search.vsearch.VSEARCHdb.makedb"><code class="name flex">
 <span>def <span class="ident">makedb</span></span>(<span>self, output=None, stdout=None, verbose=False)</span>
 </code></dt>
@@ -341,6 +371,7 @@ def command(self):
 <li>
 <h4><code><a title="seqsearch.search.vsearch.VSEARCHdb" href="#seqsearch.search.vsearch.VSEARCHdb">VSEARCHdb</a></code></h4>
 <ul class="">
+<li><code><a title="seqsearch.search.vsearch.VSEARCHdb.create_if_not_exists" href="#seqsearch.search.vsearch.VSEARCHdb.create_if_not_exists">create_if_not_exists</a></code></li>
 <li><code><a title="seqsearch.search.vsearch.VSEARCHdb.makedb" href="#seqsearch.search.vsearch.VSEARCHdb.makedb">makedb</a></code></li>
 </ul>
 </li>
