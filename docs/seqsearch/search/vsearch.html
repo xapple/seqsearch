@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.9.2" />
 <title>seqsearch.search.vsearch API documentation</title>
 <meta name="description" content="Written by Lucas Sinclair.
 MIT Licensed.
@@ -42,41 +42,83 @@ Contact at www.sinclair.bio
 
 # Built-in modules #
 
+# First party modules #
+
 # Internal modules #
-from autopaths.file_path import FilePath
 from fasta import FASTA
+from seqsearch.search.core import CoreSearch
 
 # Third party modules #
 import sh
 
 ###############################################################################
-class VSEARCHquery(object):
-    &#34;&#34;&#34;A vsearch job.&#34;&#34;&#34;
+class VSEARCHquery(CoreSearch):
+    &#34;&#34;&#34;
+    A vsearch job.
 
-    def __init__(self, query_path, db_path,
-                 params = None,
-                 out_path = None,
-                 executable = None):
-        # Save attributes #
-        self.query = FASTA(query_path)
-        self.db = db_path
-        self.params = params if params else {}
-        self.executable = FilePath(executable)
-        # Output #
-        if out_path is None: self.out_path = self.query.prefix_path + &#39;.vsearchout&#39;
-        elif out_path.endswith(&#39;/&#39;): self.out_path = out_path + self.query.prefix + &#39;.vsearchout&#39;
-        else: self.out_path = out_path
-        self.out_path = FilePath(self.out_path)
+    Example commands:
+
+        vsearch --usearch_global queries.fas --db queries.fas --id 0.6
+                --blast6out results.blast6 --maxaccepts 0 --maxrejects 0
+
+        ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
+                  --alnout alnout.txt
+
+    The interesting options form the manual:
+
+    --maxaccepts &lt;positive integer&gt;
+    &gt; Maximum number of hits to accept before stopping the search. The default
+    value is 1. This option works in pair with --maxrejects. The search process
+    sorts target sequences by decreasing number of k-mers they have in common
+    with the query sequence, using that information as a proxy for sequence
+    similarity. After pairwise alignments, if the first target sequence passes
+    the acceptation criteria, it is accepted as best hit and the search process
+    stops for that query. If --maxaccepts is set to a higher value, more hits
+    are accepted.
+    &#34;&#34;&#34;
 
     @property
     def command(self):
         # Executable #
         if self.executable: cmd = [self.executable.path]
+        else:               cmd = [&#39;vsearch&#39;]
+        # Other parameters
+        cmd += [&#39;--usearch_global&#39;, self.query,
+                &#39;-db&#39;,              self.db,
+                &#39;-maxaccepts&#39;,      20,
+                &#39;-blast6out&#39;,       self.out_path,
+                &#39;-threads&#39;,         self.cpus]
+        # Options #
+        for k,v in self.params.items(): cmd += [k, v]
         # Return #
-        return map(str, cmd)
+        return list(map(str, cmd))
 
-    def run(self):
-        sh.Command(self.command[0])(self.command[1:])</code></pre>
+    def run(self, verbose=False):
+        &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+        # Optionally print the command #
+        if verbose:
+            print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
+        # Run it #
+        sh.Command(self.command[0])(self.command[1:],
+                                    _out=self._out,
+                                    _err=self._err)
+
+###############################################################################
+class VSEARCHdb(FASTA):
+    &#34;&#34;&#34;A VSEARCH database one can search against.&#34;&#34;&#34;
+
+    def __repr__(self):
+        return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def makedb(self, output=None, stdout=None, verbose=False):
+        # Message #
+        if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+        # The output #
+        if output is None: output = self.replace_extension(&#39;udb&#39;)
+        # Options #
+        options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+        # Call the program #
+        sh.vsearch(*options, _out=stdout)</code></pre>
 </details>
 </section>
 <section>
@@ -88,44 +130,147 @@ class VSEARCHquery(object):
 <section>
 <h2 class="section-title" id="header-classes">Classes</h2>
 <dl>
-<dt id="seqsearch.search.vsearch.VSEARCHquery"><code class="flex name class">
-<span>class <span class="ident">VSEARCHquery</span></span>
-<span>(</span><span>query_path, db_path, params=None, out_path=None, executable=None)</span>
+<dt id="seqsearch.search.vsearch.VSEARCHdb"><code class="flex name class">
+<span>class <span class="ident">VSEARCHdb</span></span>
+<span>(</span><span>path)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>A vsearch job.</p></div>
+<div class="desc"><p>A VSEARCH database one can search against.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VSEARCHquery(object):
-    &#34;&#34;&#34;A vsearch job.&#34;&#34;&#34;
+<pre><code class="python">class VSEARCHdb(FASTA):
+    &#34;&#34;&#34;A VSEARCH database one can search against.&#34;&#34;&#34;
 
-    def __init__(self, query_path, db_path,
-                 params = None,
-                 out_path = None,
-                 executable = None):
-        # Save attributes #
-        self.query = FASTA(query_path)
-        self.db = db_path
-        self.params = params if params else {}
-        self.executable = FilePath(executable)
-        # Output #
-        if out_path is None: self.out_path = self.query.prefix_path + &#39;.vsearchout&#39;
-        elif out_path.endswith(&#39;/&#39;): self.out_path = out_path + self.query.prefix + &#39;.vsearchout&#39;
-        else: self.out_path = out_path
-        self.out_path = FilePath(self.out_path)
+    def __repr__(self):
+        return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def makedb(self, output=None, stdout=None, verbose=False):
+        # Message #
+        if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+        # The output #
+        if output is None: output = self.replace_extension(&#39;udb&#39;)
+        # Options #
+        options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+        # Call the program #
+        sh.vsearch(*options, _out=stdout)</code></pre>
+</details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>fasta.core.FASTA</li>
+<li>autopaths.file_path.FilePath</li>
+<li>autopaths.base_path.BasePath</li>
+<li>builtins.str</li>
+</ul>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.search.vsearch.VSEARCHdb.makedb"><code class="name flex">
+<span>def <span class="ident">makedb</span></span>(<span>self, output=None, stdout=None, verbose=False)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def makedb(self, output=None, stdout=None, verbose=False):
+    # Message #
+    if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+    # The output #
+    if output is None: output = self.replace_extension(&#39;udb&#39;)
+    # Options #
+    options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+    # Call the program #
+    sh.vsearch(*options, _out=stdout)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+<dt id="seqsearch.search.vsearch.VSEARCHquery"><code class="flex name class">
+<span>class <span class="ident">VSEARCHquery</span></span>
+<span>(</span><span>query_path, db_path, seq_type='prot', params=None, algorithm='blastn', out_path=None, executable=None, cpus=None, num=None)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A vsearch job.</p>
+<p>Example commands:</p>
+<pre><code>vsearch --usearch_global queries.fas --db queries.fas --id 0.6
+        --blast6out results.blast6 --maxaccepts 0 --maxrejects 0
+
+./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
+          --alnout alnout.txt
+</code></pre>
+<p>The interesting options form the manual:</p>
+<p>&ndash;maxaccepts <positive integer></p>
+<blockquote>
+<p>Maximum number of hits to accept before stopping the search. The default
+value is 1. This option works in pair with &ndash;maxrejects. The search process
+sorts target sequences by decreasing number of k-mers they have in common
+with the query sequence, using that information as a proxy for sequence
+similarity. After pairwise alignments, if the first target sequence passes
+the acceptation criteria, it is accepted as best hit and the search process
+stops for that query. If &ndash;maxaccepts is set to a higher value, more hits
+are accepted.</p>
+</blockquote></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class VSEARCHquery(CoreSearch):
+    &#34;&#34;&#34;
+    A vsearch job.
+
+    Example commands:
+
+        vsearch --usearch_global queries.fas --db queries.fas --id 0.6
+                --blast6out results.blast6 --maxaccepts 0 --maxrejects 0
+
+        ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
+                  --alnout alnout.txt
+
+    The interesting options form the manual:
+
+    --maxaccepts &lt;positive integer&gt;
+    &gt; Maximum number of hits to accept before stopping the search. The default
+    value is 1. This option works in pair with --maxrejects. The search process
+    sorts target sequences by decreasing number of k-mers they have in common
+    with the query sequence, using that information as a proxy for sequence
+    similarity. After pairwise alignments, if the first target sequence passes
+    the acceptation criteria, it is accepted as best hit and the search process
+    stops for that query. If --maxaccepts is set to a higher value, more hits
+    are accepted.
+    &#34;&#34;&#34;
 
     @property
     def command(self):
         # Executable #
         if self.executable: cmd = [self.executable.path]
+        else:               cmd = [&#39;vsearch&#39;]
+        # Other parameters
+        cmd += [&#39;--usearch_global&#39;, self.query,
+                &#39;-db&#39;,              self.db,
+                &#39;-maxaccepts&#39;,      20,
+                &#39;-blast6out&#39;,       self.out_path,
+                &#39;-threads&#39;,         self.cpus]
+        # Options #
+        for k,v in self.params.items(): cmd += [k, v]
         # Return #
-        return map(str, cmd)
+        return list(map(str, cmd))
 
-    def run(self):
-        sh.Command(self.command[0])(self.command[1:])</code></pre>
+    def run(self, verbose=False):
+        &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+        # Optionally print the command #
+        if verbose:
+            print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
+        # Run it #
+        sh.Command(self.command[0])(self.command[1:],
+                                    _out=self._out,
+                                    _err=self._err)</code></pre>
 </details>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li><a title="seqsearch.search.core.CoreSearch" href="core.html#seqsearch.search.core.CoreSearch">CoreSearch</a></li>
+</ul>
 <h3>Instance variables</h3>
 <dl>
 <dt id="seqsearch.search.vsearch.VSEARCHquery.command"><code class="name">var <span class="ident">command</span></code></dt>
@@ -139,24 +284,40 @@ class VSEARCHquery(object):
 def command(self):
     # Executable #
     if self.executable: cmd = [self.executable.path]
+    else:               cmd = [&#39;vsearch&#39;]
+    # Other parameters
+    cmd += [&#39;--usearch_global&#39;, self.query,
+            &#39;-db&#39;,              self.db,
+            &#39;-maxaccepts&#39;,      20,
+            &#39;-blast6out&#39;,       self.out_path,
+            &#39;-threads&#39;,         self.cpus]
+    # Options #
+    for k,v in self.params.items(): cmd += [k, v]
     # Return #
-    return map(str, cmd)</code></pre>
+    return list(map(str, cmd))</code></pre>
 </details>
 </dd>
 </dl>
 <h3>Methods</h3>
 <dl>
 <dt id="seqsearch.search.vsearch.VSEARCHquery.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self)</span>
+<span>def <span class="ident">run</span></span>(<span>self, verbose=False)</span>
 </code></dt>
 <dd>
-<div class="desc"></div>
+<div class="desc"><p>Simply run the VSEARCH search locally.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def run(self):
-    sh.Command(self.command[0])(self.command[1:])</code></pre>
+<pre><code class="python">def run(self, verbose=False):
+    &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+    # Optionally print the command #
+    if verbose:
+        print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
+    # Run it #
+    sh.Command(self.command[0])(self.command[1:],
+                                _out=self._out,
+                                _err=self._err)</code></pre>
 </details>
 </dd>
 </dl>
@@ -178,6 +339,12 @@ def command(self):
 <li><h3><a href="#header-classes">Classes</a></h3>
 <ul>
 <li>
+<h4><code><a title="seqsearch.search.vsearch.VSEARCHdb" href="#seqsearch.search.vsearch.VSEARCHdb">VSEARCHdb</a></code></h4>
+<ul class="">
+<li><code><a title="seqsearch.search.vsearch.VSEARCHdb.makedb" href="#seqsearch.search.vsearch.VSEARCHdb.makedb">makedb</a></code></li>
+</ul>
+</li>
+<li>
 <h4><code><a title="seqsearch.search.vsearch.VSEARCHquery" href="#seqsearch.search.vsearch.VSEARCHquery">VSEARCHquery</a></code></h4>
 <ul class="">
 <li><code><a title="seqsearch.search.vsearch.VSEARCHquery.command" href="#seqsearch.search.vsearch.VSEARCHquery.command">command</a></code></li>
@@ -190,7 +357,7 @@ def command(self):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
 </footer>
 </body>
 </html>

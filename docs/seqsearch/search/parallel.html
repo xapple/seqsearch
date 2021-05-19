@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
-<meta name="generator" content="pdoc 0.9.1" />
+<meta name="generator" content="pdoc 0.9.2" />
 <title>seqsearch.search.parallel API documentation</title>
 <meta name="description" content="Written by Lucas Sinclair.
 MIT Licensed.
@@ -41,39 +41,36 @@ Contact at www.sinclair.bio
 &#34;&#34;&#34;
 
 # Built-in modules #
-import math, multiprocessing
+import math, subprocess, multiprocessing
 
-# Internal modules #
-from seqsearch.search import SeqSearch
-from seqsearch.search.blast import BLASTquery
+# First party modules #
+from seqsearch.search         import SeqSearch
+from seqsearch.search.blast   import BLASTquery
 from seqsearch.search.vsearch import VSEARCHquery
-from plumbing.cache import property_cached
-from fasta.splitable import SplitableFASTA
-
-# Third party modules #
-from shell_command import shell_output
+from plumbing.cache           import property_cached
+from fasta.splitable          import SplitableFASTA
 
 ################################################################################
 class ParallelSeqSearch(SeqSearch):
     &#34;&#34;&#34;
     The same thing as a SeqSearch but operates by chopping in the input up into
-    smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
+    smaller pieces and running the algorithm on each piece separately, finally
+    joining the outputs.
 
-    You can specify the number of parts, the size in MB or GB that each part should approximately have,
-    or even how many sequences should be in each part. Specify only one of the three options.
+    You can specify the number of parts, the size in MB or GB that each part
+    should approximately have, or even how many sequences should be in each
+    part. Specify only one of the three options.
 
     You can place the pieces in a specific directory.
-
-    In addition, the pieces can be run separately on the local machine, or distributed to different
-    compute nodes using the SLURM system.
     &#34;&#34;&#34;
 
-    def __init__(self, input_fasta, database,
+    def __init__(self,
+                 input_fasta,
+                 database,
                  num_parts     = None,   # How many fasta pieces should we make
                  part_size     = None,   # What size in MB should a fasta piece be
                  seqs_per_part = None,   # How many sequences in one fasta piece
-                 slurm_params  = None,   # Additional parameters for possible SLURM jobs
-                 parts_dir     = None,   # If you want a special direcotry for the fasta pieces
+                 parts_dir     = None,   # If you want a special directory for the fasta pieces
                  **kwargs):
         # Determine number of parts #
         self.num_parts = None
@@ -88,9 +85,9 @@ class ParallelSeqSearch(SeqSearch):
             self.num_parts = int(math.ceil(input_fasta.count / seqs_per_part))
         # Default case #
         if self.num_parts is None:
-            self.num_parts = kwargs.get(&#39;num_threads&#39;, min(multiprocessing.cpu_count(), 32))
-        # In case the user has some special slurm params #
-        self.slurm_params = slurm_params
+            default = min(multiprocessing.cpu_count(), 32)
+            self.num_parts = kwargs.get(&#39;num_threads&#39;, default)
+            if self.num_parts is True: self.num_parts = default
         # In case the user wants a special parts directory #
         self.parts_dir = parts_dir
         # Super #
@@ -99,7 +96,9 @@ class ParallelSeqSearch(SeqSearch):
     @property_cached
     def splitable(self):
         &#34;&#34;&#34;The input fasta file as it is, but with the ability to split it.&#34;&#34;&#34;
-        return SplitableFASTA(self.input_fasta, self.num_parts, base_dir=self.parts_dir)
+        return SplitableFASTA(self.input_fasta,
+                              self.num_parts,
+                              base_dir = self.parts_dir)
 
     @property
     def queries(self):
@@ -110,7 +109,8 @@ class ParallelSeqSearch(SeqSearch):
 
     def join_outputs(self):
         &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
-        shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))
+        all_files = &#39; &#39;.join(q.out_path for q in self.queries)
+        subprocess.check_call(&#39;cat %s &gt; %s&#39; % (all_files, self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#
     def run_local(self):
@@ -126,32 +126,27 @@ class ParallelSeqSearch(SeqSearch):
         # Join the results #
         self.join_outputs()
 
-    def run_slurm(self):
-        &#34;&#34;&#34;Run the search via SLURM.&#34;&#34;&#34;
-        self.splitable.split()
-        for query in self.queries: query.slurm_job.run()
-        for query in self.queries: query.slurm_job.wait()
-        self.join_outputs()
-
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_queries(self):
         &#34;&#34;&#34;Make all BLAST search objects.&#34;&#34;&#34;
+        # Select the right BLAST #
+        blast_algo = self.select_blast_algo()
+        # Create a list #
         return [BLASTquery(query_path   = p,
                            db_path      = self.database,
                            seq_type     = self.seq_type,
                            params       = self.blast_params,
-                           algorithm    = self.select_blast_algo(),
-                           version      = &#34;plus&#34;,
+                           algorithm    = blast_algo,
                            cpus         = 1,
-                           slurm_params = self.slurm_params,
                            num          = p.num) for p in self.splitable.parts]
 
     #-------------------------- VSEARCH IMPLEMENTATION -------------------------#
     @property_cached
     def vsearch_queries(self):
         &#34;&#34;&#34;Make all VSEARCH search objects.&#34;&#34;&#34;
-        return [VSEARCHquery(p, self.database, self.vsearch_params) for p in self.splitable.parts]</code></pre>
+        return [VSEARCHquery(p, self.database, self.vsearch_params)
+                for p in self.splitable.parts]</code></pre>
 </details>
 </section>
 <section>
@@ -165,16 +160,16 @@ class ParallelSeqSearch(SeqSearch):
 <dl>
 <dt id="seqsearch.search.parallel.ParallelSeqSearch"><code class="flex name class">
 <span>class <span class="ident">ParallelSeqSearch</span></span>
-<span>(</span><span>input_fasta, database, num_parts=None, part_size=None, seqs_per_part=None, slurm_params=None, parts_dir=None, **kwargs)</span>
+<span>(</span><span>input_fasta, database, num_parts=None, part_size=None, seqs_per_part=None, parts_dir=None, **kwargs)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>The same thing as a SeqSearch but operates by chopping in the input up into
-smaller pieces and running the algorithm on each piece separately, finally joining the outputs.</p>
-<p>You can specify the number of parts, the size in MB or GB that each part should approximately have,
-or even how many sequences should be in each part. Specify only one of the three options.</p>
-<p>You can place the pieces in a specific directory.</p>
-<p>In addition, the pieces can be run separately on the local machine, or distributed to different
-compute nodes using the SLURM system.</p></div>
+smaller pieces and running the algorithm on each piece separately, finally
+joining the outputs.</p>
+<p>You can specify the number of parts, the size in MB or GB that each part
+should approximately have, or even how many sequences should be in each
+part. Specify only one of the three options.</p>
+<p>You can place the pieces in a specific directory.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -182,23 +177,23 @@ compute nodes using the SLURM system.</p></div>
 <pre><code class="python">class ParallelSeqSearch(SeqSearch):
     &#34;&#34;&#34;
     The same thing as a SeqSearch but operates by chopping in the input up into
-    smaller pieces and running the algorithm on each piece separately, finally joining the outputs.
+    smaller pieces and running the algorithm on each piece separately, finally
+    joining the outputs.
 
-    You can specify the number of parts, the size in MB or GB that each part should approximately have,
-    or even how many sequences should be in each part. Specify only one of the three options.
+    You can specify the number of parts, the size in MB or GB that each part
+    should approximately have, or even how many sequences should be in each
+    part. Specify only one of the three options.
 
     You can place the pieces in a specific directory.
-
-    In addition, the pieces can be run separately on the local machine, or distributed to different
-    compute nodes using the SLURM system.
     &#34;&#34;&#34;
 
-    def __init__(self, input_fasta, database,
+    def __init__(self,
+                 input_fasta,
+                 database,
                  num_parts     = None,   # How many fasta pieces should we make
                  part_size     = None,   # What size in MB should a fasta piece be
                  seqs_per_part = None,   # How many sequences in one fasta piece
-                 slurm_params  = None,   # Additional parameters for possible SLURM jobs
-                 parts_dir     = None,   # If you want a special direcotry for the fasta pieces
+                 parts_dir     = None,   # If you want a special directory for the fasta pieces
                  **kwargs):
         # Determine number of parts #
         self.num_parts = None
@@ -213,9 +208,9 @@ compute nodes using the SLURM system.</p></div>
             self.num_parts = int(math.ceil(input_fasta.count / seqs_per_part))
         # Default case #
         if self.num_parts is None:
-            self.num_parts = kwargs.get(&#39;num_threads&#39;, min(multiprocessing.cpu_count(), 32))
-        # In case the user has some special slurm params #
-        self.slurm_params = slurm_params
+            default = min(multiprocessing.cpu_count(), 32)
+            self.num_parts = kwargs.get(&#39;num_threads&#39;, default)
+            if self.num_parts is True: self.num_parts = default
         # In case the user wants a special parts directory #
         self.parts_dir = parts_dir
         # Super #
@@ -224,7 +219,9 @@ compute nodes using the SLURM system.</p></div>
     @property_cached
     def splitable(self):
         &#34;&#34;&#34;The input fasta file as it is, but with the ability to split it.&#34;&#34;&#34;
-        return SplitableFASTA(self.input_fasta, self.num_parts, base_dir=self.parts_dir)
+        return SplitableFASTA(self.input_fasta,
+                              self.num_parts,
+                              base_dir = self.parts_dir)
 
     @property
     def queries(self):
@@ -235,7 +232,8 @@ compute nodes using the SLURM system.</p></div>
 
     def join_outputs(self):
         &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
-        shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))
+        all_files = &#39; &#39;.join(q.out_path for q in self.queries)
+        subprocess.check_call(&#39;cat %s &gt; %s&#39; % (all_files, self.out_path))
 
     #-------------------------------- RUNNING --------------------------------#
     def run_local(self):
@@ -251,32 +249,27 @@ compute nodes using the SLURM system.</p></div>
         # Join the results #
         self.join_outputs()
 
-    def run_slurm(self):
-        &#34;&#34;&#34;Run the search via SLURM.&#34;&#34;&#34;
-        self.splitable.split()
-        for query in self.queries: query.slurm_job.run()
-        for query in self.queries: query.slurm_job.wait()
-        self.join_outputs()
-
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
     def blast_queries(self):
         &#34;&#34;&#34;Make all BLAST search objects.&#34;&#34;&#34;
+        # Select the right BLAST #
+        blast_algo = self.select_blast_algo()
+        # Create a list #
         return [BLASTquery(query_path   = p,
                            db_path      = self.database,
                            seq_type     = self.seq_type,
                            params       = self.blast_params,
-                           algorithm    = self.select_blast_algo(),
-                           version      = &#34;plus&#34;,
+                           algorithm    = blast_algo,
                            cpus         = 1,
-                           slurm_params = self.slurm_params,
                            num          = p.num) for p in self.splitable.parts]
 
     #-------------------------- VSEARCH IMPLEMENTATION -------------------------#
     @property_cached
     def vsearch_queries(self):
         &#34;&#34;&#34;Make all VSEARCH search objects.&#34;&#34;&#34;
-        return [VSEARCHquery(p, self.database, self.vsearch_params) for p in self.splitable.parts]</code></pre>
+        return [VSEARCHquery(p, self.database, self.vsearch_params)
+                for p in self.splitable.parts]</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
@@ -403,7 +396,8 @@ def queries(self):
 </summary>
 <pre><code class="python">def join_outputs(self):
     &#34;&#34;&#34;Join the outputs.&#34;&#34;&#34;
-    shell_output(&#39;cat %s &gt; %s&#39; % (&#39; &#39;.join(q.out_path for q in self.queries), self.out_path))</code></pre>
+    all_files = &#39; &#39;.join(q.out_path for q in self.queries)
+    subprocess.check_call(&#39;cat %s &gt; %s&#39; % (all_files, self.out_path))</code></pre>
 </details>
 </dd>
 <dt id="seqsearch.search.parallel.ParallelSeqSearch.run_local"><code class="name flex">
@@ -429,23 +423,6 @@ def queries(self):
     self.join_outputs()</code></pre>
 </details>
 </dd>
-<dt id="seqsearch.search.parallel.ParallelSeqSearch.run_slurm"><code class="name flex">
-<span>def <span class="ident">run_slurm</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Run the search via SLURM.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def run_slurm(self):
-    &#34;&#34;&#34;Run the search via SLURM.&#34;&#34;&#34;
-    self.splitable.split()
-    for query in self.queries: query.slurm_job.run()
-    for query in self.queries: query.slurm_job.wait()
-    self.join_outputs()</code></pre>
-</details>
-</dd>
 </dl>
 <h3>Inherited members</h3>
 <ul class="hlist">
@@ -460,6 +437,8 @@ def queries(self):
 <li><code><a title="seqsearch.search.SeqSearch.results" href="index.html#seqsearch.search.SeqSearch.results">results</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.run" href="index.html#seqsearch.search.SeqSearch.run">run</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.select_blast_algo" href="index.html#seqsearch.search.SeqSearch.select_blast_algo">select_blast_algo</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.set_defaults" href="index.html#seqsearch.search.SeqSearch.set_defaults">set_defaults</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.validate" href="index.html#seqsearch.search.SeqSearch.validate">validate</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.vsearch_query" href="index.html#seqsearch.search.SeqSearch.vsearch_query">vsearch_query</a></code></li>
 </ul>
 </li>
@@ -488,7 +467,6 @@ def queries(self):
 <li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.join_outputs" href="#seqsearch.search.parallel.ParallelSeqSearch.join_outputs">join_outputs</a></code></li>
 <li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.queries" href="#seqsearch.search.parallel.ParallelSeqSearch.queries">queries</a></code></li>
 <li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.run_local" href="#seqsearch.search.parallel.ParallelSeqSearch.run_local">run_local</a></code></li>
-<li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.run_slurm" href="#seqsearch.search.parallel.ParallelSeqSearch.run_slurm">run_slurm</a></code></li>
 <li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.splitable" href="#seqsearch.search.parallel.ParallelSeqSearch.splitable">splitable</a></code></li>
 <li><code><a title="seqsearch.search.parallel.ParallelSeqSearch.vsearch_queries" href="#seqsearch.search.parallel.ParallelSeqSearch.vsearch_queries">vsearch_queries</a></code></li>
 </ul>
@@ -499,7 +477,7 @@ def queries(self):
 </nav>
 </main>
 <footer id="footer">
-<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.1</a>.</p>
+<p>Generated by <a href="https://pdoc3.github.io/pdoc"><cite>pdoc</cite> 0.9.2</a>.</p>
 </footer>
 </body>
 </html>
