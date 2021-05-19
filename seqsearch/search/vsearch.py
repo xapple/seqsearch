@@ -77,6 +77,14 @@ class VSEARCHdb(FASTA):
     def __repr__(self):
         return '<%s on "%s">' % (self.__class__.__name__, self.path)
 
+    def __bool__(self):
+        """Does the indexed database actually exist?"""
+        return bool(self.replace_extension('udb'))
+
+    def create_if_not_exists(self, *args, **kwargs):
+        """If the indexed database has not been generated, generate it."""
+        if not self: return self.makedb(*args, **kwargs)
+
     def makedb(self, output=None, stdout=None, verbose=False):
         # Message #
         if verbose: print("Calling `makeudb_usearch` on '%s'..." % self)

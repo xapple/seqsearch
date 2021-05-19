@@ -179,6 +179,14 @@ class BLASTdb(FASTA):
         # Call parent constructor #
         FASTA.__init__(self, fasta_path)
 
+    def __bool__(self):
+        """Does the indexed database actually exist?"""
+        return bool(self.path + '.nsq')
+
+    def create_if_not_exists(self, *args, **kwargs):
+        """If the indexed database has not been generated, generate it."""
+        if not self: return self.makedb(*args, **kwargs)
+
     def makedb(self, logfile=None, stdout=None, verbose=False):
         # Message #
         if verbose: print("Calling `makeblastdb` on '%s'..." % self)
