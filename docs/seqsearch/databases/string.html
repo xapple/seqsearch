@@ -51,7 +51,6 @@ from seqsearch.databases import base_directory
 from fasta import FASTA
 from autopaths.auto_paths import AutoPaths
 from autopaths.file_path import FilePath
-from plumbing.csv_tables import TSVTable
 
 ###############################################################################
 class String(object):
@@ -118,7 +117,7 @@ class String(object):
     @property
     def mappings(self):
         &#34;&#34;&#34;The cog mappings.&#34;&#34;&#34;
-        return TSVTable(self.p.unzipped_mappings)
+        return FilePath(self.p.unzipped_mappings)
 
     @property
     def blast_db(self):
@@ -219,7 +218,7 @@ string = String()</code></pre>
     @property
     def mappings(self):
         &#34;&#34;&#34;The cog mappings.&#34;&#34;&#34;
-        return TSVTable(self.p.unzipped_mappings)
+        return FilePath(self.p.unzipped_mappings)
 
     @property
     def blast_db(self):
@@ -322,7 +321,7 @@ def files_to_retrieve(self):
 <pre><code class="python">@property
 def mappings(self):
     &#34;&#34;&#34;The cog mappings.&#34;&#34;&#34;
-    return TSVTable(self.p.unzipped_mappings)</code></pre>
+    return FilePath(self.p.unzipped_mappings)</code></pre>
 </details>
 </dd>
 <dt id="seqsearch.databases.string.String.raw_files"><code class="name">var <span class="ident">raw_files</span></code></dt>

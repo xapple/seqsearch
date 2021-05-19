@@ -18,7 +18,6 @@ from seqsearch.databases import base_directory
 from fasta import FASTA
 from autopaths.auto_paths import AutoPaths
 from autopaths.file_path import FilePath
-from plumbing.csv_tables import TSVTable
 
 ###############################################################################
 class String(object):
@@ -85,7 +84,7 @@ class String(object):
     @property
     def mappings(self):
         """The cog mappings."""
-        return TSVTable(self.p.unzipped_mappings)
+        return FilePath(self.p.unzipped_mappings)
 
     @property
     def blast_db(self):
