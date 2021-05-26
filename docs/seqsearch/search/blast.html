@@ -214,7 +214,7 @@ class BLASTdb(FASTA):
 
     def __bool__(self):
         &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
-        return bool(self.path + &#39;.nsq&#39;)
+        return bool(self + &#39;.nsq&#39;)
 
     def create_if_not_exists(self, *args, **kwargs):
         &#34;&#34;&#34;If the indexed database has not been generated, generate it.&#34;&#34;&#34;
@@ -265,7 +265,7 @@ class BLASTdb(FASTA):
 
     def __bool__(self):
         &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
-        return bool(self.path + &#39;.nsq&#39;)
+        return bool(self + &#39;.nsq&#39;)
 
     def create_if_not_exists(self, *args, **kwargs):
         &#34;&#34;&#34;If the indexed database has not been generated, generate it.&#34;&#34;&#34;
