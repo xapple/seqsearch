@@ -8,7 +8,7 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import multiprocessing
+import multiprocessing, threading
 
 # First party modules #
 from autopaths.file_path import FilePath
@@ -21,6 +21,8 @@ class CoreSearch(object):
     Contains methods that are common to all search algorithms implementation.
     Currently: BLASTquery and VSEARCHquery inherit from this.
     """
+
+    extension = 'out'
 
     def __repr__(self):
         return '<%s object on %s>' % (self.__class__.__name__, self.query)
@@ -54,9 +56,9 @@ class CoreSearch(object):
         self._err         = _err
         # Output defaults #
         if out_path is None:
-            self.out_path = self.query.prefix_path + '.blastout'
+            self.out_path = self.query.prefix_path + self.extension
         elif out_path.endswith('/'):
-            self.out_path = out_path + self.query.prefix + '.blastout'
+            self.out_path = out_path + self.query.prefix + self.extension
         else:
             self.out_path = out_path
         # Make it a file path #
@@ -71,3 +73,22 @@ class CoreSearch(object):
             self._out = self.out_path + '.stdout'
         if self._err is True:
             self._err = self.out_path + '.stderr'
+
+    #-------------------------------- RUNNING --------------------------------#
+    def non_block_run(self):
+        """Special method to run the query in a thread without blocking."""
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
+        self.thread.start()
+
+    def wait(self):
+        """
+        If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.
+        """
+        try:
+            # We set a large timeout so that we can Ctrl-C the process
+            self.thread.join(999999999)
+        except KeyboardInterrupt:
+            print("Stopped waiting on BLAST thread number %i" % self.num)
+

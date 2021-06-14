@@ -12,7 +12,8 @@ Contact at www.sinclair.bio
 # First party modules #
 
 # Internal modules #
-from fasta import FASTA
+from Bio import SearchIO
+from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
 # Third party modules #
@@ -44,6 +45,8 @@ class VSEARCHquery(CoreSearch):
     are accepted.
     """
 
+    extension = 'vsearchout'
+
     @property
     def command(self):
         # Executable #
@@ -52,7 +55,6 @@ class VSEARCHquery(CoreSearch):
         # Other parameters
         cmd += ['--usearch_global', self.query,
                 '-db',              self.db,
-                '-maxaccepts',      20,
                 '-blast6out',       self.out_path,
                 '-threads',         self.cpus]
         # Options #
@@ -60,22 +62,50 @@ class VSEARCHquery(CoreSearch):
         # Return #
         return list(map(str, cmd))
 
+    #-------------------------------- RUNNING --------------------------------#
     def run(self, verbose=False):
         """Simply run the VSEARCH search locally."""
+        # Create the output directory if it doesn't exist #
+        self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print("Running VSEARCH command:\n    %s" % ' '.join(self.command))
         # Run it #
-        sh.Command(self.command[0])(self.command[1:],
-                                    _out=self._out,
-                                    _err=self._err)
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
+        # Return #
+        return result
+
+    #----------------------------- PARSE RESULTS -----------------------------#
+    @property
+    def results(self):
+        """
+        Parse the results and yield biopython SearchIO entries.
+        Specifying `comments=False` causes the parser to complain about
+        duplicate entries and raise exceptions such as:
+
+            ValueError: The ID or alternative IDs of Hit 'DQ448783' exists
+            in this QueryResult.
+
+        So we set it to `True` even if there are no comments present in the
+        results file.
+        """
+        with open(self.out_path, 'rt') as handle:
+            for entry in SearchIO.parse(handle, 'blast-tab', comments=True):
+                yield entry
 
 ###############################################################################
-class VSEARCHdb(FASTA):
+class VSEARCHdb(FilePath):
     """A VSEARCH database one can search against."""
 
     def __repr__(self):
         return '<%s on "%s">' % (self.__class__.__name__, self.path)
+
+    def __init__(self, path):
+        # Call parent constructor #
+        FilePath.__init__(self, path)
+        # Check if the corresponding FASTA exists #
+        self.fasta_path = self.replace_extension('fasta')
 
     def __bool__(self):
         """Does the indexed database actually exist?"""
@@ -86,11 +116,18 @@ class VSEARCHdb(FASTA):
         if not self: return self.makedb(*args, **kwargs)
 
     def makedb(self, output=None, stdout=None, verbose=False):
+        # We need a corresponding fasta that exists #
+        if not self.fasta_path:
+            raise Exception("No fasta file at '%s'." % self.fasta_path)
         # Message #
-        if verbose: print("Calling `makeudb_usearch` on '%s'..." % self)
+        if verbose:
+            msg = "Calling `makeudb_usearch` from '%s' to '%s'."
+            print(msg % (self.fasta_path, self))
         # The output #
-        if output is None: output = self.replace_extension('udb')
+        if output is None: output = self
         # Options #
-        options = ['--makeudb_usearch', self.path, '--output', output]
+        options = ['--makeudb_usearch', self.fasta_path, '--output', output]
         # Call the program #
         sh.vsearch(*options, _out=stdout)
+        # Return #
+        return output

@@ -8,7 +8,7 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import os, threading, shutil
+import os, shutil
 
 # First party modules #
 from fasta import FASTA
@@ -33,16 +33,18 @@ class BLASTquery(CoreSearch):
          centers_path = 'centers.fasta'
          db = seqsearch.BLASTdb(centers_path)
          db.makeblastdb()
-         params = {'executable': "~/share/blastplus/blastn",
-                   '-outfmt': 0,
-                   '-evalue': 1e-2,
+         params = {'executable':    "~/share/blastplus/blastn",
+                   '-outfmt':        0,
+                   '-evalue':        1e-2,
                    '-perc_identity': 97,
-                   '-num_threads': 16}
+                   '-num_threads':   16}
          search = seqsearch.BLASTquery(records_path, db, params)
          search.run()
 
     You can also call search.non_block_run() to run many searches in parallel.
     """
+
+    extension = 'blastout'
 
     def __init__(self, *args, **kwargs):
         # Parent constructor #
@@ -76,32 +78,13 @@ class BLASTquery(CoreSearch):
         if verbose:
             print("Running BLAST command:\n    %s" % ' '.join(self.command))
         # Run it #
-        cmd = sh.Command(self.command[0])
-        result = cmd(self.command[1:],
-                     _out = self._out,
-                     _err = self._err)
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
         # Clean up #
         if os.path.exists("error.log") and os.path.getsize("error.log") == 0:
             os.remove("error.log")
         # Return #
         return result
-
-    def non_block_run(self):
-        """Special method to run the query in a thread without blocking."""
-        self.thread = threading.Thread(target=self.run)
-        self.thread.daemon = True # So that they die when we die
-        self.thread.start()
-
-    def wait(self):
-        """
-        If you have run the query in a non-blocking way, call this method to pause
-        until the query is finished.
-        """
-        try:
-            # We set a large timeout so that we can Ctrl-C the process
-            self.thread.join(999999999)
-        except KeyboardInterrupt:
-            print("Stopped waiting on BLAST thread number %i" % self.num)
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):
@@ -141,7 +124,7 @@ class BLASTquery(CoreSearch):
     #----------------------------- PARSE RESULTS -----------------------------#
     @property
     def results(self):
-        """Parse the results."""
+        """Parse the results and yield biopython SearchIO entries."""
         # Get the first number of the outfmt #
         outfmt_str = self.params.get('-outfmt', '0').strip('"').split()
         number = outfmt_str[0]
