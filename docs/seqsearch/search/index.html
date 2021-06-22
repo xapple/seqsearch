@@ -69,7 +69,7 @@ class SeqSearch(object):
                                    - Maximum targets
                                    - Minimum identity (via manual output format)
                                    - Minimum query coverage (via manual output format)
-              * VSEARCH supported: - TODO
+              * VSEARCH supported: - Maximum targets
               * HMMER supported:   - e-value
 
     Output: - List of identifiers in the database
@@ -77,10 +77,9 @@ class SeqSearch(object):
 
     Other possible algorithms:
 
-        * http://www.ncbi.nlm.nih.gov/pubmed/11932250
-        * http://ab.inf.uni-tuebingen.de/software/pauda/
-        * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
-        * Diamond
+        * https://www.ncbi.nlm.nih.gov/pubmed/11932250
+        * https://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
+        * https://github.com/bbuchfink/diamond
     &#34;&#34;&#34;
 
     def __repr__(self):
@@ -124,6 +123,8 @@ class SeqSearch(object):
         # In case we got a special object, just use the blast_db attribute #
         if self.algorithm == &#39;blast&#39; and hasattr(self.database, &#39;blast_db&#39;):
             self.database = self.database.blast_db
+        if self.algorithm == &#39;vsearch&#39; and hasattr(self.database, &#39;vsearch_db&#39;):
+            self.database = self.database.vsearch_db
         # Otherwise in case we got a path, convert it to a BLASTdb #
         if self.algorithm == &#39;blast&#39; and not isinstance(self.database, BLASTdb):
             self.database = BLASTdb(self.database)
@@ -136,7 +137,7 @@ class SeqSearch(object):
         # Output path setting #
         self.out_path = FilePath(self.out_path)
         # Number of cores default value #
-        if self.num_threads is None:
+        if self.num_threads is None or self.num_threads is True:
             self.num_threads = min(multiprocessing.cpu_count(), 32)
         # Extra params to be given to the search algorithm #
         if self.params is None: self.params = {}
@@ -176,20 +177,6 @@ class SeqSearch(object):
 
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
-    def blast_query(self):
-        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
-        # Make the query object #
-        return BLASTquery(query_path = self.input_fasta,
-                          db_path    = self.database,
-                          seq_type   = self.seq_type,
-                          params     = self.blast_params,
-                          algorithm  = self.select_blast_algo(),
-                          cpus       = self.num_threads,
-                          out_path   = self.out_path,
-                          _out       = self._out,
-                          _err       = self._err)
-
-    @property_cached
     def blast_params(self):
         &#34;&#34;&#34;
         A dictionary of options to pass to the blast executable.
@@ -215,14 +202,42 @@ class SeqSearch(object):
         if self.seq_type == &#39;nucl&#39; and db_type == &#39;prot&#39;: return &#39;blastx&#39;
         if self.seq_type == &#39;prot&#39; and db_type == &#39;nucl&#39;: return &#39;tblastn&#39;
 
+    @property_cached
+    def blast_query(self):
+        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        # Make the query object #
+        return BLASTquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.blast_params,
+                          algorithm  = self.select_blast_algo(),
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path,
+                          _out       = self._out,
+                          _err       = self._err)
+
     #------------------------- VSEARCH IMPLEMENTATION ------------------------#
+    @property_cached
+    def vsearch_params(self):
+        &#34;&#34;&#34;
+        A dictionary of options to pass to the vsearch executable.
+        These params should depend on the filtering options.
+        &#34;&#34;&#34;
+        # Make a copy #
+        params = self.params.copy()
+        # Based on the maximum number of hits #
+        if &#39;max_targets&#39; in self.filtering:
+            params[&#39;-maxaccepts&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Return #
+        return params
+
     @property_cached
     def vsearch_query(self):
         &#34;&#34;&#34;Make a VSEARCH search object.&#34;&#34;&#34;
         return VSEARCHquery(query_path = self.input_fasta,
                             db_path    = self.database,
                             seq_type   = self.seq_type,
-                            params     = self.blast_params,
+                            params     = self.vsearch_params,
                             algorithm  = &#34;usearch_global&#34;,
                             cpus       = self.num_threads,
                             out_path   = self.out_path,
@@ -310,16 +325,15 @@ all through the same interface.</p>
 - Maximum targets
 - Minimum identity (via manual output format)
 - Minimum query coverage (via manual output format)
-* VSEARCH supported: - TODO
+* VSEARCH supported: - Maximum targets
 * HMMER supported:
 - e-value</p>
 <p>Output: - List of identifiers in the database
 (object with significance value and identity attached)</p>
 <p>Other possible algorithms:</p>
-<pre><code>* &lt;http://www.ncbi.nlm.nih.gov/pubmed/11932250&gt;
-* &lt;http://ab.inf.uni-tuebingen.de/software/pauda/&gt;
-* &lt;http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/&gt;
-* Diamond
+<pre><code>* &lt;https://www.ncbi.nlm.nih.gov/pubmed/11932250&gt;
+* &lt;https://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/&gt;
+* &lt;https://github.com/bbuchfink/diamond&gt;
 </code></pre></div>
 <details class="source">
 <summary>
@@ -343,7 +357,7 @@ all through the same interface.</p>
                                    - Maximum targets
                                    - Minimum identity (via manual output format)
                                    - Minimum query coverage (via manual output format)
-              * VSEARCH supported: - TODO
+              * VSEARCH supported: - Maximum targets
               * HMMER supported:   - e-value
 
     Output: - List of identifiers in the database
@@ -351,10 +365,9 @@ all through the same interface.</p>
 
     Other possible algorithms:
 
-        * http://www.ncbi.nlm.nih.gov/pubmed/11932250
-        * http://ab.inf.uni-tuebingen.de/software/pauda/
-        * http://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
-        * Diamond
+        * https://www.ncbi.nlm.nih.gov/pubmed/11932250
+        * https://www.animalgenome.org/bioinfo/resources/manuals/wu-blast/
+        * https://github.com/bbuchfink/diamond
     &#34;&#34;&#34;
 
     def __repr__(self):
@@ -398,6 +411,8 @@ all through the same interface.</p>
         # In case we got a special object, just use the blast_db attribute #
         if self.algorithm == &#39;blast&#39; and hasattr(self.database, &#39;blast_db&#39;):
             self.database = self.database.blast_db
+        if self.algorithm == &#39;vsearch&#39; and hasattr(self.database, &#39;vsearch_db&#39;):
+            self.database = self.database.vsearch_db
         # Otherwise in case we got a path, convert it to a BLASTdb #
         if self.algorithm == &#39;blast&#39; and not isinstance(self.database, BLASTdb):
             self.database = BLASTdb(self.database)
@@ -410,7 +425,7 @@ all through the same interface.</p>
         # Output path setting #
         self.out_path = FilePath(self.out_path)
         # Number of cores default value #
-        if self.num_threads is None:
+        if self.num_threads is None or self.num_threads is True:
             self.num_threads = min(multiprocessing.cpu_count(), 32)
         # Extra params to be given to the search algorithm #
         if self.params is None: self.params = {}
@@ -450,20 +465,6 @@ all through the same interface.</p>
 
     #-------------------------- BLAST IMPLEMENTATION -------------------------#
     @property_cached
-    def blast_query(self):
-        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
-        # Make the query object #
-        return BLASTquery(query_path = self.input_fasta,
-                          db_path    = self.database,
-                          seq_type   = self.seq_type,
-                          params     = self.blast_params,
-                          algorithm  = self.select_blast_algo(),
-                          cpus       = self.num_threads,
-                          out_path   = self.out_path,
-                          _out       = self._out,
-                          _err       = self._err)
-
-    @property_cached
     def blast_params(self):
         &#34;&#34;&#34;
         A dictionary of options to pass to the blast executable.
@@ -489,14 +490,42 @@ all through the same interface.</p>
         if self.seq_type == &#39;nucl&#39; and db_type == &#39;prot&#39;: return &#39;blastx&#39;
         if self.seq_type == &#39;prot&#39; and db_type == &#39;nucl&#39;: return &#39;tblastn&#39;
 
+    @property_cached
+    def blast_query(self):
+        &#34;&#34;&#34;Make a BLAST search object.&#34;&#34;&#34;
+        # Make the query object #
+        return BLASTquery(query_path = self.input_fasta,
+                          db_path    = self.database,
+                          seq_type   = self.seq_type,
+                          params     = self.blast_params,
+                          algorithm  = self.select_blast_algo(),
+                          cpus       = self.num_threads,
+                          out_path   = self.out_path,
+                          _out       = self._out,
+                          _err       = self._err)
+
     #------------------------- VSEARCH IMPLEMENTATION ------------------------#
+    @property_cached
+    def vsearch_params(self):
+        &#34;&#34;&#34;
+        A dictionary of options to pass to the vsearch executable.
+        These params should depend on the filtering options.
+        &#34;&#34;&#34;
+        # Make a copy #
+        params = self.params.copy()
+        # Based on the maximum number of hits #
+        if &#39;max_targets&#39; in self.filtering:
+            params[&#39;-maxaccepts&#39;] = self.filtering[&#39;max_targets&#39;]
+        # Return #
+        return params
+
     @property_cached
     def vsearch_query(self):
         &#34;&#34;&#34;Make a VSEARCH search object.&#34;&#34;&#34;
         return VSEARCHquery(query_path = self.input_fasta,
                             db_path    = self.database,
                             seq_type   = self.seq_type,
-                            params     = self.blast_params,
+                            params     = self.vsearch_params,
                             algorithm  = &#34;usearch_global&#34;,
                             cpus       = self.num_threads,
                             out_path   = self.out_path,
@@ -681,6 +710,37 @@ def results(self):
     return self.query.results</code></pre>
 </details>
 </dd>
+<dt id="seqsearch.search.SeqSearch.vsearch_params"><code class="name">var <span class="ident">vsearch_params</span></code></dt>
+<dd>
+<div class="desc"><p>A dictionary of options to pass to the vsearch executable.
+These params should depend on the filtering options.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def __get__(self, instance, owner):
+    &#34;&#34;&#34;
+    If you see the current source code in a seemingly unrelated part of
+    an auto-generated documentation, it means the program making the
+    documentation was unable to correctly traverse a decorated property.
+    &#34;&#34;&#34;
+    # For debugging purposes #
+    if False: print(&#34;-&gt; property cached `%s`&#34; % instance)
+    # If called from a class #
+    if instance is None: return self
+    # Does a cache exist for this instance? #
+    self.check_cache(instance)
+    # Is the answer in the cache? #
+    if self.name in instance.__cache__: return instance.__cache__[self.name]
+    # If not we will compute it #
+    if inspect.isgeneratorfunction(self.func): result = tuple(self.func(instance))
+    else:                                      result = self.func(instance)
+    # Let&#39;s store the answer for later #
+    instance.__cache__[self.name] = result
+    # Return #
+    return result</code></pre>
+</details>
+</dd>
 <dt id="seqsearch.search.SeqSearch.vsearch_query"><code class="name">var <span class="ident">vsearch_query</span></code></dt>
 <dd>
 <div class="desc"><p>Make a VSEARCH search object.</p></div>
@@ -779,6 +839,8 @@ needed.</p></div>
     # In case we got a special object, just use the blast_db attribute #
     if self.algorithm == &#39;blast&#39; and hasattr(self.database, &#39;blast_db&#39;):
         self.database = self.database.blast_db
+    if self.algorithm == &#39;vsearch&#39; and hasattr(self.database, &#39;vsearch_db&#39;):
+        self.database = self.database.vsearch_db
     # Otherwise in case we got a path, convert it to a BLASTdb #
     if self.algorithm == &#39;blast&#39; and not isinstance(self.database, BLASTdb):
         self.database = BLASTdb(self.database)
@@ -791,7 +853,7 @@ needed.</p></div>
     # Output path setting #
     self.out_path = FilePath(self.out_path)
     # Number of cores default value #
-    if self.num_threads is None:
+    if self.num_threads is None or self.num_threads is True:
         self.num_threads = min(multiprocessing.cpu_count(), 32)
     # Extra params to be given to the search algorithm #
     if self.params is None: self.params = {}</code></pre>
@@ -857,6 +919,7 @@ the user are illegal.</p></div>
 <li><code><a title="seqsearch.search.SeqSearch.select_blast_algo" href="#seqsearch.search.SeqSearch.select_blast_algo">select_blast_algo</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.set_defaults" href="#seqsearch.search.SeqSearch.set_defaults">set_defaults</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.validate" href="#seqsearch.search.SeqSearch.validate">validate</a></code></li>
+<li><code><a title="seqsearch.search.SeqSearch.vsearch_params" href="#seqsearch.search.SeqSearch.vsearch_params">vsearch_params</a></code></li>
 <li><code><a title="seqsearch.search.SeqSearch.vsearch_query" href="#seqsearch.search.SeqSearch.vsearch_query">vsearch_query</a></code></li>
 </ul>
 </li>

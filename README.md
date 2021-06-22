@@ -1,6 +1,6 @@
 [![PyPI version](https://badge.fury.io/py/seqsearch.svg)](https://badge.fury.io/py/seqsearch)
 
-# `seqsearch` version 2.1.1
+# `seqsearch` version 2.1.2
 
 `seqsearch` is a python package for dealing sequence similarity searches (e.g. BLAST on DNA sequences) and automation.
 

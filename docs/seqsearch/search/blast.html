@@ -41,7 +41,7 @@ Contact at www.sinclair.bio
 &#34;&#34;&#34;
 
 # Built-in modules #
-import os, threading, shutil
+import os, shutil
 
 # First party modules #
 from fasta import FASTA
@@ -51,9 +51,12 @@ from autopaths.tmp_path  import new_temp_path
 from seqsearch.search.core import CoreSearch
 
 # Third party modules #
-import sh
 import Bio.Blast.NCBIXML
 from Bio import SearchIO
+
+# Module for launching shell commands #
+if os.environ.get(&#39;INSIDE_PYCHARM&#39;): import pbs3 as sh
+else:                                import sh
 
 ###############################################################################
 class BLASTquery(CoreSearch):
@@ -66,16 +69,18 @@ class BLASTquery(CoreSearch):
          centers_path = &#39;centers.fasta&#39;
          db = seqsearch.BLASTdb(centers_path)
          db.makeblastdb()
-         params = {&#39;executable&#39;: &#34;~/share/blastplus/blastn&#34;,
-                   &#39;-outfmt&#39;: 0,
-                   &#39;-evalue&#39;: 1e-2,
+         params = {&#39;executable&#39;:    &#34;~/share/blastplus/blastn&#34;,
+                   &#39;-outfmt&#39;:        0,
+                   &#39;-evalue&#39;:        1e-2,
                    &#39;-perc_identity&#39;: 97,
-                   &#39;-num_threads&#39;: 16}
+                   &#39;-num_threads&#39;:   16}
          search = seqsearch.BLASTquery(records_path, db, params)
          search.run()
 
     You can also call search.non_block_run() to run many searches in parallel.
     &#34;&#34;&#34;
+
+    extension = &#39;blastout&#39;
 
     def __init__(self, *args, **kwargs):
         # Parent constructor #
@@ -103,38 +108,25 @@ class BLASTquery(CoreSearch):
     #-------------------------------- RUNNING --------------------------------#
     def run(self, verbose=False):
         &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd(self.command[0])
         # Create the output directory if it doesn&#39;t exist #
         self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print(&#34;Running BLAST command:\n    %s&#34; % &#39; &#39;.join(self.command))
         # Run it #
-        cmd = sh.Command(self.command[0])
-        result = cmd(self.command[1:],
-                     _out = self._out,
-                     _err = self._err)
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
         # Clean up #
         if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0:
             os.remove(&#34;error.log&#34;)
         # Return #
         return result
-
-    def non_block_run(self):
-        &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
-        self.thread = threading.Thread(target=self.run)
-        self.thread.daemon = True # So that they die when we die
-        self.thread.start()
-
-    def wait(self):
-        &#34;&#34;&#34;
-        If you have run the query in a non-blocking way, call this method to pause
-        until the query is finished.
-        &#34;&#34;&#34;
-        try:
-            # We set a large timeout so that we can Ctrl-C the process
-            self.thread.join(999999999)
-        except KeyboardInterrupt:
-            print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):
@@ -174,7 +166,7 @@ class BLASTquery(CoreSearch):
     #----------------------------- PARSE RESULTS -----------------------------#
     @property
     def results(self):
-        &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+        &#34;&#34;&#34;Parse the results and yield biopython SearchIO entries.&#34;&#34;&#34;
         # Get the first number of the outfmt #
         outfmt_str = self.params.get(&#39;-outfmt&#39;, &#39;0&#39;).strip(&#39;&#34;&#39;).split()
         number = outfmt_str[0]
@@ -338,11 +330,11 @@ BLASTP or BLASTX etc. Typically you could use it like this:</p>
  centers_path = 'centers.fasta'
  db = seqsearch.BLASTdb(centers_path)
  db.makeblastdb()
- params = {'executable': "~/share/blastplus/blastn",
-           '-outfmt': 0,
-           '-evalue': 1e-2,
+ params = {'executable':    "~/share/blastplus/blastn",
+           '-outfmt':        0,
+           '-evalue':        1e-2,
            '-perc_identity': 97,
-           '-num_threads': 16}
+           '-num_threads':   16}
  search = seqsearch.BLASTquery(records_path, db, params)
  search.run()
 </code></pre>
@@ -361,16 +353,18 @@ BLASTP or BLASTX etc. Typically you could use it like this:</p>
          centers_path = &#39;centers.fasta&#39;
          db = seqsearch.BLASTdb(centers_path)
          db.makeblastdb()
-         params = {&#39;executable&#39;: &#34;~/share/blastplus/blastn&#34;,
-                   &#39;-outfmt&#39;: 0,
-                   &#39;-evalue&#39;: 1e-2,
+         params = {&#39;executable&#39;:    &#34;~/share/blastplus/blastn&#34;,
+                   &#39;-outfmt&#39;:        0,
+                   &#39;-evalue&#39;:        1e-2,
                    &#39;-perc_identity&#39;: 97,
-                   &#39;-num_threads&#39;: 16}
+                   &#39;-num_threads&#39;:   16}
          search = seqsearch.BLASTquery(records_path, db, params)
          search.run()
 
     You can also call search.non_block_run() to run many searches in parallel.
     &#34;&#34;&#34;
+
+    extension = &#39;blastout&#39;
 
     def __init__(self, *args, **kwargs):
         # Parent constructor #
@@ -398,38 +392,25 @@ BLASTP or BLASTX etc. Typically you could use it like this:</p>
     #-------------------------------- RUNNING --------------------------------#
     def run(self, verbose=False):
         &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd(self.command[0])
         # Create the output directory if it doesn&#39;t exist #
         self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print(&#34;Running BLAST command:\n    %s&#34; % &#39; &#39;.join(self.command))
         # Run it #
-        cmd = sh.Command(self.command[0])
-        result = cmd(self.command[1:],
-                     _out = self._out,
-                     _err = self._err)
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
         # Clean up #
         if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0:
             os.remove(&#34;error.log&#34;)
         # Return #
         return result
-
-    def non_block_run(self):
-        &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
-        self.thread = threading.Thread(target=self.run)
-        self.thread.daemon = True # So that they die when we die
-        self.thread.start()
-
-    def wait(self):
-        &#34;&#34;&#34;
-        If you have run the query in a non-blocking way, call this method to pause
-        until the query is finished.
-        &#34;&#34;&#34;
-        try:
-            # We set a large timeout so that we can Ctrl-C the process
-            self.thread.join(999999999)
-        except KeyboardInterrupt:
-            print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)
 
     #------------------------------- FILTERING -------------------------------#
     def filter(self, filtering):
@@ -469,7 +450,7 @@ BLASTP or BLASTX etc. Typically you could use it like this:</p>
     #----------------------------- PARSE RESULTS -----------------------------#
     @property
     def results(self):
-        &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+        &#34;&#34;&#34;Parse the results and yield biopython SearchIO entries.&#34;&#34;&#34;
         # Get the first number of the outfmt #
         outfmt_str = self.params.get(&#39;-outfmt&#39;, &#39;0&#39;).strip(&#39;&#34;&#39;).split()
         number = outfmt_str[0]
@@ -497,6 +478,13 @@ BLASTP or BLASTX etc. Typically you could use it like this:</p>
 <ul class="hlist">
 <li><a title="seqsearch.search.core.CoreSearch" href="core.html#seqsearch.search.core.CoreSearch">CoreSearch</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="seqsearch.search.blast.BLASTquery.extension"><code class="name">var <span class="ident">extension</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="seqsearch.search.blast.BLASTquery.command"><code class="name">var <span class="ident">command</span></code></dt>
@@ -524,14 +512,14 @@ def command(self):
 </dd>
 <dt id="seqsearch.search.blast.BLASTquery.results"><code class="name">var <span class="ident">results</span></code></dt>
 <dd>
-<div class="desc"><p>Parse the results.</p></div>
+<div class="desc"><p>Parse the results and yield biopython SearchIO entries.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">@property
 def results(self):
-    &#34;&#34;&#34;Parse the results.&#34;&#34;&#34;
+    &#34;&#34;&#34;Parse the results and yield biopython SearchIO entries.&#34;&#34;&#34;
     # Get the first number of the outfmt #
     outfmt_str = self.params.get(&#39;-outfmt&#39;, &#39;0&#39;).strip(&#39;&#34;&#39;).split()
     number = outfmt_str[0]
@@ -604,22 +592,6 @@ For the moment only minimum coverage and minimum identity.</p></div>
     shutil.move(temp_path, self.out_path)</code></pre>
 </details>
 </dd>
-<dt id="seqsearch.search.blast.BLASTquery.non_block_run"><code class="name flex">
-<span>def <span class="ident">non_block_run</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>Special method to run the query in a thread without blocking.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def non_block_run(self):
-    &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
-    self.thread = threading.Thread(target=self.run)
-    self.thread.daemon = True # So that they die when we die
-    self.thread.start()</code></pre>
-</details>
-</dd>
 <dt id="seqsearch.search.blast.BLASTquery.run"><code class="name flex">
 <span>def <span class="ident">run</span></span>(<span>self, verbose=False)</span>
 </code></dt>
@@ -631,16 +603,20 @@ For the moment only minimum coverage and minimum identity.</p></div>
 </summary>
 <pre><code class="python">def run(self, verbose=False):
     &#34;&#34;&#34;Simply run the BLAST search locally.&#34;&#34;&#34;
+    # Check the executable is available #
+    if self.executable:
+        self.executable.must_exist()
+    else:
+        from plumbing.check_cmd_found import check_cmd
+        check_cmd(self.command[0])
     # Create the output directory if it doesn&#39;t exist #
     self.out_path.directory.create_if_not_exists()
     # Optionally print the command #
     if verbose:
         print(&#34;Running BLAST command:\n    %s&#34; % &#39; &#39;.join(self.command))
     # Run it #
-    cmd = sh.Command(self.command[0])
-    result = cmd(self.command[1:],
-                 _out = self._out,
-                 _err = self._err)
+    cmd    = sh.Command(self.command[0])
+    result = cmd(self.command[1:], _out=self._out, _err=self._err)
     # Clean up #
     if os.path.exists(&#34;error.log&#34;) and os.path.getsize(&#34;error.log&#34;) == 0:
         os.remove(&#34;error.log&#34;)
@@ -648,29 +624,16 @@ For the moment only minimum coverage and minimum identity.</p></div>
     return result</code></pre>
 </details>
 </dd>
-<dt id="seqsearch.search.blast.BLASTquery.wait"><code class="name flex">
-<span>def <span class="ident">wait</span></span>(<span>self)</span>
-</code></dt>
-<dd>
-<div class="desc"><p>If you have run the query in a non-blocking way, call this method to pause
-until the query is finished.</p></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def wait(self):
-    &#34;&#34;&#34;
-    If you have run the query in a non-blocking way, call this method to pause
-    until the query is finished.
-    &#34;&#34;&#34;
-    try:
-        # We set a large timeout so that we can Ctrl-C the process
-        self.thread.join(999999999)
-    except KeyboardInterrupt:
-        print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)</code></pre>
-</details>
-</dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="seqsearch.search.core.CoreSearch" href="core.html#seqsearch.search.core.CoreSearch">CoreSearch</a></b></code>:
+<ul class="hlist">
+<li><code><a title="seqsearch.search.core.CoreSearch.non_block_run" href="core.html#seqsearch.search.core.CoreSearch.non_block_run">non_block_run</a></code></li>
+<li><code><a title="seqsearch.search.core.CoreSearch.wait" href="core.html#seqsearch.search.core.CoreSearch.wait">wait</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -697,13 +660,12 @@ until the query is finished.</p></div>
 </li>
 <li>
 <h4><code><a title="seqsearch.search.blast.BLASTquery" href="#seqsearch.search.blast.BLASTquery">BLASTquery</a></code></h4>
-<ul class="two-column">
+<ul class="">
 <li><code><a title="seqsearch.search.blast.BLASTquery.command" href="#seqsearch.search.blast.BLASTquery.command">command</a></code></li>
+<li><code><a title="seqsearch.search.blast.BLASTquery.extension" href="#seqsearch.search.blast.BLASTquery.extension">extension</a></code></li>
 <li><code><a title="seqsearch.search.blast.BLASTquery.filter" href="#seqsearch.search.blast.BLASTquery.filter">filter</a></code></li>
-<li><code><a title="seqsearch.search.blast.BLASTquery.non_block_run" href="#seqsearch.search.blast.BLASTquery.non_block_run">non_block_run</a></code></li>
 <li><code><a title="seqsearch.search.blast.BLASTquery.results" href="#seqsearch.search.blast.BLASTquery.results">results</a></code></li>
 <li><code><a title="seqsearch.search.blast.BLASTquery.run" href="#seqsearch.search.blast.BLASTquery.run">run</a></code></li>
-<li><code><a title="seqsearch.search.blast.BLASTquery.wait" href="#seqsearch.search.blast.BLASTquery.wait">wait</a></code></li>
 </ul>
 </li>
 </ul>

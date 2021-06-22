@@ -41,7 +41,7 @@ Contact at www.sinclair.bio
 &#34;&#34;&#34;
 
 # Built-in modules #
-import multiprocessing
+import multiprocessing, threading
 
 # First party modules #
 from autopaths.file_path import FilePath
@@ -54,6 +54,8 @@ class CoreSearch(object):
     Contains methods that are common to all search algorithms implementation.
     Currently: BLASTquery and VSEARCHquery inherit from this.
     &#34;&#34;&#34;
+
+    extension = &#39;out&#39;
 
     def __repr__(self):
         return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.query)
@@ -87,9 +89,9 @@ class CoreSearch(object):
         self._err         = _err
         # Output defaults #
         if out_path is None:
-            self.out_path = self.query.prefix_path + &#39;.blastout&#39;
+            self.out_path = self.query.prefix_path + self.extension
         elif out_path.endswith(&#39;/&#39;):
-            self.out_path = out_path + self.query.prefix + &#39;.blastout&#39;
+            self.out_path = out_path + self.query.prefix + self.extension
         else:
             self.out_path = out_path
         # Make it a file path #
@@ -103,7 +105,25 @@ class CoreSearch(object):
         if self._out is True:
             self._out = self.out_path + &#39;.stdout&#39;
         if self._err is True:
-            self._err = self.out_path + &#39;.stderr&#39;</code></pre>
+            self._err = self.out_path + &#39;.stderr&#39;
+
+    #-------------------------------- RUNNING --------------------------------#
+    def non_block_run(self):
+        &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
+        self.thread.start()
+
+    def wait(self):
+        &#34;&#34;&#34;
+        If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.
+        &#34;&#34;&#34;
+        try:
+            # We set a large timeout so that we can Ctrl-C the process
+            self.thread.join(999999999)
+        except KeyboardInterrupt:
+            print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)</code></pre>
 </details>
 </section>
 <section>
@@ -134,6 +154,8 @@ Currently: BLASTquery and VSEARCHquery inherit from this.</p></div>
     Currently: BLASTquery and VSEARCHquery inherit from this.
     &#34;&#34;&#34;
 
+    extension = &#39;out&#39;
+
     def __repr__(self):
         return &#39;&lt;%s object on %s&gt;&#39; % (self.__class__.__name__, self.query)
 
@@ -166,9 +188,9 @@ Currently: BLASTquery and VSEARCHquery inherit from this.</p></div>
         self._err         = _err
         # Output defaults #
         if out_path is None:
-            self.out_path = self.query.prefix_path + &#39;.blastout&#39;
+            self.out_path = self.query.prefix_path + self.extension
         elif out_path.endswith(&#39;/&#39;):
-            self.out_path = out_path + self.query.prefix + &#39;.blastout&#39;
+            self.out_path = out_path + self.query.prefix + self.extension
         else:
             self.out_path = out_path
         # Make it a file path #
@@ -182,13 +204,79 @@ Currently: BLASTquery and VSEARCHquery inherit from this.</p></div>
         if self._out is True:
             self._out = self.out_path + &#39;.stdout&#39;
         if self._err is True:
-            self._err = self.out_path + &#39;.stderr&#39;</code></pre>
+            self._err = self.out_path + &#39;.stderr&#39;
+
+    #-------------------------------- RUNNING --------------------------------#
+    def non_block_run(self):
+        &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
+        self.thread = threading.Thread(target=self.run)
+        self.thread.daemon = True # So that they die when we die
+        self.thread.start()
+
+    def wait(self):
+        &#34;&#34;&#34;
+        If you have run the query in a non-blocking way, call this method to pause
+        until the query is finished.
+        &#34;&#34;&#34;
+        try:
+            # We set a large timeout so that we can Ctrl-C the process
+            self.thread.join(999999999)
+        except KeyboardInterrupt:
+            print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)</code></pre>
 </details>
 <h3>Subclasses</h3>
 <ul class="hlist">
 <li><a title="seqsearch.search.blast.BLASTquery" href="blast.html#seqsearch.search.blast.BLASTquery">BLASTquery</a></li>
 <li><a title="seqsearch.search.vsearch.VSEARCHquery" href="vsearch.html#seqsearch.search.vsearch.VSEARCHquery">VSEARCHquery</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="seqsearch.search.core.CoreSearch.extension"><code class="name">var <span class="ident">extension</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="seqsearch.search.core.CoreSearch.non_block_run"><code class="name flex">
+<span>def <span class="ident">non_block_run</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Special method to run the query in a thread without blocking.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def non_block_run(self):
+    &#34;&#34;&#34;Special method to run the query in a thread without blocking.&#34;&#34;&#34;
+    self.thread = threading.Thread(target=self.run)
+    self.thread.daemon = True # So that they die when we die
+    self.thread.start()</code></pre>
+</details>
+</dd>
+<dt id="seqsearch.search.core.CoreSearch.wait"><code class="name flex">
+<span>def <span class="ident">wait</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>If you have run the query in a non-blocking way, call this method to pause
+until the query is finished.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def wait(self):
+    &#34;&#34;&#34;
+    If you have run the query in a non-blocking way, call this method to pause
+    until the query is finished.
+    &#34;&#34;&#34;
+    try:
+        # We set a large timeout so that we can Ctrl-C the process
+        self.thread.join(999999999)
+    except KeyboardInterrupt:
+        print(&#34;Stopped waiting on BLAST thread number %i&#34; % self.num)</code></pre>
+</details>
+</dd>
+</dl>
 </dd>
 </dl>
 </section>
@@ -208,6 +296,11 @@ Currently: BLASTquery and VSEARCHquery inherit from this.</p></div>
 <ul>
 <li>
 <h4><code><a title="seqsearch.search.core.CoreSearch" href="#seqsearch.search.core.CoreSearch">CoreSearch</a></code></h4>
+<ul class="">
+<li><code><a title="seqsearch.search.core.CoreSearch.extension" href="#seqsearch.search.core.CoreSearch.extension">extension</a></code></li>
+<li><code><a title="seqsearch.search.core.CoreSearch.non_block_run" href="#seqsearch.search.core.CoreSearch.non_block_run">non_block_run</a></code></li>
+<li><code><a title="seqsearch.search.core.CoreSearch.wait" href="#seqsearch.search.core.CoreSearch.wait">wait</a></code></li>
+</ul>
 </li>
 </ul>
 </li>

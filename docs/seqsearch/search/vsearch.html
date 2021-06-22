@@ -41,15 +41,18 @@ Contact at www.sinclair.bio
 &#34;&#34;&#34;
 
 # Built-in modules #
+import os
 
 # First party modules #
 
 # Internal modules #
-from fasta import FASTA
+from Bio import SearchIO
+from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
-# Third party modules #
-import sh
+# Module for launching shell commands #
+if os.environ.get(&#39;INSIDE_PYCHARM&#39;): import pbs3 as sh
+else:                                import sh
 
 ###############################################################################
 class VSEARCHquery(CoreSearch):
@@ -64,7 +67,7 @@ class VSEARCHquery(CoreSearch):
         ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
                   --alnout alnout.txt
 
-    The interesting options form the manual:
+    Some interesting options form the manual follow:
 
     --maxaccepts &lt;positive integer&gt;
     &gt; Maximum number of hits to accept before stopping the search. The default
@@ -77,6 +80,8 @@ class VSEARCHquery(CoreSearch):
     are accepted.
     &#34;&#34;&#34;
 
+    extension = &#39;vsearchout&#39;
+
     @property
     def command(self):
         # Executable #
@@ -85,7 +90,6 @@ class VSEARCHquery(CoreSearch):
         # Other parameters
         cmd += [&#39;--usearch_global&#39;, self.query,
                 &#39;-db&#39;,              self.db,
-                &#39;-maxaccepts&#39;,      20,
                 &#39;-blast6out&#39;,       self.out_path,
                 &#39;-threads&#39;,         self.cpus]
         # Options #
@@ -93,22 +97,61 @@ class VSEARCHquery(CoreSearch):
         # Return #
         return list(map(str, cmd))
 
-    def run(self, verbose=False):
+    #-------------------------------- RUNNING --------------------------------#
+    def run(self, verbose=True):
         &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd(&#39;vsearch&#39;)
+        # Create the output directory if it doesn&#39;t exist #
+        self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
         # Run it #
-        sh.Command(self.command[0])(self.command[1:],
-                                    _out=self._out,
-                                    _err=self._err)
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
+        # Return #
+        return result
+
+    #----------------------------- PARSE RESULTS -----------------------------#
+    @property
+    def results(self):
+        &#34;&#34;&#34;
+        Parse the results and yield biopython SearchIO entries.
+
+        Beware:
+        Some databases are not unique on the id, and this causes the parser to
+        complain about duplicate entries and raise exceptions such as:
+
+            ValueError: The ID or alternative IDs of Hit &#39;DQ448783&#39; exists
+            in this QueryResult.
+
+        Summary of the columns:
+        https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+            qseqid sseqid pident length mismatch gapopen qstart qend sstart send
+            evalue bitscore
+        &#34;&#34;&#34;
+        with open(self.out_path, &#39;rt&#39;) as handle:
+            for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
+                yield entry
 
 ###############################################################################
-class VSEARCHdb(FASTA):
+class VSEARCHdb(FilePath):
     &#34;&#34;&#34;A VSEARCH database one can search against.&#34;&#34;&#34;
 
     def __repr__(self):
         return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def __init__(self, path):
+        # Call parent constructor #
+        FilePath.__init__(self, path)
+        # Check if the corresponding FASTA exists #
+        self.fasta_path = self.replace_extension(&#39;fasta&#39;)
 
     def __bool__(self):
         &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
@@ -119,14 +162,21 @@ class VSEARCHdb(FASTA):
         if not self: return self.makedb(*args, **kwargs)
 
     def makedb(self, output=None, stdout=None, verbose=False):
+        # We need a corresponding fasta that exists #
+        if not self.fasta_path:
+            raise Exception(&#34;No fasta file at &#39;%s&#39;.&#34; % self.fasta_path)
         # Message #
-        if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+        if verbose:
+            msg = &#34;Calling `makeudb_usearch` from &#39;%s&#39; to &#39;%s&#39;.&#34;
+            print(msg % (self.fasta_path, self))
         # The output #
-        if output is None: output = self.replace_extension(&#39;udb&#39;)
+        if output is None: output = self
         # Options #
-        options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+        options = [&#39;--makeudb_usearch&#39;, self.fasta_path, &#39;--output&#39;, output]
         # Call the program #
-        sh.vsearch(*options, _out=stdout)</code></pre>
+        sh.vsearch(*options, _out=stdout)
+        # Return #
+        return output</code></pre>
 </details>
 </section>
 <section>
@@ -148,11 +198,17 @@ class VSEARCHdb(FASTA):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">class VSEARCHdb(FASTA):
+<pre><code class="python">class VSEARCHdb(FilePath):
     &#34;&#34;&#34;A VSEARCH database one can search against.&#34;&#34;&#34;
 
     def __repr__(self):
         return &#39;&lt;%s on &#34;%s&#34;&gt;&#39; % (self.__class__.__name__, self.path)
+
+    def __init__(self, path):
+        # Call parent constructor #
+        FilePath.__init__(self, path)
+        # Check if the corresponding FASTA exists #
+        self.fasta_path = self.replace_extension(&#39;fasta&#39;)
 
     def __bool__(self):
         &#34;&#34;&#34;Does the indexed database actually exist?&#34;&#34;&#34;
@@ -163,18 +219,24 @@ class VSEARCHdb(FASTA):
         if not self: return self.makedb(*args, **kwargs)
 
     def makedb(self, output=None, stdout=None, verbose=False):
+        # We need a corresponding fasta that exists #
+        if not self.fasta_path:
+            raise Exception(&#34;No fasta file at &#39;%s&#39;.&#34; % self.fasta_path)
         # Message #
-        if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+        if verbose:
+            msg = &#34;Calling `makeudb_usearch` from &#39;%s&#39; to &#39;%s&#39;.&#34;
+            print(msg % (self.fasta_path, self))
         # The output #
-        if output is None: output = self.replace_extension(&#39;udb&#39;)
+        if output is None: output = self
         # Options #
-        options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+        options = [&#39;--makeudb_usearch&#39;, self.fasta_path, &#39;--output&#39;, output]
         # Call the program #
-        sh.vsearch(*options, _out=stdout)</code></pre>
+        sh.vsearch(*options, _out=stdout)
+        # Return #
+        return output</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
-<li>fasta.core.FASTA</li>
 <li>autopaths.file_path.FilePath</li>
 <li>autopaths.base_path.BasePath</li>
 <li>builtins.str</li>
@@ -205,14 +267,21 @@ class VSEARCHdb(FASTA):
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def makedb(self, output=None, stdout=None, verbose=False):
+    # We need a corresponding fasta that exists #
+    if not self.fasta_path:
+        raise Exception(&#34;No fasta file at &#39;%s&#39;.&#34; % self.fasta_path)
     # Message #
-    if verbose: print(&#34;Calling `makeudb_usearch` on &#39;%s&#39;...&#34; % self)
+    if verbose:
+        msg = &#34;Calling `makeudb_usearch` from &#39;%s&#39; to &#39;%s&#39;.&#34;
+        print(msg % (self.fasta_path, self))
     # The output #
-    if output is None: output = self.replace_extension(&#39;udb&#39;)
+    if output is None: output = self
     # Options #
-    options = [&#39;--makeudb_usearch&#39;, self.path, &#39;--output&#39;, output]
+    options = [&#39;--makeudb_usearch&#39;, self.fasta_path, &#39;--output&#39;, output]
     # Call the program #
-    sh.vsearch(*options, _out=stdout)</code></pre>
+    sh.vsearch(*options, _out=stdout)
+    # Return #
+    return output</code></pre>
 </details>
 </dd>
 </dl>
@@ -230,7 +299,7 @@ class VSEARCHdb(FASTA):
 ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
           --alnout alnout.txt
 </code></pre>
-<p>The interesting options form the manual:</p>
+<p>Some interesting options form the manual follow:</p>
 <p>&ndash;maxaccepts <positive integer></p>
 <blockquote>
 <p>Maximum number of hits to accept before stopping the search. The default
@@ -258,7 +327,7 @@ are accepted.</p>
         ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
                   --alnout alnout.txt
 
-    The interesting options form the manual:
+    Some interesting options form the manual follow:
 
     --maxaccepts &lt;positive integer&gt;
     &gt; Maximum number of hits to accept before stopping the search. The default
@@ -271,6 +340,8 @@ are accepted.</p>
     are accepted.
     &#34;&#34;&#34;
 
+    extension = &#39;vsearchout&#39;
+
     @property
     def command(self):
         # Executable #
@@ -279,7 +350,6 @@ are accepted.</p>
         # Other parameters
         cmd += [&#39;--usearch_global&#39;, self.query,
                 &#39;-db&#39;,              self.db,
-                &#39;-maxaccepts&#39;,      20,
                 &#39;-blast6out&#39;,       self.out_path,
                 &#39;-threads&#39;,         self.cpus]
         # Options #
@@ -287,20 +357,60 @@ are accepted.</p>
         # Return #
         return list(map(str, cmd))
 
-    def run(self, verbose=False):
+    #-------------------------------- RUNNING --------------------------------#
+    def run(self, verbose=True):
         &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd(&#39;vsearch&#39;)
+        # Create the output directory if it doesn&#39;t exist #
+        self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
         if verbose:
             print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
         # Run it #
-        sh.Command(self.command[0])(self.command[1:],
-                                    _out=self._out,
-                                    _err=self._err)</code></pre>
+        cmd    = sh.Command(self.command[0])
+        result = cmd(self.command[1:], _out=self._out, _err=self._err)
+        # Return #
+        return result
+
+    #----------------------------- PARSE RESULTS -----------------------------#
+    @property
+    def results(self):
+        &#34;&#34;&#34;
+        Parse the results and yield biopython SearchIO entries.
+
+        Beware:
+        Some databases are not unique on the id, and this causes the parser to
+        complain about duplicate entries and raise exceptions such as:
+
+            ValueError: The ID or alternative IDs of Hit &#39;DQ448783&#39; exists
+            in this QueryResult.
+
+        Summary of the columns:
+        https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+            qseqid sseqid pident length mismatch gapopen qstart qend sstart send
+            evalue bitscore
+        &#34;&#34;&#34;
+        with open(self.out_path, &#39;rt&#39;) as handle:
+            for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
+                yield entry</code></pre>
 </details>
 <h3>Ancestors</h3>
 <ul class="hlist">
 <li><a title="seqsearch.search.core.CoreSearch" href="core.html#seqsearch.search.core.CoreSearch">CoreSearch</a></li>
 </ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="seqsearch.search.vsearch.VSEARCHquery.extension"><code class="name">var <span class="ident">extension</span></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+</dl>
 <h3>Instance variables</h3>
 <dl>
 <dt id="seqsearch.search.vsearch.VSEARCHquery.command"><code class="name">var <span class="ident">command</span></code></dt>
@@ -318,7 +428,6 @@ def command(self):
     # Other parameters
     cmd += [&#39;--usearch_global&#39;, self.query,
             &#39;-db&#39;,              self.db,
-            &#39;-maxaccepts&#39;,      20,
             &#39;-blast6out&#39;,       self.out_path,
             &#39;-threads&#39;,         self.cpus]
     # Options #
@@ -327,11 +436,52 @@ def command(self):
     return list(map(str, cmd))</code></pre>
 </details>
 </dd>
+<dt id="seqsearch.search.vsearch.VSEARCHquery.results"><code class="name">var <span class="ident">results</span></code></dt>
+<dd>
+<div class="desc"><p>Parse the results and yield biopython SearchIO entries.</p>
+<p>Beware:
+Some databases are not unique on the id, and this causes the parser to
+complain about duplicate entries and raise exceptions such as:</p>
+<pre><code>ValueError: The ID or alternative IDs of Hit 'DQ448783' exists
+in this QueryResult.
+</code></pre>
+<p>Summary of the columns:
+<a href="https://www.metagenomics.wiki/tools/blast/blastn-output-format-6">https://www.metagenomics.wiki/tools/blast/blastn-output-format-6</a></p>
+<pre><code>qseqid sseqid pident length mismatch gapopen qstart qend sstart send
+evalue bitscore
+</code></pre></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@property
+def results(self):
+    &#34;&#34;&#34;
+    Parse the results and yield biopython SearchIO entries.
+
+    Beware:
+    Some databases are not unique on the id, and this causes the parser to
+    complain about duplicate entries and raise exceptions such as:
+
+        ValueError: The ID or alternative IDs of Hit &#39;DQ448783&#39; exists
+        in this QueryResult.
+
+    Summary of the columns:
+    https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+        qseqid sseqid pident length mismatch gapopen qstart qend sstart send
+        evalue bitscore
+    &#34;&#34;&#34;
+    with open(self.out_path, &#39;rt&#39;) as handle:
+        for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
+            yield entry</code></pre>
+</details>
+</dd>
 </dl>
 <h3>Methods</h3>
 <dl>
 <dt id="seqsearch.search.vsearch.VSEARCHquery.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self, verbose=False)</span>
+<span>def <span class="ident">run</span></span>(<span>self, verbose=True)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simply run the VSEARCH search locally.</p></div>
@@ -339,18 +489,36 @@ def command(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def run(self, verbose=False):
+<pre><code class="python">def run(self, verbose=True):
     &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
+    # Check the executable is available #
+    if self.executable:
+        self.executable.must_exist()
+    else:
+        from plumbing.check_cmd_found import check_cmd
+        check_cmd(&#39;vsearch&#39;)
+    # Create the output directory if it doesn&#39;t exist #
+    self.out_path.directory.create_if_not_exists()
     # Optionally print the command #
     if verbose:
         print(&#34;Running VSEARCH command:\n    %s&#34; % &#39; &#39;.join(self.command))
     # Run it #
-    sh.Command(self.command[0])(self.command[1:],
-                                _out=self._out,
-                                _err=self._err)</code></pre>
+    cmd    = sh.Command(self.command[0])
+    result = cmd(self.command[1:], _out=self._out, _err=self._err)
+    # Return #
+    return result</code></pre>
 </details>
 </dd>
 </dl>
+<h3>Inherited members</h3>
+<ul class="hlist">
+<li><code><b><a title="seqsearch.search.core.CoreSearch" href="core.html#seqsearch.search.core.CoreSearch">CoreSearch</a></b></code>:
+<ul class="hlist">
+<li><code><a title="seqsearch.search.core.CoreSearch.non_block_run" href="core.html#seqsearch.search.core.CoreSearch.non_block_run">non_block_run</a></code></li>
+<li><code><a title="seqsearch.search.core.CoreSearch.wait" href="core.html#seqsearch.search.core.CoreSearch.wait">wait</a></code></li>
+</ul>
+</li>
+</ul>
 </dd>
 </dl>
 </section>
@@ -379,6 +547,8 @@ def command(self):
 <h4><code><a title="seqsearch.search.vsearch.VSEARCHquery" href="#seqsearch.search.vsearch.VSEARCHquery">VSEARCHquery</a></code></h4>
 <ul class="">
 <li><code><a title="seqsearch.search.vsearch.VSEARCHquery.command" href="#seqsearch.search.vsearch.VSEARCHquery.command">command</a></code></li>
+<li><code><a title="seqsearch.search.vsearch.VSEARCHquery.extension" href="#seqsearch.search.vsearch.VSEARCHquery.extension">extension</a></code></li>
+<li><code><a title="seqsearch.search.vsearch.VSEARCHquery.results" href="#seqsearch.search.vsearch.VSEARCHquery.results">results</a></code></li>
 <li><code><a title="seqsearch.search.vsearch.VSEARCHquery.run" href="#seqsearch.search.vsearch.VSEARCHquery.run">run</a></code></li>
 </ul>
 </li>
