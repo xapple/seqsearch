@@ -24,18 +24,20 @@ file_name = inspect.getframeinfo(inspect.currentframe()).filename
 this_dir  = os.path.dirname(os.path.abspath(file_name)) + '/'
 
 ###############################################################################
-# Main input #
-seqs = FASTA(this_dir + 'seqs.fasta')
+if __name__ == "__main__":
 
-# The database to search against #
-db = ncbi_16s.blast_db
+    # Main input #
+    seqs = FASTA(this_dir + 'seqs.fasta')
 
-# Create search #
-search = SeqSearch(seqs, db)
+    # The database to search against #
+    db = ncbi_16s.blast_db
 
-# Run #
-search.run()
+    # Create search #
+    search = SeqSearch(seqs, db)
 
-# Show results #
-for r in search.results:
-    print(r)
+    # Run #
+    search.run()
+
+    # Show results #
+    for r in search.results:
+        print(r)
