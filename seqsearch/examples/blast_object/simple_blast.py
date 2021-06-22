@@ -7,10 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 
 A script to demonstrate the usage of the `BLASTquery` class.
-
-Typically you would run this file from a command line like this:
-
-     ipython3 -i -- ~/deploy/seqsearch/scripts/simple_blast.py
 """
 
 # Built-in modules #
