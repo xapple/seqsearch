@@ -8,6 +8,7 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
+import os
 
 # First party modules #
 
@@ -16,8 +17,9 @@ from Bio import SearchIO
 from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
-# Third party modules #
-import sh
+# Module for launching shell commands #
+if os.environ.get('INSIDE_PYCHARM'): import pbs3 as sh
+else:                                import sh
 
 ###############################################################################
 class VSEARCHquery(CoreSearch):
@@ -32,7 +34,7 @@ class VSEARCHquery(CoreSearch):
         ./vsearch --usearch_global queries.fsa --db database.fsa --id 0.9
                   --alnout alnout.txt
 
-    The interesting options form the manual:
+    Some interesting options form the manual follow:
 
     --maxaccepts <positive integer>
     > Maximum number of hits to accept before stopping the search. The default
@@ -63,8 +65,14 @@ class VSEARCHquery(CoreSearch):
         return list(map(str, cmd))
 
     #-------------------------------- RUNNING --------------------------------#
-    def run(self, verbose=False):
+    def run(self, verbose=True):
         """Simply run the VSEARCH search locally."""
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd('vsearch')
         # Create the output directory if it doesn't exist #
         self.out_path.directory.create_if_not_exists()
         # Optionally print the command #
@@ -81,17 +89,22 @@ class VSEARCHquery(CoreSearch):
     def results(self):
         """
         Parse the results and yield biopython SearchIO entries.
-        Specifying `comments=False` causes the parser to complain about
-        duplicate entries and raise exceptions such as:
+
+        Beware:
+        Some databases are not unique on the id, and this causes the parser to
+        complain about duplicate entries and raise exceptions such as:
 
             ValueError: The ID or alternative IDs of Hit 'DQ448783' exists
             in this QueryResult.
 
-        So we set it to `True` even if there are no comments present in the
-        results file.
+        Summary of the columns:
+        https://www.metagenomics.wiki/tools/blast/blastn-output-format-6
+
+            qseqid sseqid pident length mismatch gapopen qstart qend sstart send
+            evalue bitscore
         """
         with open(self.out_path, 'rt') as handle:
-            for entry in SearchIO.parse(handle, 'blast-tab', comments=True):
+            for entry in SearchIO.parse(handle, 'blast-tab', ):
                 yield entry
 
 ###############################################################################

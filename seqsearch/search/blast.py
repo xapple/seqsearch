@@ -18,9 +18,12 @@ from autopaths.tmp_path  import new_temp_path
 from seqsearch.search.core import CoreSearch
 
 # Third party modules #
-import sh
 import Bio.Blast.NCBIXML
 from Bio import SearchIO
+
+# Module for launching shell commands #
+if os.environ.get('INSIDE_PYCHARM'): import pbs3 as sh
+else:                                import sh
 
 ###############################################################################
 class BLASTquery(CoreSearch):
@@ -72,6 +75,12 @@ class BLASTquery(CoreSearch):
     #-------------------------------- RUNNING --------------------------------#
     def run(self, verbose=False):
         """Simply run the BLAST search locally."""
+        # Check the executable is available #
+        if self.executable:
+            self.executable.must_exist()
+        else:
+            from plumbing.check_cmd_found import check_cmd
+            check_cmd(self.command[0])
         # Create the output directory if it doesn't exist #
         self.out_path.directory.create_if_not_exists()
         # Optionally print the command #

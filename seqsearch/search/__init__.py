@@ -104,7 +104,7 @@ class SeqSearch(object):
         # Output path setting #
         self.out_path = FilePath(self.out_path)
         # Number of cores default value #
-        if self.num_threads is None:
+        if self.num_threads is None or self.num_threads is True:
             self.num_threads = min(multiprocessing.cpu_count(), 32)
         # Extra params to be given to the search algorithm #
         if self.params is None: self.params = {}
