@@ -48,6 +48,13 @@ class Database:
         # Make autopaths object #
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
 
+    def __bool__(self):
+        """
+        Return True if the database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        """
+        return not self.autopaths.unzipped_dir.empty
+
     @property_cached
     def ftp(self):
         """If the data is to be obtained by FTP, here is the ftputil object."""
