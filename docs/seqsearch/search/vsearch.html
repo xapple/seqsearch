@@ -89,16 +89,16 @@ class VSEARCHquery(CoreSearch):
         else:               cmd = [&#39;vsearch&#39;]
         # Other parameters
         cmd += [&#39;--usearch_global&#39;, self.query,
-                &#39;-db&#39;,              self.db,
-                &#39;-blast6out&#39;,       self.out_path,
-                &#39;-threads&#39;,         self.cpus]
+                &#39;--db&#39;,             self.db,
+                &#39;--blast6out&#39;,      self.out_path,
+                &#39;--threads&#39;,        self.cpus]
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
         return list(map(str, cmd))
 
     #-------------------------------- RUNNING --------------------------------#
-    def run(self, verbose=True):
+    def run(self, verbose=False):
         &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
         # Check the executable is available #
         if self.executable:
@@ -135,6 +135,10 @@ class VSEARCHquery(CoreSearch):
 
             qseqid sseqid pident length mismatch gapopen qstart qend sstart send
             evalue bitscore
+
+        Warning: Unlike BLAST results, if a sequence got no hits it is NOT
+                 reported at all in VSEARCH. The number of entries yielded
+                 will not match the number of sequences at input.
         &#34;&#34;&#34;
         with open(self.out_path, &#39;rt&#39;) as handle:
             for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
@@ -349,16 +353,16 @@ are accepted.</p>
         else:               cmd = [&#39;vsearch&#39;]
         # Other parameters
         cmd += [&#39;--usearch_global&#39;, self.query,
-                &#39;-db&#39;,              self.db,
-                &#39;-blast6out&#39;,       self.out_path,
-                &#39;-threads&#39;,         self.cpus]
+                &#39;--db&#39;,             self.db,
+                &#39;--blast6out&#39;,      self.out_path,
+                &#39;--threads&#39;,        self.cpus]
         # Options #
         for k,v in self.params.items(): cmd += [k, v]
         # Return #
         return list(map(str, cmd))
 
     #-------------------------------- RUNNING --------------------------------#
-    def run(self, verbose=True):
+    def run(self, verbose=False):
         &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
         # Check the executable is available #
         if self.executable:
@@ -395,6 +399,10 @@ are accepted.</p>
 
             qseqid sseqid pident length mismatch gapopen qstart qend sstart send
             evalue bitscore
+
+        Warning: Unlike BLAST results, if a sequence got no hits it is NOT
+                 reported at all in VSEARCH. The number of entries yielded
+                 will not match the number of sequences at input.
         &#34;&#34;&#34;
         with open(self.out_path, &#39;rt&#39;) as handle:
             for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
@@ -427,9 +435,9 @@ def command(self):
     else:               cmd = [&#39;vsearch&#39;]
     # Other parameters
     cmd += [&#39;--usearch_global&#39;, self.query,
-            &#39;-db&#39;,              self.db,
-            &#39;-blast6out&#39;,       self.out_path,
-            &#39;-threads&#39;,         self.cpus]
+            &#39;--db&#39;,             self.db,
+            &#39;--blast6out&#39;,      self.out_path,
+            &#39;--threads&#39;,        self.cpus]
     # Options #
     for k,v in self.params.items(): cmd += [k, v]
     # Return #
@@ -449,7 +457,10 @@ in this QueryResult.
 <a href="https://www.metagenomics.wiki/tools/blast/blastn-output-format-6">https://www.metagenomics.wiki/tools/blast/blastn-output-format-6</a></p>
 <pre><code>qseqid sseqid pident length mismatch gapopen qstart qend sstart send
 evalue bitscore
-</code></pre></div>
+</code></pre>
+<p>Warning: Unlike BLAST results, if a sequence got no hits it is NOT
+reported at all in VSEARCH. The number of entries yielded
+will not match the number of sequences at input.</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -471,6 +482,10 @@ def results(self):
 
         qseqid sseqid pident length mismatch gapopen qstart qend sstart send
         evalue bitscore
+
+    Warning: Unlike BLAST results, if a sequence got no hits it is NOT
+             reported at all in VSEARCH. The number of entries yielded
+             will not match the number of sequences at input.
     &#34;&#34;&#34;
     with open(self.out_path, &#39;rt&#39;) as handle:
         for entry in SearchIO.parse(handle, &#39;blast-tab&#39;, ):
@@ -481,7 +496,7 @@ def results(self):
 <h3>Methods</h3>
 <dl>
 <dt id="seqsearch.search.vsearch.VSEARCHquery.run"><code class="name flex">
-<span>def <span class="ident">run</span></span>(<span>self, verbose=True)</span>
+<span>def <span class="ident">run</span></span>(<span>self, verbose=False)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Simply run the VSEARCH search locally.</p></div>
@@ -489,7 +504,7 @@ def results(self):
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def run(self, verbose=True):
+<pre><code class="python">def run(self, verbose=False):
     &#34;&#34;&#34;Simply run the VSEARCH search locally.&#34;&#34;&#34;
     # Check the executable is available #
     if self.executable:

@@ -81,6 +81,13 @@ class Database:
         # Make autopaths object #
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
 
+    def __bool__(self):
+        &#34;&#34;&#34;
+        Return True if the database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        &#34;&#34;&#34;
+        return not self.autopaths.unzipped_dir.empty
+
     @property_cached
     def ftp(self):
         &#34;&#34;&#34;If the data is to be obtained by FTP, here is the ftputil object.&#34;&#34;&#34;
@@ -271,6 +278,13 @@ Contact at www.sinclair.bio</p></div>
         self.base_dir = DirectoryPath(self.base_dir)
         # Make autopaths object #
         self.autopaths = AutoPaths(self.base_dir, self.all_paths)
+
+    def __bool__(self):
+        &#34;&#34;&#34;
+        Return True if the database was already downloaded and the
+        results are stored on the filesystem. Return False otherwise.
+        &#34;&#34;&#34;
+        return not self.autopaths.unzipped_dir.empty
 
     @property_cached
     def ftp(self):
