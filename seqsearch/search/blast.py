@@ -53,7 +53,7 @@ class BLASTquery(CoreSearch):
         # Parent constructor #
         super(BLASTquery, self).__init__(*args, **kwargs)
         # Auto detect XML output #
-        if self.out_path.extension == '.xml': self.params['-outfmt'] = '5'
+        if self.out_path.extension == 'xml': self.params['-outfmt'] = '5'
         # The database to search against #
         self.db = BLASTdb(self.db, self.seq_type)
 
