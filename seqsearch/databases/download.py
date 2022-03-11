@@ -23,7 +23,7 @@ Entrez.email = "I don't know who will be running this script"
 def acc_to_fasta(accessions):
     """
     Pass a list of accessions IDs as argument and a string representing
-    a FASTA is returned. You can also pass a list of GIs.
+    a FASTA is returned.
     """
     entries = Entrez.efetch(db      = "nuccore",
                             id      = accessions,
