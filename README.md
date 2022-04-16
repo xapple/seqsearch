@@ -38,7 +38,7 @@ Bellow are some examples to illustrate the various ways there are to use this pa
 
 ### Searches
 
-You can parallelize BLAST searches by splitting the input into several files. It's easier to chop-up the input, because database chopping requires message passing across the nodes like mpiblast does (when and if it works).
+You can parallelize BLAST searches by splitting the input into several files. It's easier to chop-up the input, because database chopping requires message passing across the nodes like `mpiblast` does (when and if it works).
 
 Input chopping is fine as long as the database to search against fits in the RAM of the nodes. If the input is small and the database is large you can always switch them one for the other (in most cases).
 

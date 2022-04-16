@@ -10,10 +10,10 @@ Contact at www.sinclair.bio
 # Built-in modules #
 
 # Internal modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseFTP
 
 ###############################################################################
-class RefSeqBacteriaProtNR(Database):
+class RefSeqBacteriaProtNR(DatabaseFTP):
     """
     The RefSeq sequences for only bacteria, only protein, and only the
     non-redundant version. We will download the raw sequences by FTP
@@ -26,7 +26,7 @@ class RefSeqBacteriaProtNR(Database):
     pattern    = 'bacteria.nonredundant_protein.*.protein.faa.gz'
 
 ###############################################################################
-class RefSeqArchaeaProtNR(Database):
+class RefSeqArchaeaProtNR(DatabaseFTP):
     """
     The RefSeq sequences for only bacteria, only protein, and only the
     non-redundant version. We will download the raw sequences by FTP

@@ -12,7 +12,7 @@ import urllib
 from collections import OrderedDict
 
 # Internal modules #
-from seqsearch.databases import base_directory
+from seqsearch.databases import base_directory, DatabaseHTTP
 
 # First party modules #
 from fasta import FASTA
@@ -20,7 +20,7 @@ from autopaths.auto_paths import AutoPaths
 from autopaths.file_path import FilePath
 
 ###############################################################################
-class String(object):
+class String(DatabaseHTTP):
     """
     The STRING database. See:
     http://string.embl.de/newstring_cgi/show_download_page.pl
@@ -52,13 +52,6 @@ class String(object):
         result[self.base_url + "protein.sequences.v9.1.fa.gz"] = FilePath(self.p.raw_proteins)
         result[self.base_url + "COG.mappings.v9.1.txt.gz"]     = FilePath(self.p.raw_mappings)
         return result
-
-    @property
-    def files_remaining(self):
-        """The files we haven't downloaded yet based on size checks."""
-        get_size_http = lambda url: urllib.urlopen(url).info().getheaders("Content-Length")[0]
-        return OrderedDict((source, dest) for source, dest in self.files_to_retrieve.items()
-                           if dest.count_bytes != get_size_http(source))
 
     def download(self):
         """Retrieve all files from the website"""

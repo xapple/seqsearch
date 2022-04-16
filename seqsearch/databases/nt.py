@@ -10,7 +10,7 @@ Contact at www.sinclair.bio
 # Built-in modules #
 
 # Internal modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseFTP
 from seqsearch.search    import SeqSearch
 
 # First party modules #
@@ -18,7 +18,7 @@ from autopaths.tmp_path import new_temp_dir
 from fasta import FASTA
 
 ###############################################################################
-class NucleotideDatabase(Database):
+class NucleotideDatabase(DatabaseFTP):
     """
     The Nucleotide database is a collection of sequences from several sources,
      including GenBank, RefSeq, TPA and PDB.

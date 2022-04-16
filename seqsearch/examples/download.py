@@ -51,7 +51,9 @@ class NCBIOldStuff(object):
         Can also accept a list of GI numbers in the parameter `id_num`
         """
         if isinstance(id_num, list):
-            gb_entries = Entrez.efetch(db="nuccore", id=id_num, rettype="fasta",
+            gb_entries = Entrez.efetch(db="nuccore",
+                                       id=id_num,
+                                       rettype="fasta",
                                        retmode="xml")
             gb_records = Entrez.read(gb_entries)
             return gb_records

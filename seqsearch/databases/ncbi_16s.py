@@ -11,7 +11,7 @@ Contact at www.sinclair.bio
 import os
 
 # First party modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseFTP
 
 # Third party modules #
 
@@ -19,7 +19,7 @@ from seqsearch.databases import Database
 home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
-class NCBI16S(Database):
+class NCBI16S(DatabaseFTP):
     """
     The NCBI provides a database of 16S ribosomal sequences.
     The exact title is "Bacteria and Archaea: 16S ribosomal RNA project".
