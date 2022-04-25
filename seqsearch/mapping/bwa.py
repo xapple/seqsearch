@@ -47,6 +47,9 @@ class MapBWA:
         # However, this one needs to be created separately at a later time.
         self.bam = BamFile(sam_out.replace_extension('bam'))
 
+    def __bool__(self):
+        return self.sam_out or self.bam
+
     #------------------------------ Running ----------------------------------#
     def __call__(self, cpus=None, verbose=True, stderr=False, timer=False):
         """Run BWA MEM, and produce a SAM file."""

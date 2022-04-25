@@ -26,6 +26,7 @@ class BamFile(BamOrSamFile):
     """
 
     read_mode = 'rb'
+    format = "BAM"
 
     def index(self, cpus=None, index=True, verbose=True):
         """Create the corresponding '.bai' file for this BAM file."""

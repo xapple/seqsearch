@@ -9,6 +9,7 @@ Contact at www.sinclair.bio
 
 # Built-in modules #
 import functools, multiprocessing, json
+from collections import defaultdict
 
 # Internal modules #
 
@@ -28,13 +29,19 @@ class BamOrSamFile(FilePath):
 
     @functools.cached_property
     def handle(self):
-        return pysam.AlignmentFile(self.path, self.read_mode)
+        # See https://github.com/pysam-developers/pysam/issues/939
+        save = pysam.set_verbosity(0)
+        handle = pysam.AlignmentFile(self.path, self.read_mode)
+        pysam.set_verbosity(save)
+        return handle
 
     @functools.cached_property
     def __len__(self):
+        self.handle.reset()
         return self.handle.count()
 
     def __iter__(self):
+        self.handle.reset()
         return iter(self.handle)
 
     @functools.cached_property
@@ -42,6 +49,84 @@ class BamOrSamFile(FilePath):
         result = json.loads(pysam.flagstat('-O', 'json', self.path))
         return result['QC-passed reads']
 
+    @functools.cached_property
+    def ids(self):
+        """A frozen set of all unique IDs in the file."""
+        self.handle.reset()
+        as_list = [seq.query_name for seq in self]
+        as_set = frozenset(as_list)
+        assert len(as_set) == len(as_list)
+        return as_set
+
+    #------------------------------- Pairs ----------------------------------#
+    @property
+    def iter_pairs(self):
+        """
+        Iterate over entries in pairs. Only valid for paired read files that
+        have been collated (sort -n).
+        """
+        # Reset #
+        self.handle.reset()
+        # Function to get the next non supplementary #
+        def next_seq():
+            while True:
+                try: seq_next = next(self.handle)
+                except StopIteration: return None
+                if seq_next.is_supplementary: continue
+                return seq_next
+        # Loop #
+        for seq in self.handle:
+            # Skip the supplementary reads that are unpaired #
+            if seq.is_supplementary: continue
+            # Get the next one #
+            seq_next = next_seq()
+            if seq_next is None: break
+            # Check it's the same name #
+            assert seq.query_name == seq_next.query_name
+            # Yield in the right order #
+            if seq.is_read1: yield seq, seq_next
+            else:            yield seq_next, seq
+
+    #------------------------------ Sorting ----------------------------------#
+    def collate_to_bam(self, out_bam, cpus=None, verbose=True):
+        """
+        Collate the current file and produce a compressed BAM.
+        Subsequently, running `samtols flagstats` produces the same results
+        between the original SAM and the collated BAM.
+        """
+        # Message #
+        if verbose: print("Collating the %s file '%s'." % (self.format, self))
+        # Number of cores #
+        if cpus is None: cpus = min(multiprocessing.cpu_count(), 32)
+        # Make sure it is a BAM object #
+        from seqsearch.mapping.bam import BamFile
+        out_bam = BamFile(out_bam)
+        # Run #
+        pysam.collate('-o',           str(out_bam),
+                      '--output-fmt', 'bam',
+                      '--threads',    str(cpus),
+                      self.path)
+        # Return #
+        return out_bam
+
+    def sort_to_bam(self, out_bam, cpus=None, verbose=True):
+        """Sort the current file and produce a compressed BAM file."""
+        # Message #
+        if verbose: print("Sorting the %s file '%s'." % (self.format, self))
+        # Number of cores #
+        if cpus is None: cpus = min(multiprocessing.cpu_count(), 32)
+        # Make sure it is a BAM object #
+        from seqsearch.mapping.bam import BamFile
+        out_bam = BamFile(out_bam)
+        # Run the sorting #
+        pysam.sort('-o',           str(out_bam),
+                   '--output-fmt', 'bam',
+                   '--threads',    str(cpus),
+                   self.path)
+        # Return #
+        return out_bam
+
+    #---------------------------- Extracting ---------------------------------#
     def didnt_map_to_fastq(self, out_fastq, cpus=None, verbose=True):
         """Extract all the reads that didn't map and save them as a FASTQ."""
         # Message #
