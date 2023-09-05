@@ -102,9 +102,15 @@ class VSEARCHquery(CoreSearch):
                  reported at all in VSEARCH. The number of entries yielded
                  will not match the number of sequences at input.
         """
+        # Import parsing library #
         from Bio import SearchIO
+        # Avoid the warning #
+        import warnings
+        from Bio import BiopythonDeprecationWarning
+        warnings.filterwarnings("ignore", BiopythonDeprecationWarning)
+        # Iterate over lines #
         with open(self.out_path, 'rt') as handle:
-            for entry in SearchIO.parse(handle, 'blast-tab', ):
+            for entry in SearchIO.parse(handle, 'blast-tab'):
                 yield entry
 
 ###############################################################################
