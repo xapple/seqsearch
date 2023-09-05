@@ -19,7 +19,7 @@ from fasta import FASTA
 from autopaths.file_path import FilePath
 
 # Third party modules #
-import sh
+from seqsearch import sh
 
 # Warnings #
 warnings.filterwarnings("ignore", "Bio.SearchIO")

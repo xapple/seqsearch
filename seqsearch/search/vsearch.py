@@ -8,9 +8,6 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import os
-
-# First party modules #
 
 # Internal modules #
 from Bio import SearchIO
@@ -18,8 +15,7 @@ from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
 # Module for launching shell commands #
-if os.environ.get('INSIDE_PYCHARM'): import pbs3 as sh
-else:                                import sh
+from seqsearch import sh
 
 ###############################################################################
 class VSEARCHquery(CoreSearch):

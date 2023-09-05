@@ -8,7 +8,6 @@ Contact at www.sinclair.bio
 """
 
 # Built-in modules #
-import sh
 
 # First party modules #
 from seqsearch.databases import Database
@@ -16,6 +15,9 @@ from autopaths.auto_paths import AutoPaths
 from autopaths.dir_path   import DirectoryPath
 from plumbing.cache import property_cached
 from fasta import FASTA
+
+# Module for launching shell commands #
+from seqsearch import sh
 
 ###############################################################################
 class Pfam(Database):

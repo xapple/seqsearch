@@ -22,8 +22,7 @@ import Bio.Blast.NCBIXML
 from Bio import SearchIO
 
 # Module for launching shell commands #
-if os.environ.get('INSIDE_PYCHARM'): import pbs3 as sh
-else:                                import sh
+from seqsearch import sh
 
 ###############################################################################
 class BLASTquery(CoreSearch):
