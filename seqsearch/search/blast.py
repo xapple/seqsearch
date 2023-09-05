@@ -17,10 +17,6 @@ from autopaths.tmp_path  import new_temp_path
 # Internal modules #
 from seqsearch.search.core import CoreSearch
 
-# Third party modules #
-import Bio.Blast.NCBIXML
-from Bio import SearchIO
-
 # Module for launching shell commands #
 from seqsearch import sh
 
@@ -133,6 +129,8 @@ class BLASTquery(CoreSearch):
     @property
     def results(self):
         """Parse the results and yield biopython SearchIO entries."""
+        from Bio import SearchIO
+        import Bio.Blast.NCBIXML
         # Get the first number of the outfmt #
         outfmt_str = self.params.get('-outfmt', '0').strip('"').split()
         number = outfmt_str[0]

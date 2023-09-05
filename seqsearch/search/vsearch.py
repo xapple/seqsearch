@@ -10,11 +10,10 @@ Contact at www.sinclair.bio
 # Built-in modules #
 
 # Internal modules #
-from Bio import SearchIO
 from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
-# Module for launching shell commands #
+# Third party modules #
 from seqsearch import sh
 
 ###############################################################################
@@ -103,6 +102,7 @@ class VSEARCHquery(CoreSearch):
                  reported at all in VSEARCH. The number of entries yielded
                  will not match the number of sequences at input.
         """
+        from Bio import SearchIO
         with open(self.out_path, 'rt') as handle:
             for entry in SearchIO.parse(handle, 'blast-tab', ):
                 yield entry

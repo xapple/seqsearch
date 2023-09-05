@@ -24,7 +24,6 @@ from seqsearch import sh
 # Warnings #
 warnings.filterwarnings("ignore", "Bio.SearchIO")
 warnings.filterwarnings("ignore", "BiopythonWarning")
-from Bio import SearchIO
 
 ###############################################################################
 class HmmQuery(object):
@@ -108,4 +107,5 @@ class HmmQuery(object):
     def hits(self):
         if not self.out_path:
             raise Exception("You can't access results from HMMER before running the algorithm.")
+        from Bio import SearchIO
         return SearchIO.read(self.out_path, 'hmmer3-tab')
