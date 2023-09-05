@@ -56,4 +56,4 @@ More documentation is available at:
 
 This documentation is simply generated with:
 
-    $ pdoc --html --output-dir docs --force seqsearch
+    $ pdoc --output-dir docs seqsearch
