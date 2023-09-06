@@ -134,8 +134,7 @@ class BLASTquery(CoreSearch):
         import Bio.Blast.NCBIXML
         # Avoid the warning #
         import warnings
-        from Bio import BiopythonDeprecationWarning
-        warnings.filterwarnings("ignore", BiopythonDeprecationWarning)
+        warnings.filterwarnings("ignore", 'BiopythonDeprecationWarning')
         # Get the first number of the outfmt #
         outfmt_str = self.params.get('-outfmt', '0').strip('"').split()
         number = outfmt_str[0]
