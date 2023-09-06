@@ -8,7 +8,7 @@ Contact at www.sinclair.bio
 """
 
 # Special variables #
-__version__ = '2.1.9'
+__version__ = '2.2.0'
 
 # After sh==1.14.3 the object returned changed #
 import sh
