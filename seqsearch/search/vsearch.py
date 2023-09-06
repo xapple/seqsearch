@@ -106,8 +106,7 @@ class VSEARCHquery(CoreSearch):
         from Bio import SearchIO
         # Avoid the warning #
         import warnings
-        from Bio import BiopythonDeprecationWarning
-        warnings.filterwarnings("ignore", BiopythonDeprecationWarning)
+        warnings.filterwarnings("ignore", 'BiopythonDeprecationWarning')
         # Iterate over lines #
         with open(self.out_path, 'rt') as handle:
             for entry in SearchIO.parse(handle, 'blast-tab'):
