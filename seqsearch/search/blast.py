@@ -128,13 +128,22 @@ class BLASTquery(CoreSearch):
     #----------------------------- PARSE RESULTS -----------------------------#
     @property
     def results(self):
-        """Parse the results and yield biopython SearchIO entries."""
+        """
+        Parse the results and yield biopython SearchIO entries.
+        We should probably avoid using the BLAST tabular output format in
+        the future.
+        # Bio.BiopythonDeprecationWarning: The 'Bio.SearchIO._legacy' module
+        # for parsing BLAST plain text output is deprecated and will be
+        # removed in a future release of Biopython. Consider generating your
+        # BLAST output for parsing as XML or tabular format instead.
+        """
         # Import parsing library #
         from Bio import SearchIO
         import Bio.Blast.NCBIXML
+        from Bio import BiopythonDeprecationWarning
         # Avoid the warning #
         import warnings
-        warnings.filterwarnings("ignore", 'BiopythonDeprecationWarning')
+        warnings.filterwarnings("ignore", category=BiopythonDeprecationWarning)
         # Get the first number of the outfmt #
         outfmt_str = self.params.get('-outfmt', '0').strip('"').split()
         number = outfmt_str[0]
