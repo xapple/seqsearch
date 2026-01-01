@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seqsearch"
+version = "2.2.1"
+
+description = "Sequence similarity searches (e.g. BLAST) made easy."
+readme = { file = "README.md", content-type = "text/markdown" }
+license = { file = "LICENSE.txt" }
+requires-python = ">=3.8"
+
+authors = [
+  { name = "Lucas Sinclair", email = "lucas.sinclair@me.com" },
+]
+
+classifiers = [
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+dependencies = [
+  "autopaths>=1.6.2",
+  "plumbing>=2.11.3",
+  "fasta>=2.2.11",
+  "biopython",
+  "sh",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+ftp = ["ftputil"]
+downloads = ["wget"]
+
+[project.urls]
+Homepage = "https://github.com/xapple/seqsearch"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+namespaces = true
+exclude = ["example"]
