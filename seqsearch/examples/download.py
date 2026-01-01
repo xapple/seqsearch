@@ -7,12 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 """
 
-# Built-in modules #
-
-# Internal modules #
-
-# Third party modules #
-
 ###############################################################################
 def acc_to_fasta(accessions):
     """

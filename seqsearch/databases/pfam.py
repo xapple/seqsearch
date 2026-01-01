@@ -10,7 +10,7 @@ Contact at www.sinclair.bio
 # Built-in modules #
 
 # First party modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseFTP
 from autopaths.auto_paths import AutoPaths
 from autopaths.dir_path   import DirectoryPath
 from plumbing.cache import property_cached
@@ -20,7 +20,7 @@ from fasta import FASTA
 from seqsearch import sh
 
 ###############################################################################
-class Pfam(Database):
+class Pfam(DatabaseFTP):
     """The Pfam database is a large collection of protein families,
     each represented by multiple sequence alignments and HMMs.
 
@@ -122,16 +122,16 @@ class SpecificFamily(object):
     def add_taxonomy(self, fasta):
         """Add taxonomic information to the fastas file"""
         ids        = [seq.description for seq in fasta]
-        accesions  = [seq.description.split()[1] for seq in fasta]
-        taxonomies = map(self.uniprot_acc_to_taxonmy, accesions)
+        accessions = [seq.description.split()[1] for seq in fasta]
+        taxonomies = map(self.uniprot_acc_to_taxonmy, accessions)
         naming_dict  = {ids[i]: ids[i] + taxonomies[i] for i in range(len(ids))}
         fasta.rename_sequences(naming_dict, in_place=True)
 
-    def uniprot_acc_to_taxonmy(self, accesion):
+    def uniprot_acc_to_taxonmy(self, accession):
         """From one uniprot ID to taxonomy"""
         from bioservices import UniProt
         u = UniProt()
-        data = u.search(accesion, frmt="xml")
+        data = u.search(accession, frmt="xml")
         from bs4 import BeautifulSoup
         soup = BeautifulSoup(data, "html.parser")
         return ' (' + ', '.join([t.text for t in soup.find_all('taxon')]) + ')'

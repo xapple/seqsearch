@@ -11,7 +11,7 @@ Contact at www.sinclair.bio
 import os
 
 # First party modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseHTTP
 from autopaths.auto_paths import AutoPaths
 from autopaths.file_path import FilePath
 
@@ -21,7 +21,7 @@ from autopaths.file_path import FilePath
 home = os.environ.get('HOME', '~') + '/'
 
 ###############################################################################
-class PrTwo(Database):
+class PrTwo(DatabaseHTTP):
     """
     This is the PR2 database.
 

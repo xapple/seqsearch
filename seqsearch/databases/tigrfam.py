@@ -10,12 +10,12 @@ Contact at www.sinclair.bio
 # Built-in modules #
 
 # First party modules #
-from seqsearch.databases import Database
+from seqsearch.databases import DatabaseFTP
 from plumbing.cache import property_cached
 from fasta import FASTA
 
 ###############################################################################
-class Tigrfam(Database):
+class Tigrfam(DatabaseFTP):
     """
     The TIGRFAMs is a resource consisting of curated multiple sequence
     alignments, Hidden Markov Models (HMMs) for protein sequence
