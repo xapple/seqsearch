@@ -7,8 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 """
 
-# Built-in modules #
-
 # First party modules #
 from seqsearch.databases import DatabaseFTP
 from autopaths.auto_paths import AutoPaths

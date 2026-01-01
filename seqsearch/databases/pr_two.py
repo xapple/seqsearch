@@ -15,8 +15,6 @@ from seqsearch.databases import DatabaseHTTP
 from autopaths.auto_paths import AutoPaths
 from autopaths.file_path import FilePath
 
-# Third party modules #
-
 # Constants #
 home = os.environ.get('HOME', '~') + '/'
 

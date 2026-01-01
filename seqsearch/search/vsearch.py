@@ -7,8 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 """
 
-# Built-in modules #
-
 # Internal modules #
 from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch

@@ -14,8 +14,6 @@ import multiprocessing
 from seqsearch.mapping.bam import BamFile
 from seqsearch.mapping.bam_and_sam import BamOrSamFile
 
-# First party modules #
-
 # Third party modules #
 import pysam
 

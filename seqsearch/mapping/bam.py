@@ -13,9 +13,6 @@ import multiprocessing
 # Internal modules #
 from seqsearch.mapping.bam_and_sam import BamOrSamFile
 
-# First party modules #
-from fasta import PairedFASTQ
-
 # Third party modules #
 import pysam
 

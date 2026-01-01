@@ -7,12 +7,6 @@ MIT Licensed.
 Contact at www.sinclair.bio
 """
 
-# Built-in modules #
-
-# Internal modules #
-
-# First party modules #
-
 ###############################################################################
 class NonRedundant(object):
     """
@@ -21,4 +15,3 @@ class NonRedundant(object):
     (i.e. GenPept) together with sequences from other databanks
     (Refseq, PDB, SwissProt, PIR and PRF).
     """
-

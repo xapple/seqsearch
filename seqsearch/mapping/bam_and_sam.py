@@ -11,8 +11,6 @@ Contact at www.sinclair.bio
 import functools, multiprocessing, json
 from collections import defaultdict
 
-# Internal modules #
-
 # First party modules #
 from fasta import PairedFASTQ
 from autopaths.file_path import FilePath
