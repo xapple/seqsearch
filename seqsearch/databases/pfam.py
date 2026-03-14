@@ -15,7 +15,7 @@ from plumbing.cache import property_cached
 from fasta import FASTA
 
 # Module for launching shell commands #
-from seqsearch import sh
+from runps import sh
 
 ###############################################################################
 class Pfam(DatabaseFTP):

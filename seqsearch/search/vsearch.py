@@ -12,7 +12,7 @@ from autopaths.file_path import FilePath
 from seqsearch.search.core import CoreSearch
 
 # Third party modules #
-from seqsearch import sh
+from runps import sh
 
 ###############################################################################
 class VSEARCHquery(CoreSearch):

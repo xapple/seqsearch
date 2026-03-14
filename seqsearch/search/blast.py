@@ -18,7 +18,7 @@ from autopaths.tmp_path  import new_temp_path
 from seqsearch.search.core import CoreSearch
 
 # Module for launching shell commands #
-from seqsearch import sh
+from runps import sh
 
 ###############################################################################
 class BLASTquery(CoreSearch):

@@ -18,7 +18,7 @@ from plumbing.check_cmd_found import check_cmd
 from fasta import PairedFASTQ
 
 # Third party modules #
-import sh
+from runps import sh
 
 ###############################################################################
 class MapBWA:
